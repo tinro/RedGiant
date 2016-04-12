@@ -1,7 +1,10 @@
 Red Giant
 =========
+
 Red Giant is a simple and light-weighted indexing and search system designed
 for small scale personalized recommendation systems.
+
+Latest version: 0.0.1 (not completed yet)
 
 It is simple since:
 * All documents are consindered as a set of weighted features.
