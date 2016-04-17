@@ -4,13 +4,17 @@
 AC_PREREQ([2.69])
 AC_INIT([redgiant], [1.0])
 AC_CONFIG_SRCDIR([src/main/main.cc])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIRS([m4])
 
 AM_INIT_AUTOMAKE
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_RANLIB
+
+CFLAGS+=" -std=c11"
+CXXFLAGS+=" -std=c++11"
 
 # Checks for libraries.
 
@@ -35,5 +39,6 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset pow socket sqrt strstr strtol])
 
 AC_CONFIG_FILES([Makefile
-                 src/main/Makefile])
+                 src/main/Makefile
+                 src/main/service/Makefile])
 AC_OUTPUT
