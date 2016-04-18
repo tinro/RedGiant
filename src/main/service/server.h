@@ -22,8 +22,8 @@ public:
 public:
   int bind(const std::string& uri, std::shared_ptr<RequestHandlerFactory> factory);
   int initialize();
-  void start();
-  void stop();
+  int start();
+  int stop();
 
 private:
   static int bind_socket(int port, int backlog);

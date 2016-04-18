@@ -40,5 +40,7 @@ AC_CHECK_FUNCS([memset pow socket sqrt strstr strtol])
 
 AC_CONFIG_FILES([Makefile
                  src/main/Makefile
-                 src/main/service/Makefile])
+                 src/main/handler/Makefile
+                 src/main/service/Makefile
+                 src/main/utils/Makefile])
 AC_OUTPUT
