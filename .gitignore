@@ -37,6 +37,15 @@ config.h.in
 config.status
 autom4te.cache
 aclocal.m4
+config.guess
+config.sub
+depcomp
+install-sh
+libtool
+ltmain.sh
+m4/
+.deps
 
 # Others
 *.log
+*.xcodeproj
