@@ -91,23 +91,31 @@ int Server::initialize() {
   return 0;
 }
 
-void Server::start() {
-  LOG_INFO(logger, "Server at port=%d init done, start accept request", port_);
+int Server::start() {
+  if (fd_ < 0 || notify_fd_[1] < 0) {
+    LOG_ERROR(logger, "Failed to start server, fd error.");
+    return -1;
+  }
+
+  LOG_DEBUG(logger, "Server at port=%d init done, starting handler threads.", port_);
   for (auto& instance: instances_) {
     instance_threads_.emplace_back(&ServerInstance::run, instance);
   }
+
+  LOG_INFO(logger, "Server at port=%d started.", port_);
+  return 0;
 }
 
-void Server::stop() {
+int Server::stop() {
   if (fd_ < 0 || notify_fd_[1] < 0) {
-    LOG_ERROR(logger, "fail to notify server exit, fd error.");
-    return;
+    LOG_ERROR(logger, "Failed to stop server, fd error.");
+    return -1;
   }
 
   char buf[] = "stop";
   if (::write(notify_fd_[1], buf, sizeof(buf)) < 0) {
-    LOG_ERROR(logger, "fail to notify server exit, write error");
-    return;
+    LOG_ERROR(logger, "Failed to notify server exit, write error.");
+    return -1;
   }
 
   for (auto& thrd: instance_threads_) {
@@ -122,6 +130,9 @@ void Server::stop() {
   notify_fd_[0] = -1;
   ::close(notify_fd_[1]);
   notify_fd_[1] = -1;
+
+  LOG_INFO(logger, "Server at port=%d stopped.", port_);
+  return 0;
 }
 
 int Server::bind_socket(int port, int backlog) {
