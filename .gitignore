@@ -44,7 +44,8 @@ install-sh
 libtool
 ltmain.sh
 test-driver
-m4/
+compile
+missing
 .deps
 
 # CppUnit
