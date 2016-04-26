@@ -43,9 +43,14 @@ depcomp
 install-sh
 libtool
 ltmain.sh
+test-driver
 m4/
 .deps
+
+# CppUnit
+*.trs
 
 # Others
 *.log
 *.xcodeproj
+

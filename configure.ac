@@ -7,6 +7,7 @@ AC_CONFIG_SRCDIR([src/main/main.cc])
 AC_CONFIG_MACRO_DIRS([m4])
 
 AM_INIT_AUTOMAKE
+AM_PATH_CPPUNIT(1.13.2)
 
 # Checks for programs.
 AC_PROG_CXX
@@ -42,5 +43,9 @@ AC_CONFIG_FILES([Makefile
                  src/main/Makefile
                  src/main/handler/Makefile
                  src/main/service/Makefile
-                 src/main/utils/Makefile])
+                 src/main/utils/Makefile
+                 src/test/Makefile
+                 src/test/core_index/Makefile
+                 src/test/core_reader/Makefile
+                 src/test/service/Makefile])
 AC_OUTPUT

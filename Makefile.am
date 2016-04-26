@@ -1,1 +1,1 @@
-SUBDIRS = src/main
+SUBDIRS = src/main src/test
