@@ -1,3 +1,6 @@
+#ifndef REDGIANT_UTILS_LOGGER_INL_H_
+#define REDGIANT_UTILS_LOGGER_INL_H_
+
 #include "utils/logger.h"
 
 #include <stdio.h>
@@ -11,7 +14,7 @@ using namespace log4cxx;
 
 namespace redgiant {
 
-int init_logger(const char* conf_path) {
+inline int init_logger(const char* conf_path) {
   try {
     if (conf_path == NULL || strlen(conf_path) == 0) {
       printf ("Warning: Using default logger\n");
@@ -35,3 +38,4 @@ int init_logger(const char* conf_path) {
 
 } // namespace redgiant
 
+#endif /* REDGIANT_UTILS_LOGGER_INL_H_ */

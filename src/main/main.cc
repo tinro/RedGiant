@@ -9,6 +9,7 @@
 #include "handler/test_handler.h"
 #include "service/server.h"
 #include "utils/logger.h"
+#include "utils/logger-inl.h"
 #include "utils/scope_guard.h"
 
 using std::string;
