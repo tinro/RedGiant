@@ -1,7 +1,7 @@
 #ifndef SRC_MAIN_REDGIANT_DATA_JSON_PARSER_H_
 #define SRC_MAIN_REDGIANT_DATA_JSON_PARSER_H_
 
-#include <utility>
+#include <memory>
 
 #include "parser/parser.h"
 #include "third_party/rapidjson/document.h"

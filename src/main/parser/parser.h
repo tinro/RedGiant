@@ -1,7 +1,7 @@
 #ifndef SRC_MAIN_REDGIANT_DATA_PARSER_H_
 #define SRC_MAIN_REDGIANT_DATA_PARSER_H_
 
-#include <utility>
+#include <memory>
 
 namespace redgiant {
 template <typename Output>

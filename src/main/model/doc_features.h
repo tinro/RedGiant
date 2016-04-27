@@ -1,6 +1,7 @@
 #ifndef SRC_MAIN_MODEL_DOC_FEATURES_H_
 #define SRC_MAIN_MODEL_DOC_FEATURES_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 
