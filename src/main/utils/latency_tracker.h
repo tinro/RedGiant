@@ -8,12 +8,12 @@ namespace redgiant {
 template <int N>
 class LatencyTracker {
 public:
-  LatencyTracker(const StopWatch& watch, std::array<long, N>& ticks)
-  : watch_(watch), ticks_(ticks) {
+  LatencyTracker()
+  : ticks_(0) {
   }
 
   LatencyTracker(const LatencyTracker& other)
-  : watch_(other.watch_), ticks_(other.ticks_) {
+  : ticks_(other.ticks_) {
   }
 
   // not assignable
@@ -21,15 +21,21 @@ public:
 
   ~LatencyTracker() = default;
 
-  void tick(int i) {
-    if (i < N) {
-      ticks_[i] = watch_.get_ticks_us();
+  void tick(const StopWatch& watch, int i) {
+    if (i >= 0 && i < N) {
+      ticks_[i] = watch.get_ticks_us();
     }
   }
 
+  long get(int i) {
+    if (i >=0 && i < N) {
+      return ticks_[i];
+    }
+    return -1;
+  }
+
 private:
-  const StopWatch& watch_;
-  std::array<long, N>& ticks_;
+  std::array<long, N> ticks_;
 };
 } /* namespace redgiant */
 
