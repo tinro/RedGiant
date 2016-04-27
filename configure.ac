@@ -4,7 +4,6 @@
 AC_PREREQ([2.69])
 AC_INIT([redgiant], [1.0])
 AC_CONFIG_SRCDIR([src/main/main.cc])
-AC_CONFIG_MACRO_DIRS([m4])
 
 AM_INIT_AUTOMAKE
 AM_PATH_CPPUNIT(1.13.2)
