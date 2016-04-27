@@ -7,13 +7,13 @@ namespace redgiant {
 template<typename T>
 class CachedBuffer {
 public:
-  CachedBuffer(uint64_t max_reused)
+  CachedBuffer(size_t max_reused)
   : max_reused_(max_reused), size_(0), max_size_(0) {
   }
 
   ~CachedBuffer() = default;
 
-  void alloc(uint64_t size) {
+  void alloc(size_t size) {
     if (size > max_size_) {
       // increase the size by at least double
       max_size_ = (size > 2*max_size_ ? size : 2*max_size_);
@@ -39,18 +39,18 @@ public:
     return buffer_.get();
   }
 
-  uint64_t size() {
+  size_t size() {
     return size_;
   }
 
-  uint64_t max_size() {
+  size_t max_size() {
     return max_size_;
   }
 
 private:
-  uint64_t size_;
-  uint64_t max_size_;
-  uint64_t max_reused_;
+  size_t size_;
+  size_t max_size_;
+  size_t max_reused_;
   std::unique_ptr<T[]> buffer_;
 };
 
