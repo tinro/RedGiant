@@ -42,7 +42,6 @@ AC_CONFIG_FILES([Makefile
                  src/main/Makefile
                  src/main/handler/Makefile
                  src/main/service/Makefile
-                 src/main/utils/Makefile
                  src/test/Makefile
                  src/test/core_index/Makefile
                  src/test/core_reader/Makefile

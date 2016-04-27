@@ -6,7 +6,6 @@
 #include <log4cxx/logger.h>
 
 namespace redgiant {
-int init_logger(const char* conf_path);
 
 inline char* log_format_internal__(char* buf, size_t n, const char* fmt, ...) __attribute__((format(printf,3,4)));
 
