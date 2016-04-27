@@ -36,43 +36,43 @@ protected:
   void test_size() {
     CachedBuffer<int> buffer(256);
     CPPUNIT_ASSERT_EQUAL(0, (int)buffer.size());
-    CPPUNIT_ASSERT(buffer.max_size() <= 256);
+    CPPUNIT_ASSERT(buffer.cached_size() <= 256);
 
     buffer.alloc(100);
     CPPUNIT_ASSERT_EQUAL(100, (int)buffer.size());
-    CPPUNIT_ASSERT(buffer.max_size() >= 100);
-    CPPUNIT_ASSERT(buffer.max_size() <= 256);
+    CPPUNIT_ASSERT(buffer.cached_size() >= 100);
+    CPPUNIT_ASSERT(buffer.cached_size() <= 256);
 
     buffer.alloc(200);
     CPPUNIT_ASSERT_EQUAL(2048, (int)buffer.size());
-    CPPUNIT_ASSERT(buffer.max_size() >= 200);
-    CPPUNIT_ASSERT(buffer.max_size() <= 256);
+    CPPUNIT_ASSERT(buffer.cached_size() >= 200);
+    CPPUNIT_ASSERT(buffer.cached_size() <= 256);
 
     buffer.clear();
     CPPUNIT_ASSERT_EQUAL(0, (int)buffer.size());
-    CPPUNIT_ASSERT(buffer.max_size() <= 256);
+    CPPUNIT_ASSERT(buffer.cached_size() <= 256);
 
     buffer.alloc(100);
     CPPUNIT_ASSERT_EQUAL(100, (int)buffer.size());
-    CPPUNIT_ASSERT(buffer.max_size() >= 100);
-    CPPUNIT_ASSERT(buffer.max_size() <= 256);
+    CPPUNIT_ASSERT(buffer.cached_size() >= 100);
+    CPPUNIT_ASSERT(buffer.cached_size() <= 256);
 
     buffer.alloc(300);
     CPPUNIT_ASSERT_EQUAL(300, (int)buffer.size());
-    CPPUNIT_ASSERT(buffer.max_size() >= 300);
+    CPPUNIT_ASSERT(buffer.cached_size() >= 300);
 
     buffer.clear();
     CPPUNIT_ASSERT_EQUAL(0, (int)buffer.size());
-    CPPUNIT_ASSERT(buffer.max_size() <= 256);
+    CPPUNIT_ASSERT(buffer.cached_size() <= 256);
 
     buffer.alloc(100);
     CPPUNIT_ASSERT_EQUAL(100, (int)buffer.size());
-    CPPUNIT_ASSERT(buffer.max_size() >= 100);
-    CPPUNIT_ASSERT(buffer.max_size() <= 256);
+    CPPUNIT_ASSERT(buffer.cached_size() >= 100);
+    CPPUNIT_ASSERT(buffer.cached_size() <= 256);
 
     buffer.clear();
     CPPUNIT_ASSERT_EQUAL(0, (int)buffer.size());
-    CPPUNIT_ASSERT(buffer.max_size() <= 256);
+    CPPUNIT_ASSERT(buffer.cached_size() <= 256);
   }
 
   void test_alloc() {
