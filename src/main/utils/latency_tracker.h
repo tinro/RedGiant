@@ -1,5 +1,5 @@
-#ifndef REDGIANT_UTILS_LATENCY_TRACKER_H_
-#define REDGIANT_UTILS_LATENCY_TRACKER_H_
+#ifndef SRC_MAIN_REDGIANT_UTILS_LATENCY_TRACKER_H_
+#define SRC_MAIN_REDGIANT_UTILS_LATENCY_TRACKER_H_
 
 #include <array>
 #include "utils/stop_watch.h"
@@ -39,4 +39,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* REDGIANT_UTILS_LATENCY_TRACKER_H_ */
+#endif /* SRC_MAIN_REDGIANT_UTILS_LATENCY_TRACKER_H_ */

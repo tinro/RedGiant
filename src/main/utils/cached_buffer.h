@@ -1,5 +1,5 @@
-#ifndef REDGIANT_UTILS_CACHED_BUFFER_H_
-#define REDGIANT_UTILS_CACHED_BUFFER_H_
+#ifndef SRC_MAIN_REDGIANT_UTILS_CACHED_BUFFER_H_
+#define SRC_MAIN_REDGIANT_UTILS_CACHED_BUFFER_H_
 
 namespace redgiant {
 
@@ -56,5 +56,5 @@ private:
 
 } /* namespace redgiant */
 
-#endif /* REDGIANT_UTILS_CACHED_BUFFER_H_ */
+#endif /* SRC_MAIN_REDGIANT_UTILS_CACHED_BUFFER_H_ */
 

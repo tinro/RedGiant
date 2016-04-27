@@ -1,5 +1,5 @@
-#ifndef REDGIANT_CORE_READER_WAND_READER_INL_H_
-#define REDGIANT_CORE_READER_WAND_READER_INL_H_
+#ifndef SRC_MAIN_REDGIANT_CORE_READER_WAND_READER_INL_H_
+#define SRC_MAIN_REDGIANT_CORE_READER_WAND_READER_INL_H_
 
 #include <algorithm>
 #include <set>
@@ -160,4 +160,4 @@ void WandReader<DocId, Score>::move_term(size_t term) {
 
 } /* namespace redgiant */
 
-#endif /* REDGIANT_CORE_READER_WAND_READER_INL_H_ */
+#endif /* SRC_MAIN_REDGIANT_CORE_READER_WAND_READER_INL_H_ */

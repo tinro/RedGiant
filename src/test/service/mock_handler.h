@@ -1,5 +1,5 @@
-#ifndef REDGIANT_TEST_SERVICE_MOCK_HANDLER_H_
-#define REDGIANT_TEST_SERVICE_MOCK_HANDLER_H_
+#ifndef SRC_TEST_REDGIANT_TEST_SERVICE_MOCK_HANDLER_H_
+#define SRC_TEST_REDGIANT_TEST_SERVICE_MOCK_HANDLER_H_
 
 #include <memory>
 #include <string>
@@ -42,4 +42,4 @@ public:
 };
 } /* namespace redgiant */
 
-#endif /* REDGIANT_TEST_SERVICE_MOCK_HANDLER_H_ */
+#endif /* SRC_TEST_REDGIANT_TEST_SERVICE_MOCK_HANDLER_H_ */

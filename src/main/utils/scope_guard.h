@@ -1,5 +1,5 @@
-#ifndef REDGIANT_UTILS_SCOPE_GUARD_H_
-#define REDGIANT_UTILS_SCOPE_GUARD_H_
+#ifndef SRC_MAIN_REDGIANT_UTILS_SCOPE_GUARD_H_
+#define SRC_MAIN_REDGIANT_UTILS_SCOPE_GUARD_H_
 
 #include <functional>
 #include <utility>
@@ -38,4 +38,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* REDGIANT_UTILS_SCOPE_GUARD_H_ */
+#endif /* SRC_MAIN_REDGIANT_UTILS_SCOPE_GUARD_H_ */
