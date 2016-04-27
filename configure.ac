@@ -1,12 +1,12 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.68])
 AC_INIT([redgiant], [1.0])
 AC_CONFIG_SRCDIR([src/main/main.cc])
 
 AM_INIT_AUTOMAKE
-AM_PATH_CPPUNIT(1.13.2)
+AM_PATH_CPPUNIT(1.12)
 
 # Checks for programs.
 AC_PROG_CXX
