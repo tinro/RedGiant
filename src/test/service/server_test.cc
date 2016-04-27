@@ -21,10 +21,6 @@ public:
   ServerTest() = default;
   virtual ~ServerTest() = default;
 
-  virtual void setUp() {
-    init_logger("../resources/log4cxx.xml");
-  }
-
 protected:
   void test_server() {
     Server server(port_, 2, 1024);
