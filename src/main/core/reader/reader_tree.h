@@ -1,5 +1,5 @@
-#ifndef REDGIANT_CORE_READER_READER_TREE_H_
-#define REDGIANT_CORE_READER_READER_TREE_H_
+#ifndef SRC_MAIN_REDGIANT_CORE_READER_READER_TREE_H_
+#define SRC_MAIN_REDGIANT_CORE_READER_READER_TREE_H_
 
 #include <memory>
 #include <utility>
@@ -107,4 +107,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* REDGIANT_CORE_READER_READER_TREE_H_ */
+#endif /* SRC_MAIN_REDGIANT_CORE_READER_READER_TREE_H_ */

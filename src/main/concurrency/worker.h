@@ -1,5 +1,5 @@
-#ifndef REDGIANT_CONCURRENCY_WORKER_H_
-#define REDGIANT_CONCURRENCY_WORKER_H_
+#ifndef SRC_MAIN_REDGIANT_CONCURRENCY_WORKER_H_
+#define SRC_MAIN_REDGIANT_CONCURRENCY_WORKER_H_
 
 #include <memory>
 
@@ -25,4 +25,4 @@ public:
 };
 } /* namespace redgiant */
 
-#endif /* REDGIANT_CONCURRENCY_WORKER_H_ */
+#endif /* SRC_MAIN_REDGIANT_CONCURRENCY_WORKER_H_ */

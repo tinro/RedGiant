@@ -1,5 +1,5 @@
-#ifndef REDGIANT_HANDLER_TEST_HANDLER_H_
-#define REDGIANT_HANDLER_TEST_HANDLER_H_
+#ifndef SRC_MAIN_REDGIANT_HANDLER_TEST_HANDLER_H_
+#define SRC_MAIN_REDGIANT_HANDLER_TEST_HANDLER_H_
 
 #include <memory>
 #include "service/request_handler.h"
@@ -24,4 +24,4 @@ public:
 };
 } /* namespace redgiant */
 
-#endif /* REDGIANT_HANDLER_TEST_HANDLER_H_ */
+#endif /* SRC_MAIN_REDGIANT_HANDLER_TEST_HANDLER_H_ */

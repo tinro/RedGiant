@@ -1,5 +1,5 @@
-#ifndef REDGIANT_CORE_READER_WAND_READER_H_
-#define REDGIANT_CORE_READER_WAND_READER_H_
+#ifndef SRC_MAIN_REDGIANT_CORE_READER_WAND_READER_H_
+#define SRC_MAIN_REDGIANT_CORE_READER_WAND_READER_H_
 
 #include <memory>
 #include <vector>
@@ -49,4 +49,4 @@ private:
 
 } /* namespace redgiant */
 
-#endif /* REDGIANT_CORE_READER_WAND_READER_H_ */
+#endif /* SRC_MAIN_REDGIANT_CORE_READER_WAND_READER_H_ */

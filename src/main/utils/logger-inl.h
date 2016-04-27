@@ -1,5 +1,5 @@
-#ifndef REDGIANT_UTILS_LOGGER_INL_H_
-#define REDGIANT_UTILS_LOGGER_INL_H_
+#ifndef SRC_MAIN_REDGIANT_UTILS_LOGGER_INL_H_
+#define SRC_MAIN_REDGIANT_UTILS_LOGGER_INL_H_
 
 #include "utils/logger.h"
 
@@ -38,4 +38,4 @@ inline int init_logger(const char* conf_path) {
 
 } // namespace redgiant
 
-#endif /* REDGIANT_UTILS_LOGGER_INL_H_ */
+#endif /* SRC_MAIN_REDGIANT_UTILS_LOGGER_INL_H_ */

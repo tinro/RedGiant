@@ -1,5 +1,5 @@
-#ifndef REDGIANT_CORE_SNAPSHOT_SNAPSHOT_READER_H_
-#define REDGIANT_CORE_SNAPSHOT_SNAPSHOT_READER_H_
+#ifndef SRC_MAIN_REDGIANT_CORE_SNAPSHOT_SNAPSHOT_READER_H_
+#define SRC_MAIN_REDGIANT_CORE_SNAPSHOT_SNAPSHOT_READER_H_
 
 #include "core/reader/posting_list_reader.h"
 #include "core/snapshot/snapshot.h"
@@ -40,4 +40,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* REDGIANT_CORE_SNAPSHOT_SNAPSHOT_READER_H_ */
+#endif /* SRC_MAIN_REDGIANT_CORE_SNAPSHOT_SNAPSHOT_READER_H_ */
