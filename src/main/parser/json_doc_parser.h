@@ -1,6 +1,7 @@
 #ifndef SRC_MAIN_REDGIANT_DATA_JSON_DOC_PARSER_H_
 #define SRC_MAIN_REDGIANT_DATA_JSON_DOC_PARSER_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 

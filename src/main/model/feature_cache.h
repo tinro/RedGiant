@@ -1,6 +1,7 @@
 #ifndef SRC_MAIN_MODEL_FEATURE_CACHE_H_
 #define SRC_MAIN_MODEL_FEATURE_CACHE_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>

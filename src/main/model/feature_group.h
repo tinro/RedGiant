@@ -2,6 +2,7 @@
 #define SRC_MAIN_MODEL_FEATURE_GROUP_H_
 
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 

@@ -2,6 +2,7 @@
 #define SRC_MAIN_MODEL_FEATURE_H_
 
 #include <string>
+#include <memory>
 #include <utility>
 
 #include "model/feature_space.h"
