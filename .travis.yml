@@ -2,11 +2,9 @@ language: cpp
 
 compiler:
  - clang
- - gcc
 
 env:
   matrix:
-    - CONF=debug   ARCH=x86_64
     - CONF=release ARCH=x86_64
 
 before_install:
