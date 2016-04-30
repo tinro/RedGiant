@@ -17,8 +17,8 @@ public:
     kInteger
   };
 
-  FeatureSpace(Type type, std::string name, SpaceId id)
-  : type_(type), space_name_(std::move(name)), space_id_(id) {
+  FeatureSpace(std::string name, Type type, SpaceId id)
+  : space_name_(std::move(name)), type_(type), space_id_(id) {
   }
 
   FeatureSpace(const FeatureSpace& other) = default;
@@ -53,9 +53,9 @@ private:
   static const FeatureId kSpaceMask = (~(FeatureId)0) << 56;
   static const FeatureId kFeatureMask = (~(FeatureId)0) >> 8;
 
+  std::string space_name_;
   Type type_;
   SpaceId space_id_;
-  std::string space_name_;
 };
 
 } /* namespace redgiant */

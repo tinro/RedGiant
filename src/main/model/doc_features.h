@@ -1,17 +1,26 @@
 #ifndef SRC_MAIN_MODEL_DOC_FEATURES_H_
 #define SRC_MAIN_MODEL_DOC_FEATURES_H_
 
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
-#include "model/feature_group.h"
 #include "model/feature_space.h"
 
 namespace redgiant {
 
 class DocFeatures {
 public:
+  typedef FeatureSpace::FeatureId FeatureId;
+  typedef FeatureSpace::SpaceId SpaceId;
+  typedef FeatureSpace::Weight Weight;
+
+  typedef std::pair<FeatureId, Weight> FeaturePair;
+  typedef std::vector<FeaturePair> FeatureWeights;
+  typedef std::map<std::string, FeatureWeights> FeatureWeightsMap;
+
   DocFeatures(std::string id)
   : doc_id_(std::move(id)) {
   }
@@ -25,28 +34,18 @@ public:
     return doc_id_;
   }
 
-  const std::map<std::string, std::shared_ptr<FeatureGroup>>& get_feature_groups() const {
-    return feature_groups_;
+  const FeatureWeightsMap& get_feature_weights() const {
+    return feature_weights_;
   }
 
-  std::shared_ptr<FeatureGroup> add_feature_group(const std::string& name, std::shared_ptr<FeatureSpace> space) {
-    std::shared_ptr<FeatureGroup> group = std::make_shared<FeatureGroup>(name, std::move(space));
-    feature_groups_[name] = group;
-    return group;
-  }
-
-  std::shared_ptr<FeatureGroup> get_feature_group(const std::string& name) {
-    auto iter = feature_groups_.find(name);
-    if (iter != feature_groups_.end()) {
-      return iter->second;
-    } else {
-      return nullptr;
-    }
+  void add_feature_space(const std::string& space_name, FeatureWeights features) {
+    feature_weights_[space_name] = std::move(features);
   }
 
 private:
   std::string doc_id_;
-  std::map<std::string, std::shared_ptr<FeatureGroup>> feature_groups_;
+  // map from name of a feature space to a list of feature-weight pairs
+  FeatureWeightsMap feature_weights_;
 };
 
 } /* namespace redgiant */
