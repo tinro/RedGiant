@@ -1,5 +1,5 @@
-#ifndef SRC_TEST_REDGIANT_TEST_CORE_READER_MOCK_READER_H_
-#define SRC_TEST_REDGIANT_TEST_CORE_READER_MOCK_READER_H_
+#ifndef SRC_TEST_CORE_READER_MOCK_READER_H_
+#define SRC_TEST_CORE_READER_MOCK_READER_H_
 
 #include <utility>
 #include <vector>
@@ -52,4 +52,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_TEST_REDGIANT_TEST_CORE_READER_MOCK_READER_H_ */
+#endif /* SRC_TEST_CORE_READER_MOCK_READER_H_ */

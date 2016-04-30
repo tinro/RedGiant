@@ -1,13 +1,13 @@
-#ifndef SRC_MAIN_REDGIANT_CONCURRENCY_WORKER_EXECUTOR_H_
-#define SRC_MAIN_REDGIANT_CONCURRENCY_WORKER_EXECUTOR_H_
+#ifndef SRC_MAIN_UTILS_CONCURRENCY_WORKER_EXECUTOR_H_
+#define SRC_MAIN_UTILS_CONCURRENCY_WORKER_EXECUTOR_H_
 
 #include <condition_variable>
 #include <memory>
 #include <mutex>
 #include <utility>
-#include "concurrency/job_executor.h"
-#include "concurrency/message_queue.h"
-#include "concurrency/worker.h"
+#include "utils/concurrency/job_executor.h"
+#include "utils/concurrency/message_queue.h"
+#include "utils/concurrency/worker.h"
 
 namespace redgiant {
 /*
@@ -88,4 +88,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_CONCURRENCY_WORKER_EXECUTOR_H_ */
+#endif /* SRC_MAIN_UTILS_CONCURRENCY_WORKER_EXECUTOR_H_ */

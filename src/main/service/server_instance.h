@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_SERVICE_SERVER_INSTANCE_H_
-#define SRC_MAIN_REDGIANT_SERVICE_SERVER_INSTANCE_H_
+#ifndef SRC_MAIN_SERVICE_SERVER_INSTANCE_H_
+#define SRC_MAIN_SERVICE_SERVER_INSTANCE_H_
 
 #include <memory>
 #include <string>
@@ -44,4 +44,4 @@ private:
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_SERVICE_SERVER_INSTANCE_H_ */
+#endif /* SRC_MAIN_SERVICE_SERVER_INSTANCE_H_ */

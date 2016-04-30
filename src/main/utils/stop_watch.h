@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_UTILS_STOP_WATCH_H_
-#define SRC_MAIN_REDGIANT_UTILS_STOP_WATCH_H_
+#ifndef SRC_MAIN_UTILS_STOP_WATCH_H_
+#define SRC_MAIN_UTILS_STOP_WATCH_H_
 
 #include <chrono>
 
@@ -56,4 +56,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_UTILS_STOP_WATCH_H_ */
+#endif /* SRC_MAIN_UTILS_STOP_WATCH_H_ */

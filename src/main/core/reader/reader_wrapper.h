@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_CORE_READER_READER_WRAPPER_H_
-#define SRC_MAIN_REDGIANT_CORE_READER_READER_WRAPPER_H_
+#ifndef SRC_MAIN_CORE_READER_READER_WRAPPER_H_
+#define SRC_MAIN_CORE_READER_READER_WRAPPER_H_
 
 #include <memory>
 #include <utility>
@@ -36,4 +36,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_CORE_READER_READER_WRAPPER_H_ */
+#endif /* SRC_MAIN_CORE_READER_READER_WRAPPER_H_ */

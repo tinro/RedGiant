@@ -1,5 +1,5 @@
-#ifndef SRC_TEST_REDGIANT_TEST_SERVICE_TEST_CLIENT_H_
-#define SRC_TEST_REDGIANT_TEST_SERVICE_TEST_CLIENT_H_
+#ifndef SRC_TEST_SERVICE_TEST_CLIENT_H_
+#define SRC_TEST_SERVICE_TEST_CLIENT_H_
 
 #include <string>
 #include <event2/event.h>
@@ -57,4 +57,4 @@ protected:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_TEST_REDGIANT_TEST_SERVICE_TEST_CLIENT_H_ */
+#endif /* SRC_TEST_SERVICE_TEST_CLIENT_H_ */

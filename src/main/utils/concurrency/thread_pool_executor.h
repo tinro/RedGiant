@@ -1,13 +1,13 @@
-#ifndef SRC_MAIN_REDGIANT_CONCURRENCY_THREAD_POOL_EXECUTOR_H_
-#define SRC_MAIN_REDGIANT_CONCURRENCY_THREAD_POOL_EXECUTOR_H_
+#ifndef SRC_MAIN_UTILS_CONCURRENCY_THREAD_POOL_EXECUTOR_H_
+#define SRC_MAIN_UTILS_CONCURRENCY_THREAD_POOL_EXECUTOR_H_
 
 #include <condition_variable>
 #include <memory>
 #include <mutex>
 #include <utility>
-#include "concurrency/job_executor.h"
-#include "concurrency/worker.h"
-#include "concurrency/worker_executor.h"
+#include "utils/concurrency/job_executor.h"
+#include "utils/concurrency/worker.h"
+#include "utils/concurrency/worker_executor.h"
 
 namespace redgiant {
 template <typename RunnableJob>
@@ -146,4 +146,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_CONCURRENCY_THREAD_POOL_EXECUTOR_H_ */
+#endif /* SRC_MAIN_UTILS_CONCURRENCY_THREAD_POOL_EXECUTOR_H_ */

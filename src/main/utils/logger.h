@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_UTILS_LOGGER_H_
-#define SRC_MAIN_REDGIANT_UTILS_LOGGER_H_
+#ifndef SRC_MAIN_UTILS_LOGGER_H_
+#define SRC_MAIN_UTILS_LOGGER_H_
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -43,4 +43,4 @@ inline char* log_format_internal__(char* buf, size_t n, const char* fmt, ...) {
 
 } // namespace redgiant
 
-#endif /* SRC_MAIN_REDGIANT_UTILS_LOGGER_H_ */
+#endif /* SRC_MAIN_UTILS_LOGGER_H_ */

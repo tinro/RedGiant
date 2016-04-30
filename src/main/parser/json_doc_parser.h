@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_DATA_JSON_DOC_PARSER_H_
-#define SRC_MAIN_REDGIANT_DATA_JSON_DOC_PARSER_H_
+#ifndef SRC_MAIN_DATA_JSON_DOC_PARSER_H_
+#define SRC_MAIN_DATA_JSON_DOC_PARSER_H_
 
 #include <memory>
 #include <string>
@@ -36,4 +36,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_DATA_JSON_DOC_PARSER_H_ */
+#endif /* SRC_MAIN_DATA_JSON_DOC_PARSER_H_ */

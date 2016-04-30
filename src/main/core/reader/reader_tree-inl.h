@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_CORE_READER_READER_TREE_INL_H_
-#define SRC_MAIN_REDGIANT_CORE_READER_READER_TREE_INL_H_
+#ifndef SRC_MAIN_CORE_READER_READER_TREE_INL_H_
+#define SRC_MAIN_CORE_READER_READER_TREE_INL_H_
 
 #include "core/reader/reader_tree.h"
 
@@ -98,4 +98,4 @@ OutputWeight SubtractReader<DocId, InputWeight, OutputWeight, ScoreCombiner>::up
 }
 }
 
-#endif /* SRC_MAIN_REDGIANT_CORE_READER_READER_TREE_INL_H_ */
+#endif /* SRC_MAIN_CORE_READER_READER_TREE_INL_H_ */

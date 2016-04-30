@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_CORE_QUERY_POSTING_LIST_QUERY_H_
-#define SRC_MAIN_REDGIANT_CORE_QUERY_POSTING_LIST_QUERY_H_
+#ifndef SRC_MAIN_CORE_QUERY_POSTING_LIST_QUERY_H_
+#define SRC_MAIN_CORE_QUERY_POSTING_LIST_QUERY_H_
 
 #include "core/reader/posting_list_reader.h"
 
@@ -17,4 +17,4 @@ public:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_CORE_QUERY_POSTING_LIST_QUERY_H_ */
+#endif /* SRC_MAIN_CORE_QUERY_POSTING_LIST_QUERY_H_ */

@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_CONCURRENT_MESSAGE_QUEUE_H_
-#define SRC_MAIN_REDGIANT_CONCURRENT_MESSAGE_QUEUE_H_
+#ifndef SRC_MAIN_UTILS_CONCURRENT_MESSAGE_QUEUE_H_
+#define SRC_MAIN_UTILS_CONCURRENT_MESSAGE_QUEUE_H_
 
 #include <condition_variable>
 #include <mutex>
@@ -97,4 +97,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_CONCURRENT_MESSAGE_QUEUE_H_ */
+#endif /* SRC_MAIN_UTILS_CONCURRENT_MESSAGE_QUEUE_H_ */

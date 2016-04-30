@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_CORE_READER_READER_UTILS_H_
-#define SRC_MAIN_REDGIANT_CORE_READER_READER_UTILS_H_
+#ifndef SRC_MAIN_CORE_READER_READER_UTILS_H_
+#define SRC_MAIN_CORE_READER_READER_UTILS_H_
 
 #include <memory>
 #include <type_traits>
@@ -128,4 +128,4 @@ size_t read_dump(PostingListReader<DocId, Weight>& reader, SnapshotDumper&& dump
 }
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_CORE_READER_READER_UTILS_H_ */
+#endif /* SRC_MAIN_CORE_READER_READER_UTILS_H_ */

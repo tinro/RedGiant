@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_CORE_INDEX_POSTING_LIST_H_
-#define SRC_MAIN_REDGIANT_CORE_INDEX_POSTING_LIST_H_
+#ifndef SRC_MAIN_CORE_INDEX_POSTING_LIST_H_
+#define SRC_MAIN_CORE_INDEX_POSTING_LIST_H_
 
 #include <memory>
 #include <utility>
@@ -78,4 +78,4 @@ public:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_CORE_INDEX_POSTING_LIST_H_ */
+#endif /* SRC_MAIN_CORE_INDEX_POSTING_LIST_H_ */

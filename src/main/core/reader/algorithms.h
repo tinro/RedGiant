@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_CORE_READER_ALGORITHMS_H_
-#define SRC_MAIN_REDGIANT_CORE_READER_ALGORITHMS_H_
+#ifndef SRC_MAIN_CORE_READER_ALGORITHMS_H_
+#define SRC_MAIN_CORE_READER_ALGORITHMS_H_
 
 #include <algorithm>
 #include <memory>
@@ -73,4 +73,4 @@ public:
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_CORE_READER_ALGORITHMS_H_ */
+#endif /* SRC_MAIN_CORE_READER_ALGORITHMS_H_ */

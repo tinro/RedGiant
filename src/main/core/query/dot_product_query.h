@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_REDGIANT_CORE_QUERY_DOT_PRODUCT_QUERY_H_
-#define SRC_MAIN_REDGIANT_CORE_QUERY_DOT_PRODUCT_QUERY_H_
+#ifndef SRC_MAIN_CORE_QUERY_DOT_PRODUCT_QUERY_H_
+#define SRC_MAIN_CORE_QUERY_DOT_PRODUCT_QUERY_H_
 
 #include <memory>
 #include <type_traits>
@@ -43,4 +43,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_REDGIANT_CORE_QUERY_DOT_PRODUCT_QUERY_H_ */
+#endif /* SRC_MAIN_CORE_QUERY_DOT_PRODUCT_QUERY_H_ */

@@ -1,5 +1,5 @@
-#ifndef SRC_TEST_REDGIANT_TEST_CORE_READER_MOCK_WEIGHT_H_
-#define SRC_TEST_REDGIANT_TEST_CORE_READER_MOCK_WEIGHT_H_
+#ifndef SRC_TEST_CORE_READER_MOCK_WEIGHT_H_
+#define SRC_TEST_CORE_READER_MOCK_WEIGHT_H_
 
 #include <algorithm>
 #include <utility>
@@ -26,4 +26,4 @@ public:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_TEST_REDGIANT_TEST_CORE_READER_MOCK_WEIGHT_H_ */
+#endif /* SRC_TEST_CORE_READER_MOCK_WEIGHT_H_ */
