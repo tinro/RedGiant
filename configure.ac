@@ -17,11 +17,11 @@ CFLAGS+=" -std=c11"
 CXXFLAGS+=" -std=c++11"
 
 # Checks for libraries.
+AC_CHECK_LIB(['event'], ['event_init'])
 
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_CHECK_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_INT32_T
 AC_TYPE_INT64_T
