@@ -22,10 +22,10 @@ public:
       LOG_ERROR(logger, "parse error=%x, %zu", root.GetParseError(), root.GetErrorOffset());
       return nullptr;
     }
-    return parse_node(root);
+    return parse_json(root);
   }
 
-  virtual std::unique_ptr<Output> parse_node(const rapidjson::Value &root) = 0;
+  virtual std::unique_ptr<Output> parse_json(const rapidjson::Value &root) = 0;
 };
 } /* namespace redgiant */
 

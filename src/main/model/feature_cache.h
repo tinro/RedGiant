@@ -13,6 +13,9 @@ namespace redgiant {
 
 class FeatureCache {
 public:
+  typedef FeatureSpace::FeatureId FeatureId;
+  typedef FeatureSpace::SpaceId SpaceId;
+
   FeatureCache();
   ~FeatureCache() = default;
 
@@ -29,8 +32,8 @@ public:
     spaces_[space_name] = std::move(space);
   }
 
-  std::shared_ptr<Feature> get_feature(const std::string& feature_key) const {
-    auto iter = features_.find(feature_key);
+  std::shared_ptr<Feature> get_feature(FeatureId id) const {
+    auto iter = features_.find(id);
     if (iter != features_.end()) {
       return iter->second;
     } else {
@@ -38,13 +41,16 @@ public:
     }
   }
 
-  void set_feature(const std::string& feature_key, std::shared_ptr<Feature> feature) {
-    features_[feature_key] = std::move(feature);
+  void set_feature(std::shared_ptr<Feature> feature) {
+    features_[feature->get_id()] = std::move(feature);
   }
+
+  std::shared_ptr<Feature> create_feature(const std::string& feature_key, const std::string& space_name);
+  std::shared_ptr<Feature> create_feature(const std::string& feature_key, const std::shared_ptr<FeatureSpace>& space);
 
 private:
   std::unordered_map<std::string, std::shared_ptr<FeatureSpace>> spaces_;
-  std::unordered_map<std::string, std::shared_ptr<Feature>> features_;
+  std::unordered_map<FeatureId, std::shared_ptr<Feature>> features_;
 };
 
 } /* namespace redgiant */

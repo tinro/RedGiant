@@ -14,6 +14,8 @@ namespace redgiant {
  */
 class Feature {
 public:
+  typedef FeatureSpace::FeatureId FeatureId;
+
   Feature(std::shared_ptr<FeatureSpace> space, std::string key)
   : space_(std::move(space)), key_(std::move(key)) {
     id_ = space_->calculate_feature_id(key_);
@@ -32,14 +34,14 @@ public:
     return space_->get_name();
   }
 
-  FeatureSpace::FeatureId get_id() const {
+  FeatureId get_id() const {
     return id_;
   }
 
 private:
   std::shared_ptr<FeatureSpace> space_;
   std::string key_;
-  FeatureSpace::FeatureId id_;
+  FeatureId id_;
 };
 
 } /* namespace redgiant */
