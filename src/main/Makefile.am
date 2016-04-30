@@ -1,4 +1,4 @@
-SUBDIRS = handler model parser service
+SUBDIRS = handler model parser pipeline service
 
 bin_PROGRAMS = redgiant
 redgiant_SOURCES = main.cc
