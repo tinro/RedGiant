@@ -44,7 +44,7 @@ protected:
     CPPUNIT_ASSERT(buffer.cached_size() <= 256);
 
     buffer.alloc(200);
-    CPPUNIT_ASSERT_EQUAL(2048, (int)buffer.size());
+    CPPUNIT_ASSERT_EQUAL(200, (int)buffer.size());
     CPPUNIT_ASSERT(buffer.cached_size() >= 200);
     CPPUNIT_ASSERT(buffer.cached_size() <= 256);
 
@@ -97,7 +97,7 @@ protected:
     buffer->clear();
     // released all items (except cached)
     CPPUNIT_ASSERT_EQUAL(0, (int)buffer->size());
-    CPPUNIT_ASSERT(MockBufferedItem::alloc_count - MockBufferedItem::release_count >= 256);
+    CPPUNIT_ASSERT(MockBufferedItem::alloc_count - MockBufferedItem::release_count <= 256);
 
     buffer->alloc(300);
     CPPUNIT_ASSERT_EQUAL(300, (int)buffer->size());
@@ -105,7 +105,7 @@ protected:
 
     buffer->clear();
     CPPUNIT_ASSERT_EQUAL(0, (int)buffer->size());
-    CPPUNIT_ASSERT(MockBufferedItem::alloc_count - MockBufferedItem::release_count >= 256);
+    CPPUNIT_ASSERT(MockBufferedItem::alloc_count - MockBufferedItem::release_count <= 256);
 
     delete buffer;
     // assert all memory are released
