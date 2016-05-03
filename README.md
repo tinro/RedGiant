@@ -17,3 +17,13 @@ It supports the following features:
 * Defining group of features.
 * Defining retrieval models.
 
+Build
+--------
+Prerequisite:
+* gcc >= 4.8 or clang >= 3.4
+* libevent >= 2.0
+* liblog4cxx >= 0.10
+* libcppunit >= 1.12 (for unit tests)
+
+Make:
+run `./make.sh` under your shell.
