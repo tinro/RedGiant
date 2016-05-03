@@ -21,7 +21,7 @@ Build
 --------
 Prerequisite:
 * gcc >= 4.8 or clang >= 3.4
-* autotools (autoconf >= 2.69, automake >= 1.11)
+* autotools (autoconf >= 2.68, automake >= 1.11)
 * libevent >= 2.0
 * liblog4cxx >= 0.10
 * libcppunit >= 1.12 (for unit tests)
