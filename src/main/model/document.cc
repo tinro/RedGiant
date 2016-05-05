@@ -1,4 +1,4 @@
-#include "model/doc_features.h"
+#include "model/document.h"
 
 namespace redgiant {
 

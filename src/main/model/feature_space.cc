@@ -7,7 +7,7 @@ DECLARE_LOGGER(logger, __FILE__);
 
 namespace redgiant {
 
-auto FeatureSpace::calculate_feature_id(const std::string& key)
+auto FeatureSpace::calculate_feature_id(const std::string& feature_key) const
 -> FeatureId {
   static std::hash<std::string> string_hash;
 
@@ -17,15 +17,15 @@ auto FeatureSpace::calculate_feature_id(const std::string& key)
 
   if (type_ == Type::kString) {
     // For strings, hash the string and get the lower 56 bits.
-    id |= (FeatureId)string_hash(key) & kFeatureMask;
+    id |= (FeatureId)string_hash(feature_key) & kFeatureMask;
   } else {
     // For integers, get the lower 56 bits directly.
-    unsigned long number = stoul(key);
+    unsigned long number = stoul(feature_key);
     id |= (FeatureId)number & kFeatureMask;
   }
 
   LOG_TRACE(logger, "Built feature key %s in space %s to id %016llx",
-      key.c_str(), space_name_.c_str(), id);
+      feature_key.c_str(), space_name_.c_str(), id);
   return id;
 }
 
