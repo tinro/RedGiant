@@ -41,12 +41,30 @@ public:
     }
   }
 
+  std::shared_ptr<Feature> get_feature(const std::string& feature_key,
+      const FeatureSpace& space) const {
+    return get_feature(space.calculate_feature_id(feature_key));
+  }
+
+  std::shared_ptr<Feature> get_feature(const std::string& feature_key,
+      const std::string& space_name) const {
+    auto iter = spaces_.find(space_name);
+    if (iter != spaces_.end()) {
+      return get_feature(feature_key, *(iter->second));
+    } else {
+      return nullptr;
+    }
+  }
+
   void set_feature(std::shared_ptr<Feature> feature) {
     features_[feature->get_id()] = std::move(feature);
   }
 
-  std::shared_ptr<Feature> create_feature(const std::string& feature_key, const std::string& space_name);
-  std::shared_ptr<Feature> create_feature(const std::string& feature_key, const std::shared_ptr<FeatureSpace>& space);
+  std::shared_ptr<Feature> create_or_get_feature(const std::string& feature_key,
+      const std::string& space_name);
+
+  std::shared_ptr<Feature> create_or_get_feature(const std::string& feature_key,
+      const std::shared_ptr<FeatureSpace>& space);
 
 private:
   std::unordered_map<std::string, std::shared_ptr<FeatureSpace>> spaces_;

@@ -1,7 +1,5 @@
-#ifndef SRC_MAIN_DATA_JSON_PARSER_H_
-#define SRC_MAIN_DATA_JSON_PARSER_H_
-
-#include <memory>
+#ifndef SRC_MAIN_PARSER_JSON_PARSER_H_
+#define SRC_MAIN_PARSER_JSON_PARSER_H_
 
 #include "parser/parser.h"
 #include "third_party/rapidjson/document.h"
@@ -14,19 +12,19 @@ public:
   JsonParser() = default;
   virtual ~JsonParser() = default;
 
-  virtual std::unique_ptr<Output> parse(const char* str, size_t len) {
+  virtual int parse(const char* str, size_t len, Output& output) {
     DECLARE_LOGGER(logger, __FILE__);
     (void) len;
     rapidjson::Document root;
-    if (root.Parse<0>(str).HasParseError()) {
+    if (root.Parse(str).HasParseError()) {
       LOG_ERROR(logger, "parse error=%x, %zu", root.GetParseError(), root.GetErrorOffset());
-      return nullptr;
+      return -1;
     }
-    return parse_json(root);
+    return parse_json(root, output);
   }
 
-  virtual std::unique_ptr<Output> parse_json(const rapidjson::Value &root) = 0;
+  virtual int parse_json(const rapidjson::Value &root, Output& output) = 0;
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_DATA_JSON_PARSER_H_ */
+#endif /* SRC_MAIN_PARSER_JSON_PARSER_H_ */

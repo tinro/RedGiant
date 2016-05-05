@@ -3,7 +3,8 @@
 #include <algorithm>
 #include <string>
 #include <utility>
-#include "parser/json_doc_parser.h"
+
+#include "parser/document_parser.h"
 #include "pipeline/feed_document_job.h"
 #include "service/request_context.h"
 #include "service/response_writer.h"
@@ -45,15 +46,18 @@ void FeedDocumentHandler::handle_request(const RequestContext* request, Response
   int ret_len = request->get_post_content(value, post_len);
   value[ret_len] = '\0';
 
-  std::unique_ptr<DocFeatures> doc = doc_parser_->parse(value, ret_len);
+  std::unique_ptr<Document> doc;
+  int ret = doc_parser_->parse(value, ret_len, *doc);
   buf_.clear();
 
-  if (!doc) {
+  if (ret < 0) {
     LOG_ERROR(logger, "parse error");
     response->add_body("parse error\n");
     response->send_done(400, NULL);
     return;
   }
+
+  // do something here
 
   std::ostringstream os;
   os << R"({"ret":"0", "message":"success"})" << std::endl ;

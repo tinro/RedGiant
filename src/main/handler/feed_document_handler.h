@@ -3,7 +3,8 @@
 
 #include <memory>
 #include <vector>
-#include "model/doc_features.h"
+
+#include "model/document.h"
 #include "parser/parser.h"
 #include "service/request_handler.h"
 #include "utils/cached_buffer.h"
@@ -24,7 +25,7 @@ private:
   JobExecutor<FeedDocumentJob>* doc_pipeline_;
   uint32_t doc_expires_;
   CachedBuffer<char> buf_;
-  std::unique_ptr<Parser<DocFeatures>> doc_parser_;
+  std::unique_ptr<Parser<Document>> doc_parser_;
 };
 
 class FeedDocumentHandlerFactory: public RequestHandlerFactory {

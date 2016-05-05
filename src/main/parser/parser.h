@@ -1,7 +1,5 @@
-#ifndef SRC_MAIN_DATA_PARSER_H_
-#define SRC_MAIN_DATA_PARSER_H_
-
-#include <memory>
+#ifndef SRC_MAIN_PARSER_PARSER_H_
+#define SRC_MAIN_PARSER_PARSER_H_
 
 namespace redgiant {
 template <typename Output>
@@ -10,8 +8,8 @@ public:
   Parser() = default;
   virtual ~Parser() = default;
 
-  virtual std::unique_ptr<Output> parse(const char* str, size_t len) = 0;
+  virtual int parse(const char* str, size_t len, Output& output) = 0;
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_DATA_PARSER_H_ */
+#endif /* SRC_MAIN_PARSER_PARSER_H_ */
