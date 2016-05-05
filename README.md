@@ -24,7 +24,7 @@ Prerequisite:
 * autotools (autoconf >= 2.68, automake >= 1.11)
 * libevent >= 2.0
 * liblog4cxx >= 0.10
-* libcppunit >= 1.12 (for unit tests)
+* libcppunit >= 1.13 (for unit tests)
 
 Make:
 run `./make.sh` under your shell.

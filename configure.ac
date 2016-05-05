@@ -6,15 +6,15 @@ AC_INIT([redgiant], [1.0])
 AC_CONFIG_SRCDIR([src/main/main.cc])
 
 AM_INIT_AUTOMAKE
-AM_PATH_CPPUNIT(1.12)
+AM_PATH_CPPUNIT(1.13)
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_RANLIB
 
-CFLAGS+=" -std=c11"
-CXXFLAGS+=" -std=c++11"
+CFLAGS+=" -std=c11 -Werror"
+CXXFLAGS+=" -std=c++11 -Werror"
 
 # Checks for libraries.
 AC_CHECK_LIB(['event'], ['event_init'])
