@@ -25,7 +25,7 @@ auto FeatureSpace::calculate_feature_id(const std::string& feature_key) const
   }
 
   LOG_TRACE(logger, "Built feature key %s in space %s to id %016llx",
-      feature_key.c_str(), space_name_.c_str(), id);
+      feature_key.c_str(), space_name_.c_str(), (unsigned long long int)id);
   return id;
 }
 

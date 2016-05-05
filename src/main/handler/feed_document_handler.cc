@@ -1,7 +1,7 @@
 #include "handler/feed_document_handler.h"
 
-#include <algorithm>
 #include <string>
+#include <memory>
 #include <utility>
 
 #include "parser/document_parser.h"

@@ -2,7 +2,6 @@
 #define SRC_MAIN_HANDLER_FEED_DOCUMENT_HANDLER_H_
 
 #include <memory>
-#include <vector>
 
 #include "model/document.h"
 #include "parser/parser.h"
@@ -11,7 +10,7 @@
 #include "utils/concurrency/job_executor.h"
 
 namespace redgiant {
-class FeedDocumentJob;
+struct FeedDocumentJob;
 
 class FeedDocumentHandler: public RequestHandler {
 public:
