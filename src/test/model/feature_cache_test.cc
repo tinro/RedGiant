@@ -61,7 +61,7 @@ protected:
 
     CPPUNIT_ASSERT(!!f1); // not null
     CPPUNIT_ASSERT_EQUAL(string("111"), f1->get_key());
-    CPPUNIT_ASSERT_EQUAL(111ULL, FeatureSpace::get_part_feature_id(f1->get_id()));
+    CPPUNIT_ASSERT_EQUAL(111ULL, (unsigned long long)FeatureSpace::get_part_feature_id(f1->get_id()));
 
     CPPUNIT_ASSERT(!!f2); // not null
     CPPUNIT_ASSERT_EQUAL(string("xxx"), f2->get_key());
