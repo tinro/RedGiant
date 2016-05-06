@@ -5,13 +5,13 @@
 #include <utility>
 #include <vector>
 #include "utils/stop_watch.h"
-#include "model/feature_space.h"
+#include "model/feature.h"
 
 namespace redgiant {
 class QueryRequest {
 public:
-  typedef FeatureSpace::FeatureId FeatureId;
-  typedef FeatureSpace::Weight Weight;
+  typedef Feature::FeatureId FeatureId;
+  typedef double Weight;
   typedef std::pair<FeatureId, Weight> QueryFeaturePair;
 
   QueryRequest(const std::string& request_id, size_t query_count,

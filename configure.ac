@@ -49,6 +49,11 @@ AC_CONFIG_FILES([Makefile
                  src/test/Makefile
                  src/test/core_index/Makefile
                  src/test/core_reader/Makefile
+                 src/test/handler/Makefile
+                 src/test/index/Makefile
+                 src/test/model/Makefile
+                 src/test/parser/Makefile
+                 src/test/pipeline/Makefile
                  src/test/service/Makefile
                  src/test/utils/Makefile])
 AC_OUTPUT

@@ -14,7 +14,7 @@ namespace redgiant {
  */
 class FeatureVector {
 public:
-  typedef FeatureSpace::Weight Weight;
+  typedef double Weight;
   typedef std::pair<std::shared_ptr<Feature>, Weight> FeaturePair;
 
   FeatureVector(std::shared_ptr<FeatureSpace> space)
@@ -28,6 +28,10 @@ public:
 
   void add_feature(std::shared_ptr<Feature> feature, Weight weight) {
     features_.emplace_back(std::move(feature), weight);
+  }
+
+  void add_feature(const std::string& feature_key, Weight weight) {
+    features_.emplace_back(space_->create_feature(feature_key), weight);
   }
 
   const std::shared_ptr<FeatureSpace>& get_space() const {

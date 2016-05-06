@@ -4,15 +4,16 @@
 #include <functional>
 #include "model/document.h"
 #include "model/document_id.h"
-#include "model/feature_space.h"
+#include "model/feature.h"
+#include "model/feature_vector.h"
 
 namespace redgiant {
 class DocumentTraits {
 public:
   typedef Document Doc;
   typedef DocumentId DocId;
-  typedef FeatureSpace::FeatureId TermId;
-  typedef FeatureSpace::Weight TermWeight;
+  typedef Feature::FeatureId TermId;
+  typedef FeatureVector::Weight TermWeight;
   typedef int32_t ExpireTime;
   typedef double Score;
   typedef DocumentId::Hash DocIdHash;

@@ -5,6 +5,7 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
+
 #include "core/index/btree_expire_table.h"
 
 namespace redgiant {

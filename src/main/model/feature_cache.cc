@@ -23,11 +23,15 @@ auto FeatureCache::create_or_get_feature(const std::string& feature_key,
     const std::shared_ptr<FeatureSpace>& space)
 -> std::shared_ptr<Feature> {
   FeatureId id = space->calculate_feature_id(feature_key);
+  if (id == FeatureSpace::kInvalidId) {
+    return nullptr;
+  }
+
   auto iter = features_.find(id);
   if (iter != features_.end()) {
     return iter->second;
   } else {
-    std::shared_ptr<Feature> feature = std::make_shared<Feature>(space, feature_key);
+    std::shared_ptr<Feature> feature = std::make_shared<Feature>(feature_key, id);
     // add the newly created feature
     features_[id] = feature;
     return feature;

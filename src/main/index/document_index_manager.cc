@@ -146,7 +146,7 @@ int DocumentIndexManager::dump(const std::string& snapshot_prefix) {
 
 int DocumentIndexManager::do_maintain(time_t time) {
   StopWatch watch;
-  int32_t expire_time = 0;
+  int32_t expire_time = time;
   LOG_INFO(logger, "start maintaining document index. expire_time=%d", expire_time);
 
   int ret = 0;

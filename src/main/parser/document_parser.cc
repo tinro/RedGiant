@@ -24,7 +24,7 @@ int DocumentParser::parse_json(const rapidjson::Value& root, Document& output) {
     return -1;
   }
 
-  if (root["uuid"].IsString()) {
+  if (root.HasMember("uuid") && root["uuid"].IsString()) {
     std::string uuid;
     uuid = root["uuid"].GetString();
     if (uuid.empty()) {
@@ -40,7 +40,7 @@ int DocumentParser::parse_json(const rapidjson::Value& root, Document& output) {
   }
 
 
-  if (root["features"].IsObject()) {
+  if (root.HasMember("features") && root["features"].IsObject()) {
     if (parse_feature_spaces(root["features"], output) < 0) {
       return -1;
     }
@@ -55,10 +55,10 @@ int DocumentParser::parse_feature_spaces(const rapidjson::Value& root, Document&
       std::shared_ptr<FeatureSpace> space = cache_->get_space(space_name);
       if (!space) {
         // feature space must be pre-defined in feature cache
-        LOG_WARN(logger, "document[%s]: unknown feature space %s, ignored.",
+        LOG_WARN(logger, "document[%s]: unknown feature space [%s], ignored.",
             doc.get_id_str().c_str(), space_name.c_str());
       } else {
-        LOG_TRACE(logger, "document[%s]: parsing feature space %s",
+        LOG_TRACE(logger, "document[%s]: parsing feature space [%s]",
             doc.get_id_str().c_str(), space_name.c_str());
 
         FeatureVector vec(std::move(space));
@@ -79,7 +79,7 @@ int DocumentParser::parse_single_value_feature_vector(const rapidjson::Value& ro
     const Document& doc, FeatureVector& vec) {
   std::shared_ptr<Feature> feature = cache_->create_or_get_feature(root.GetString(), vec.get_space());
   if (feature) {
-    LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space %s",
+    LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
         doc.get_id_str().c_str(), (unsigned long long)feature->get_id(),
         feature->get_key().c_str(), vec.get_space_name().c_str());
     vec.add_feature(std::move(feature), 1.0);
@@ -94,7 +94,7 @@ int DocumentParser::parse_multi_value_feature_vector(const rapidjson::Value& roo
     if (it->name.IsString() && it->value.IsNumber()) {
       std::shared_ptr<Feature> feature = cache_->create_or_get_feature(it->name.GetString(), vec.get_space());
       if (feature) {
-        LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space %s",
+        LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
             doc.get_id_str().c_str(), (unsigned long long)feature->get_id(),
             feature->get_key().c_str(), vec.get_space_name().c_str());
         vec.add_feature(std::move(feature), it->value.GetDouble());

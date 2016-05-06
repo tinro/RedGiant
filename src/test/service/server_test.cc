@@ -4,12 +4,14 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
+
+#include "mock_handler.h"
+#include "test_client.h"
+
 #include "service/server.h"
 #include "service/server_instance.h"
 #include "utils/logger.h"
 #include "utils/scope_guard.h"
-#include "mock_handler.h"
-#include "test_client.h"
 
 namespace redgiant {
 class ServerTest: public CppUnit::TestFixture {

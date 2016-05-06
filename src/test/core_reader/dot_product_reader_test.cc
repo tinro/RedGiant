@@ -4,9 +4,11 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
+
+#include "mock_reader.h"
+
 #include "core/reader/reader_utils.h"
 #include "core/reader/dot_product_reader.h"
-#include "mock_reader.h"
 
 namespace redgiant {
 class DotProductReaderTest: public CppUnit::TestFixture {

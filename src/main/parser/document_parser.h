@@ -13,7 +13,7 @@ class FeatureCache;
 
 class DocumentParser: public JsonParser<Document> {
 public:
-  DocumentParser(std::shared_ptr<FeatureCache> cache)
+  DocumentParser(FeatureCache* cache)
   : cache_(std::move(cache)) {
   }
 
@@ -30,7 +30,8 @@ private:
   int parse_multi_value_feature_vector(const rapidjson::Value& root,
       const Document& doc, FeatureVector& vec);
 
-  std::shared_ptr<FeatureCache> cache_;
+private:
+  FeatureCache* cache_;
 };
 } /* namespace redgiant */
 
