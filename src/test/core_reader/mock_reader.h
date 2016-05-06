@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <vector>
+
 #include "core/reader/algorithms.h"
 #include "core/reader/posting_list_reader.h"
 

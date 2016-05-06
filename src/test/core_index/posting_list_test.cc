@@ -4,13 +4,15 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
+
+#include "mock_weight.h"
+#include "../core_reader/mock_reader.h"
+
 #include "core/index/posting_list.h"
 #include "core/index/map_posting_list.h"
 #include "core/index/btree_posting_list.h"
 #include "core/reader/posting_list_reader.h"
 #include "core/reader/reader_utils.h"
-#include "mock_weight.h"
-#include "../core_reader/mock_reader.h"
 
 namespace redgiant {
 class PostingListTest: public CppUnit::TestFixture {

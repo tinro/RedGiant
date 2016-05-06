@@ -5,8 +5,6 @@
 #include <memory>
 #include <utility>
 
-#include "model/feature_space.h"
-
 namespace redgiant {
 
 /*
@@ -14,25 +12,16 @@ namespace redgiant {
  */
 class Feature {
 public:
-  typedef FeatureSpace::FeatureId FeatureId;
+  typedef uint64_t FeatureId;
 
-  Feature(std::shared_ptr<FeatureSpace> space, std::string key)
-  : space_(std::move(space)), key_(std::move(key)) {
-    id_ = space_->calculate_feature_id(key);
+  Feature(std::string key, FeatureId id)
+  : key_(std::move(key)), id_(id) {
   }
 
   Feature(const Feature& other) = default;
   Feature(Feature&& other) = default;
 
   ~Feature() = default;
-
-  std::shared_ptr<FeatureSpace> get_space() const {
-    return space_;
-  }
-
-  const std::string& get_space_name() const {
-    return space_->get_name();
-  }
 
   const std::string& get_key() const {
     return key_;
@@ -43,7 +32,6 @@ public:
   }
 
 private:
-  std::shared_ptr<FeatureSpace> space_;
   std::string key_;
   FeatureId id_;
 };

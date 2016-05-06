@@ -4,10 +4,12 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
+
+#include "mock_reader.h"
+
 #include "core/reader/reader_utils.h"
 #include "core/reader/wand_reader.h"
 #include "core/reader/wand_reader-inl.h"
-#include "mock_reader.h"
 
 namespace redgiant {
 class WandReaderTest: public CppUnit::TestFixture {

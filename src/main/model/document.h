@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "model/document_id.h"
+#include "model/feature.h"
 #include "model/feature_space.h"
 #include "model/feature_vector.h"
 
@@ -15,9 +16,11 @@ namespace redgiant {
 
 class Document {
 public:
-  typedef FeatureSpace::FeatureId FeatureId;
+  typedef Feature::FeatureId FeatureId;
   typedef FeatureSpace::SpaceId SpaceId;
-  typedef FeatureSpace::Weight Weight;
+  typedef FeatureVector::Weight Weight;
+
+  Document() = default;
 
   Document(std::string id)
   : id_(id) {

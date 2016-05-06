@@ -1,9 +1,8 @@
+#include <iostream>
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "model/document_id.h"
-
-#include <iostream>
 
 using namespace std;
 
@@ -15,11 +14,15 @@ class DocumentIdTest: public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  DocumentIdTest() = default;
+  virtual ~DocumentIdTest() = default;
+
+protected:
   void test_doc_id_constructor() {
-    string uuid = "a3269eb7-0de1-337d-8fa1-b929eb92b5ff";
+    string uuid = "abcd1234-9876-1234-ffff-001122ddeeff";
     DocumentId document_id(uuid);
     string new_uuid(document_id.to_string());
-    CPPUNIT_ASSERT_EQUAL(uuid,  new_uuid);
+    CPPUNIT_ASSERT_EQUAL(uuid, new_uuid);
 
     string uuid_default = "00000000-0000-0000-0000-000000000000";
     DocumentId document_id_default;

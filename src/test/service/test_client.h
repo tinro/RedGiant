@@ -53,7 +53,7 @@ protected:
   }
 
   std::string response_;
-  struct event_base* base_;
+  struct event_base* base_ = NULL;
 };
 } /* namespace redgiant */
 

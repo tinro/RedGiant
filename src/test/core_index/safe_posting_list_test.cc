@@ -4,12 +4,14 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
+
+#include "../core_reader/mock_reader.h"
+
 #include "core/index/posting_list.h"
 #include "core/index/btree_posting_list.h"
 #include "core/index/safe_posting_list.h"
 #include "core/reader/posting_list_reader.h"
 #include "core/reader/reader_utils.h"
-#include "../core_reader/mock_reader.h"
 
 namespace redgiant {
 class SafePostingListTest: public CppUnit::TestFixture {

@@ -1,7 +1,6 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils/cached_buffer.h"
-#include "utils/logger.h"
 
 namespace redgiant {
 

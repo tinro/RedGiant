@@ -13,10 +13,10 @@ namespace redgiant {
 
 class FeatureCache {
 public:
-  typedef FeatureSpace::FeatureId FeatureId;
+  typedef Feature::FeatureId FeatureId;
   typedef FeatureSpace::SpaceId SpaceId;
 
-  FeatureCache();
+  FeatureCache() = default;
   ~FeatureCache() = default;
 
   std::shared_ptr<FeatureSpace> get_space(const std::string& space_name) const {
@@ -28,8 +28,17 @@ public:
     }
   }
 
-  void set_space(const std::string& space_name, std::shared_ptr<FeatureSpace> space) {
-    spaces_[space_name] = std::move(space);
+  void set_space(std::shared_ptr<FeatureSpace> space) {
+    if (space) {
+      spaces_[space->get_name()] = std::move(space);
+    }
+  }
+
+  std::shared_ptr<FeatureSpace> create_space(std::string space_name, SpaceId space_id,
+      FeatureSpace::FeatureType type) {
+    std::shared_ptr<FeatureSpace> space = std::make_shared<FeatureSpace>(space_name, space_id, type);
+    set_space(space);
+    return space;
   }
 
   std::shared_ptr<Feature> get_feature(FeatureId id) const {
@@ -57,7 +66,9 @@ public:
   }
 
   void set_feature(std::shared_ptr<Feature> feature) {
-    features_[feature->get_id()] = std::move(feature);
+    if (feature) {
+      features_[feature->get_id()] = std::move(feature);
+    }
   }
 
   std::shared_ptr<Feature> create_or_get_feature(const std::string& feature_key,
