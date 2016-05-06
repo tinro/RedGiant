@@ -30,6 +30,10 @@ public:
     features_.emplace_back(std::move(feature), weight);
   }
 
+  void add_feature(const std::string& feature_key, Weight weight) {
+    features_.emplace_back(space_->create_feature(feature_key), weight);
+  }
+
   const std::shared_ptr<FeatureSpace>& get_space() const {
     return space_;
   }

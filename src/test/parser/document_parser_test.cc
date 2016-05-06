@@ -49,14 +49,14 @@ protected:
     CPPUNIT_ASSERT_EQUAL(string("abcd1234-9876-1234-ffff-001122ddeeff"), doc.get_id().to_string());
 
     const auto& vecs = doc.get_feature_vectors();
-    CPPUNIT_ASSERT_EQUAL((size_t)4, vecs.size());
+    CPPUNIT_ASSERT_EQUAL(4, (int)vecs.size());
 
     // feature vector 1: publisher
     auto fv = &(vecs[0]);
     CPPUNIT_ASSERT_EQUAL(string("publisher"), fv->get_space_name());
     CPPUNIT_ASSERT_EQUAL(FeatureSpace::kString, fv->get_space()->get_type());
     // only one item
-    CPPUNIT_ASSERT_EQUAL((size_t)1, fv->get_features().size());
+    CPPUNIT_ASSERT_EQUAL(1, (int)fv->get_features().size());
     auto f = &(fv->get_features()[0]);
     CPPUNIT_ASSERT_EQUAL(string("publisher_id_test"), f->first->get_key());
     CPPUNIT_ASSERT_DOUBLES_EQUAL((double)1.0, f->second, 0.0001);
@@ -65,7 +65,7 @@ protected:
     CPPUNIT_ASSERT_EQUAL(string("time"), fv->get_space_name());
     CPPUNIT_ASSERT_EQUAL(FeatureSpace::kInteger, fv->get_space()->get_type());
     // only one item
-    CPPUNIT_ASSERT_EQUAL((size_t)1, fv->get_features().size());
+    CPPUNIT_ASSERT_EQUAL(1, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);
     CPPUNIT_ASSERT_EQUAL(string("1234567"), f->first->get_key());
     CPPUNIT_ASSERT_DOUBLES_EQUAL((double)1.0, f->second, 0.0001);
@@ -74,7 +74,7 @@ protected:
     CPPUNIT_ASSERT_EQUAL(string("categories"), fv->get_space_name());
     CPPUNIT_ASSERT_EQUAL(FeatureSpace::kInteger, fv->get_space()->get_type());
     // 3 items
-    CPPUNIT_ASSERT_EQUAL((size_t)3, fv->get_features().size());
+    CPPUNIT_ASSERT_EQUAL(3, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);
     CPPUNIT_ASSERT_EQUAL(string("1"), f->first->get_key());
     CPPUNIT_ASSERT_DOUBLES_EQUAL((double)0.1, f->second, 0.0001);
@@ -89,7 +89,7 @@ protected:
     CPPUNIT_ASSERT_EQUAL(string("entities"), fv->get_space_name());
     CPPUNIT_ASSERT_EQUAL(FeatureSpace::kString, fv->get_space()->get_type());
     // 3 items
-    CPPUNIT_ASSERT_EQUAL((size_t)3, fv->get_features().size());
+    CPPUNIT_ASSERT_EQUAL(3, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);
     CPPUNIT_ASSERT_EQUAL(string("ent_1"), f->first->get_key());
     CPPUNIT_ASSERT_DOUBLES_EQUAL((double)0.1, f->second, 0.0001);
