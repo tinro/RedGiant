@@ -8,6 +8,8 @@ public:
   Parser() = default;
   virtual ~Parser() = default;
 
+  virtual int parse_file(const char* file_name, Output& output) = 0;
+
   virtual int parse(const char* str, size_t len, Output& output) = 0;
 };
 } /* namespace redgiant */

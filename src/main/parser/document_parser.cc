@@ -24,27 +24,30 @@ int DocumentParser::parse_json(const rapidjson::Value& root, Document& output) {
     return -1;
   }
 
-  if (root.HasMember("uuid") && root["uuid"].IsString()) {
-    std::string uuid;
-    uuid = root["uuid"].GetString();
-    if (uuid.empty()) {
-      LOG_ERROR(logger, "document uuid is empty!");
-      return -1;
-    }
-
-    output.set_doc_id(std::move(uuid));
-    LOG_TRACE(logger, "document[%s]: parsing.", output.get_id_str().c_str());
-  } else {
+  if (!root.HasMember("uuid") || !root["uuid"].IsString()) {
     LOG_ERROR(logger, "document uuid missing!");
     return -1;
   }
 
-
-  if (root.HasMember("features") && root["features"].IsObject()) {
-    if (parse_feature_spaces(root["features"], output) < 0) {
-      return -1;
-    }
+  std::string uuid;
+  uuid = root["uuid"].GetString();
+  if (uuid.empty()) {
+    LOG_ERROR(logger, "document uuid is empty!");
+    return -1;
   }
+
+  output.set_doc_id(std::move(uuid));
+  LOG_TRACE(logger, "document[%s]: parsing.", output.get_id_str().c_str());
+
+  if (!root.HasMember("features") || !root["features"].IsObject()) {
+    LOG_ERROR(logger, "document[%s]: no features found!", output.get_id_str().c_str());
+    return -1;
+  }
+
+  if (parse_feature_spaces(root["features"], output) < 0) {
+    return -1;
+  }
+
   return 0;
 }
 

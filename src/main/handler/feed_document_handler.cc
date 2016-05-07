@@ -4,7 +4,7 @@
 #include <memory>
 #include <utility>
 
-#include "parser/document_parser.h"
+#include "model/document.h"
 #include "pipeline/feed_document_job.h"
 #include "service/request_context.h"
 #include "service/response_writer.h"
@@ -17,8 +17,10 @@ namespace redgiant {
 
 DECLARE_LOGGER(logger, __FILE__);
 
-FeedDocumentHandler::FeedDocumentHandler(JobExecutor<FeedDocumentJob>* doc_pipeline, uint32_t doc_expires)
-: doc_pipeline_(doc_pipeline), doc_expires_(doc_expires), buf_(2 * 1024 * 1024) {
+FeedDocumentHandler::FeedDocumentHandler(JobExecutor<FeedDocumentJob>* doc_pipeline,
+    Parser<Document>* doc_parser, uint32_t doc_expires)
+: doc_pipeline_(doc_pipeline), doc_parser_(doc_parser), doc_expires_(doc_expires),
+  buf_(2 * 1024 * 1024) {
 }
 
 void FeedDocumentHandler::handle_request(const RequestContext* request, ResponseWriter* response) {
@@ -46,7 +48,7 @@ void FeedDocumentHandler::handle_request(const RequestContext* request, Response
   int ret_len = request->get_post_content(value, post_len);
   value[ret_len] = '\0';
 
-  std::unique_ptr<Document> doc;
+  std::shared_ptr<Document> doc = std::make_shared<Document>();
   int ret = doc_parser_->parse(value, ret_len, *doc);
   buf_.clear();
 
@@ -57,7 +59,12 @@ void FeedDocumentHandler::handle_request(const RequestContext* request, Response
     return;
   }
 
+  std::shared_ptr<FeedDocumentJob> job = std::make_shared<FeedDocumentJob>();
+  job->expire_time = 0;
+  job->doc = std::move(doc);
+
   // do something here
+  doc_pipeline_->schedule(std::move(job));
 
   std::ostringstream os;
   os << R"({"ret":"0", "message":"success"})" << std::endl ;

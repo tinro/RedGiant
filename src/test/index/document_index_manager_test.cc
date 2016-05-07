@@ -161,10 +161,7 @@ private:
       cout << "Doc id: " << iter.to_string() << endl;
     }
   }
-
-  long long get_timestamp() {
-    return 1405991574;
-  }
 };
+
 CPPUNIT_TEST_SUITE_REGISTRATION(DocumentIndexManagerTest);
 }

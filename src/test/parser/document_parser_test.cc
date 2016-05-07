@@ -34,8 +34,8 @@ protected:
         "features": {
           "publisher": "publisher_id_test",
           "time": "1234567",
-          "categories": {"1": 0.1, "2":0.2, "3" : 0.3}, 
-          "entities": {"ent_1":0.1, "ent_2":0.2, "ent_3" : 0.3},
+          "category": {"1": 0.1, "2":0.2, "3" : 0.3}, 
+          "entity": {"ent_1":0.1, "ent_2":0.2, "ent_3" : 0.3},
           "unknown": "abc"
         }
       })";
@@ -110,8 +110,8 @@ protected:
         "features": {
           "publisher": "publisher_id_test",
           "time": "1234567",
-          "categories": {"1": 0.1, "2":0.2, "3" : 0.3}, 
-          "entities": {"ent_1":0.1, "ent_2":0.2, "ent_3" : 0.3},
+          "category": {"1": 0.1, "2":0.2, "3" : 0.3}, 
+          "entity": {"ent_1":0.1, "ent_2":0.2, "ent_3" : 0.3},
           "unknown": "abc"
         }
       })";
@@ -126,8 +126,8 @@ private:
     auto cache = std::unique_ptr<FeatureCache>(new FeatureCache());
     cache->create_space("time", 1, FeatureSpace::FeatureType::kInteger);
     cache->create_space("publisher", 2, FeatureSpace::FeatureType::kString);
-    cache->create_space("entities", 3, FeatureSpace::FeatureType::kString);
-    cache->create_space("categories", 3, FeatureSpace::FeatureType::kInteger);
+    cache->create_space("entity", 3, FeatureSpace::FeatureType::kString);
+    cache->create_space("category", 4, FeatureSpace::FeatureType::kInteger);
     return cache;
   };
 

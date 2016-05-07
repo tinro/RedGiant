@@ -6,9 +6,13 @@
 #include "utils/concurrency/worker.h"
 
 namespace redgiant {
+class DocumentIndexManager;
+
 class FeedDocumentWorker: public Worker<FeedDocumentJob> {
 public:
-  FeedDocumentWorker();
+  FeedDocumentWorker(DocumentIndexManager* index)
+  : index_(index) {
+  }
 
   virtual ~FeedDocumentWorker() = default;
 
@@ -19,20 +23,23 @@ public:
   virtual void execute(FeedDocumentJob& job);
 
 private:
+  DocumentIndexManager* index_;
 };
 
 class FeedDocumentWorkerFactory: public WorkerFactory<FeedDocumentWorker> {
 public:
-  FeedDocumentWorkerFactory() {
+  FeedDocumentWorkerFactory(DocumentIndexManager* index)
+  : index_(index) {
   }
 
   virtual ~FeedDocumentWorkerFactory() = default;
 
   virtual std::unique_ptr<FeedDocumentWorker> create() {
-    return std::unique_ptr<FeedDocumentWorker>(new FeedDocumentWorker());
+    return std::unique_ptr<FeedDocumentWorker>(new FeedDocumentWorker(index_));
   }
 
 private:
+  DocumentIndexManager* index_;
 };
 } /* namespace redgiant */
 
