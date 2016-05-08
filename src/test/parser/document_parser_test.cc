@@ -71,7 +71,7 @@ protected:
     CPPUNIT_ASSERT_DOUBLES_EQUAL((double)1.0, f->second, 0.0001);
 
     fv = &(vecs[2]);
-    CPPUNIT_ASSERT_EQUAL(string("categories"), fv->get_space_name());
+    CPPUNIT_ASSERT_EQUAL(string("category"), fv->get_space_name());
     CPPUNIT_ASSERT_EQUAL(FeatureSpace::kInteger, fv->get_space()->get_type());
     // 3 items
     CPPUNIT_ASSERT_EQUAL(3, (int)fv->get_features().size());
@@ -86,7 +86,7 @@ protected:
     CPPUNIT_ASSERT_DOUBLES_EQUAL((double)0.3, f->second, 0.0001);
 
     fv = &(vecs[3]);
-    CPPUNIT_ASSERT_EQUAL(string("entities"), fv->get_space_name());
+    CPPUNIT_ASSERT_EQUAL(string("entity"), fv->get_space_name());
     CPPUNIT_ASSERT_EQUAL(FeatureSpace::kString, fv->get_space()->get_type());
     // 3 items
     CPPUNIT_ASSERT_EQUAL(3, (int)fv->get_features().size());

@@ -7,7 +7,7 @@
 namespace redgiant {
 class DocumentId {
 public:
-  DocumentId() // invalid
+  DocumentId() // invalid id
   : low_(0), high_(0) {
   }
 

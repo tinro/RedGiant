@@ -1,18 +1,13 @@
 #include "parser/document_parser.h"
 
-#include <algorithm>
-#include <cmath>
-#include <cstdlib>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "model/document.h"
 #include "model/feature.h"
 #include "model/feature_cache.h"
+#include "model/feature_vector.h"
 #include "utils/logger.h"
-
-using namespace std;
 
 namespace redgiant {
 
