@@ -22,7 +22,7 @@ public:
   virtual void handle_request(const RequestContext* request, ResponseWriter* response) {
     (void) request;
     response->add_body(message_);
-    response->send_done(200, NULL);
+    response->send(200, NULL);
   }
 };
 

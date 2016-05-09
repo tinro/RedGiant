@@ -10,8 +10,13 @@ DECLARE_LOGGER(logger, __FILE__);
 
 namespace redgiant {
 
-EventRequestContext::EventRequestContext(evhttp_request* req, std::shared_ptr<evhttp_uri> ev_uri)
-: ev_req_(req), ev_uri_(std::move(ev_uri)) {
+EventRequestContext::EventRequestContext(evhttp_request* req)
+: ev_req_(req) {
+  const char* uri = evhttp_request_get_uri(req);
+  if (uri) {
+    evhttp_uri* ev_uri = evhttp_uri_parse(uri);
+    ev_uri_.reset(ev_uri, evhttp_uri_free);
+  }
 }
 
 std::string EventRequestContext::get_uri() const {
@@ -28,21 +33,23 @@ std::string EventRequestContext::get_path() const {
   }
 }
 
-void EventRequestContext::get_query_params(std::map<std::string, std::string>& out_params) const {
+std::map<std::string, std::string> EventRequestContext::get_query_params() const {
   evkeyvalq params;
   int ret = evhttp_parse_query_str(evhttp_uri_get_query(ev_uri_.get()), &params);
   if (ret != 0 ) {
     LOG_ERROR (logger, "decode query params error: %s", evhttp_uri_get_query(ev_uri_.get()));
     evhttp_clear_headers(&params);
-    return;
+    return {};
   }
 
+  std::map<std::string, std::string> out_params;
   evkeyval* entry;
   for (entry = params.tqh_first; entry != NULL; entry = entry->next.tqe_next) {
     //printf(" %s: %s\n", entry->key, entry->value);
     out_params[entry->key] = entry->value;
   }
   evhttp_clear_headers(&params);
+  return out_params;
 }
 
 std::string EventRequestContext::get_query_param(const char* key) const {
@@ -91,12 +98,15 @@ int EventRequestContext::get_method() const {
   return METHOD_UNKNOWN;
 }
 
-int EventRequestContext::get_post_length() const {
+int EventRequestContext::get_content_length() const {
   evbuffer* buf = evhttp_request_get_input_buffer(ev_req_);
+  if (!buf) {
+    return -1;
+  }
   return evbuffer_get_length(buf);
 }
 
-int EventRequestContext::get_post_content(char* out_buf, int max_len) const {
+int EventRequestContext::get_content(char* out_buf, int max_len) const {
   evbuffer* buf = evhttp_request_get_input_buffer(ev_req_);
   int post_len = evbuffer_get_length(buf);
   int ret_len = post_len < max_len? post_len: max_len;
@@ -106,8 +116,9 @@ int EventRequestContext::get_post_content(char* out_buf, int max_len) const {
 std::string EventRequestContext::get_header(const char* key) const {
   evkeyvalq *headers = ev_req_->input_headers;
   const char* ret = evhttp_find_header(headers, key);
-  if (ret == NULL)
+  if (ret == NULL) {
     return "";
+  }
   return ret;
 }
 

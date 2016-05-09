@@ -31,14 +31,14 @@ protected:
     string message2 = "World!";
     writer->add_body(message1);
     writer->add_body(message2);
-    writer->send_done(200, NULL);
+    writer->send(200, NULL);
   }
 
   void test_error() {
     evhttp_request* req = evhttp_request_new(NULL, NULL);
     unique_ptr<ResponseWriter> writer(new EventResponseWriter(req));
     writer->add_header("Connection", "close");
-    writer->send_error(400, NULL);
+    writer->send_empty(400, NULL);
   }
 
 private:

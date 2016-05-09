@@ -7,9 +7,10 @@ namespace redgiant {
 
 DECLARE_LOGGER(logger, __FILE__);
 
-FeedDocumentPipeline::FeedDocumentPipeline(size_t thread_num, size_t queue_size) {
+FeedDocumentPipeline::FeedDocumentPipeline(size_t thread_num,
+    size_t queue_size, DocumentIndexManager* index) {
   feed_document_ = std::make_shared<WorkerExecutor<FeedDocumentJob, FeedDocumentWorker>>(
-      std::make_shared<FeedDocumentWorkerFactory>(), thread_num, queue_size);
+      std::make_shared<FeedDocumentWorkerFactory>(index), thread_num, queue_size);
 }
 
 void FeedDocumentPipeline::start() {

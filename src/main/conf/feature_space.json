@@ -1,0 +1,9 @@
+{
+  "feature_spaces": [
+    {"id": 1, "name":"category", "type":"integer"},
+    {"id": 2, "name":"entity", "type":"string"},
+    {"id": 3, "name":"author", "type":"string"},
+    {"id": 4, "name":"publisher", "type":"string"}
+  ]
+}
+

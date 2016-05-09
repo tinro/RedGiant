@@ -2,8 +2,9 @@
 #define SRC_MAIN_FEEDING_FEED_DOCUMENT_JOB_H_
 
 #include <ctime>
+#include <memory>
 
-#include "../model/document.h"
+#include "model/document.h"
 #include "utils/stop_watch.h"
 
 namespace redgiant {
@@ -11,7 +12,7 @@ struct FeedDocumentJob {
   // used for measuring feeding latency
   StopWatch watch;
   // doc feature
-  Document doc;
+  std::shared_ptr<Document> doc;
   // expire time
   time_t expire_time;
 };
