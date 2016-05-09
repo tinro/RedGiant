@@ -24,14 +24,15 @@ public:
   RequestContext() = default;
   virtual ~RequestContext() = default;
 
+  // return strings by value to be compatible to all internal implementations
   virtual std::string get_uri() const = 0;
   virtual std::string get_path() const = 0;
-  virtual void get_query_params(std::map<std::string, std::string>& params) const = 0;
-  virtual std::string get_query_param(const char* key) const = 0;
-  virtual int get_method() const = 0;
-  virtual int get_post_length() const = 0;
-  virtual int get_post_content(char* out_buf, int max_len) const = 0;
   virtual std::string get_header(const char* key) const = 0;
+  virtual std::string get_query_param(const char* key) const = 0;
+  virtual std::map<std::string, std::string> get_query_params() const = 0;
+  virtual int get_method() const = 0;
+  virtual int get_content_length() const = 0;
+  virtual int get_content(char* out_buf, int max_len) const = 0;
 };
 } // namespace redgiant
 

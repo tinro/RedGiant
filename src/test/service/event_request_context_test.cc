@@ -34,11 +34,8 @@ protected:
     evhttp_add_header(req->output_headers, "Host", "localhost");
     evhttp_make_request(conn.get(), req, EVHTTP_REQ_GET, "/test/query?key=abc&from=test");
 
-    std::shared_ptr<evhttp_uri> uri(
-        evhttp_uri_parse(evhttp_request_get_uri(req)),
-        evhttp_uri_free);
     // create target
-    EventRequestContext req_ctx(req, uri);
+    EventRequestContext req_ctx(req);
 
     CPPUNIT_ASSERT_EQUAL(string("/test/query?key=abc&from=test"), req_ctx.get_uri());
     CPPUNIT_ASSERT_EQUAL(string("/test/query"), req_ctx.get_path());
@@ -48,8 +45,7 @@ protected:
     CPPUNIT_ASSERT_EQUAL(string(""), req_ctx.get_query_param("to"));
     CPPUNIT_ASSERT_EQUAL((int)RequestContext::METHOD_GET, req_ctx.get_method());
 
-    map<string, string> params;
-    req_ctx.get_query_params(params);
+    map<string, string> params = req_ctx.get_query_params();
     CPPUNIT_ASSERT_EQUAL(2, (int)params.size());
     CPPUNIT_ASSERT_EQUAL(string("abc"), params["key"]);
     CPPUNIT_ASSERT_EQUAL(string("test"), params["from"]);
@@ -69,18 +65,15 @@ protected:
     evhttp_add_header(req->output_headers, "Host", "localhost");
     evhttp_make_request(conn.get(), req, EVHTTP_REQ_POST, "/query");
 
-    std::shared_ptr<evhttp_uri> uri(
-        evhttp_uri_parse(evhttp_request_get_uri(req)),
-        evhttp_uri_free);
     // create target
-    EventRequestContext req_ctx(req, uri);
+    EventRequestContext req_ctx(req);
 
     CPPUNIT_ASSERT_EQUAL(string("/query"), req_ctx.get_path());
     CPPUNIT_ASSERT_EQUAL((int)RequestContext::METHOD_POST, req_ctx.get_method());
-    CPPUNIT_ASSERT_EQUAL((int)content.size(), req_ctx.get_post_length());
+    CPPUNIT_ASSERT_EQUAL((int)content.size(), req_ctx.get_content_length());
 
     char cbuf[1024];
-    int ret = req_ctx.get_post_content(cbuf, 1023);
+    int ret = req_ctx.get_content(cbuf, 1023);
     CPPUNIT_ASSERT_EQUAL((int)content.size(), ret);
     cbuf[ret] = 0;
     CPPUNIT_ASSERT_EQUAL(content, string(cbuf));

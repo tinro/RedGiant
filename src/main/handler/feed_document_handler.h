@@ -14,39 +14,38 @@ struct FeedDocumentJob;
 
 class FeedDocumentHandler: public RequestHandler {
 public:
-  FeedDocumentHandler(JobExecutor<FeedDocumentJob>* doc_pipeline,
-      Parser<Document>* doc_parser, uint32_t doc_expires);
+  FeedDocumentHandler(JobExecutor<FeedDocumentJob>* pipeline,
+      Parser<Document>* parser, uint32_t default_ttl = 0);
 
   virtual ~FeedDocumentHandler() = default;
 
   virtual void handle_request(const RequestContext* request, ResponseWriter* response);
 
 private:
-  JobExecutor<FeedDocumentJob>* doc_pipeline_;
-  Parser<Document>* doc_parser_;
-  uint32_t doc_expires_;
+  JobExecutor<FeedDocumentJob>* pipeline_;
+  Parser<Document>* parser_;
+  uint32_t default_ttl_;
   CachedBuffer<char> buf_;
 };
 
 class FeedDocumentHandlerFactory: public RequestHandlerFactory {
 public:
-  FeedDocumentHandlerFactory(JobExecutor<FeedDocumentJob>* doc_pipeline,
-      Parser<Document>* doc_parser, uint32_t doc_expires)
-  : doc_pipeline_(doc_pipeline), doc_parser_(doc_parser),
-    doc_expires_(doc_expires) {
+  FeedDocumentHandlerFactory(JobExecutor<FeedDocumentJob>* pipeline,
+      Parser<Document>* parser, uint32_t default_ttl = 0)
+  : pipeline_(pipeline), parser_(parser), default_ttl_(default_ttl) {
   }
 
   virtual ~FeedDocumentHandlerFactory() = default;
 
   virtual std::unique_ptr<RequestHandler> create_handler() {
     return std::unique_ptr<RequestHandler>(
-        new FeedDocumentHandler(doc_pipeline_, doc_parser_, doc_expires_));
+        new FeedDocumentHandler(pipeline_, parser_, default_ttl_));
   }
 
 private:
-  JobExecutor<FeedDocumentJob>* doc_pipeline_;
-  Parser<Document>* doc_parser_;
-  uint32_t doc_expires_;
+  JobExecutor<FeedDocumentJob>* pipeline_;
+  Parser<Document>* parser_;
+  uint32_t default_ttl_;
 };
 } /* namespace redgiant */
 

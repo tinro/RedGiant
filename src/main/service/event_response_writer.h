@@ -13,9 +13,9 @@ public:
   virtual ~EventResponseWriter() = default;
 
   virtual void add_header(const char* key, const char* value);
-  virtual void add_body(const char* body, int size);
-  virtual void send_done(int status_code, const char* status_msg);
-  virtual void send_error(int status_code, const char* status_msg);
+  virtual void add_body(const void* body, size_t size);
+  virtual void send(int status_code, const char* status_msg);
+  virtual void send_empty(int status_code, const char* status_msg);
 
 private:
   evhttp_request* ev_req_;

@@ -40,23 +40,13 @@ void ServerInstance::on_request_cb(evhttp_request *req, void* arg) {
 }
 
 void ServerInstance::on_request(evhttp_request *req) {
-  const char *uri = evhttp_request_get_uri(req);
-  if (uri == NULL) {
-    LOG_ERROR(logger, "%s - Can't get URI", req->remote_host);
-    evhttp_send_error(req, 400, NULL);
-    return;
-  }
-
-  LOG_DEBUG(logger, "%s - Access: %s", req->remote_host, uri);
-  evhttp_uri* ev_uri = evhttp_uri_parse(uri);
+  const evhttp_uri* ev_uri = evhttp_request_get_evhttp_uri(req);
   if (ev_uri == NULL) {
-    LOG_ERROR(logger, "%s - Failed parse uri", req->remote_host);
+    LOG_ERROR(logger, "%s - Failed get uri", req->remote_host);
     evhttp_send_error(req, 400, NULL);
     return;
   }
 
-  // the lifecycle of ev_uri is now managed by the shared_ptr
-  std::shared_ptr<evhttp_uri> ev_uri_sp(ev_uri, evhttp_uri_free);
   const char* path = evhttp_uri_get_path(ev_uri);
   std::string path_str;
   if (path == NULL) {
@@ -65,6 +55,8 @@ void ServerInstance::on_request(evhttp_request *req) {
     path_str = path;
   }
 
+  LOG_DEBUG(logger, "%s - Access: %s", req->remote_host, path_str.c_str());
+
   auto find_it = route_map_.find(path_str);
   if (find_it == route_map_.end()) {
     LOG_ERROR(logger, "%s - URI Not Found: %s", req->remote_host, path_str.c_str());
@@ -72,7 +64,7 @@ void ServerInstance::on_request(evhttp_request *req) {
     return;
   }
 
-  EventRequestContext request_ctx(req, ev_uri_sp);
+  EventRequestContext request_ctx(req);
   EventResponseWriter response_writer(req);
   // close the connection after such amount of requests
   handle_count_++;
@@ -80,6 +72,7 @@ void ServerInstance::on_request(evhttp_request *req) {
     handle_count_ = 0;
     response_writer.add_header("Connection", "close");
   }
+
   // the handler may extend the lifetime of request context and response writer
   find_it->second->handle_request(&request_ctx, &response_writer);
 }

@@ -13,7 +13,7 @@ void TestHandler::handle_request(const RequestContext* request, ResponseWriter* 
   (void) request;
 
   response->add_body("OK\n");
-  response->send_done(200, NULL);
+  response->send(200, NULL);
 }
 
 } /* namespace redgiant */
