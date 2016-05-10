@@ -10,11 +10,11 @@
 
 namespace redgiant {
 class Document;
-struct FeedDocumentJob;
+struct FeedDocumentRequest;
 
 class FeedDocumentHandler: public RequestHandler {
 public:
-  FeedDocumentHandler(JobExecutor<FeedDocumentJob>* pipeline,
+  FeedDocumentHandler(JobExecutor<FeedDocumentRequest>* pipeline,
       Parser<Document>* parser, uint32_t default_ttl = 0);
 
   virtual ~FeedDocumentHandler() = default;
@@ -22,7 +22,7 @@ public:
   virtual void handle_request(const RequestContext* request, ResponseWriter* response);
 
 private:
-  JobExecutor<FeedDocumentJob>* pipeline_;
+  JobExecutor<FeedDocumentRequest>* pipeline_;
   Parser<Document>* parser_;
   uint32_t default_ttl_;
   CachedBuffer<char> buf_;
@@ -30,7 +30,7 @@ private:
 
 class FeedDocumentHandlerFactory: public RequestHandlerFactory {
 public:
-  FeedDocumentHandlerFactory(JobExecutor<FeedDocumentJob>* pipeline,
+  FeedDocumentHandlerFactory(JobExecutor<FeedDocumentRequest>* pipeline,
       Parser<Document>* parser, uint32_t default_ttl = 0)
   : pipeline_(pipeline), parser_(parser), default_ttl_(default_ttl) {
   }
@@ -43,7 +43,7 @@ public:
   }
 
 private:
-  JobExecutor<FeedDocumentJob>* pipeline_;
+  JobExecutor<FeedDocumentRequest>* pipeline_;
   Parser<Document>* parser_;
   uint32_t default_ttl_;
 };

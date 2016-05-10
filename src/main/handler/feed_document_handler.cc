@@ -1,11 +1,12 @@
 #include "handler/feed_document_handler.h"
 
+#include <time.h>
 #include <string>
 #include <memory>
 #include <utility>
 
+#include "../pipeline/feed_document_request.h"
 #include "model/document.h"
-#include "pipeline/feed_document_job.h"
 #include "service/request_context.h"
 #include "service/response_writer.h"
 #include "utils/logger.h"
@@ -17,7 +18,7 @@ namespace redgiant {
 
 DECLARE_LOGGER(logger, __FILE__);
 
-FeedDocumentHandler::FeedDocumentHandler(JobExecutor<FeedDocumentJob>* doc_pipeline,
+FeedDocumentHandler::FeedDocumentHandler(JobExecutor<FeedDocumentRequest>* doc_pipeline,
     Parser<Document>* doc_parser, uint32_t doc_expires)
 : pipeline_(doc_pipeline), parser_(doc_parser), default_ttl_(doc_expires),
   buf_(2 * 1024 * 1024) {
@@ -59,10 +60,9 @@ void FeedDocumentHandler::handle_request(const RequestContext* request, Response
     return;
   }
 
-  std::shared_ptr<FeedDocumentJob> job = std::make_shared<FeedDocumentJob>();
-  job->expire_time = 0;
-  job->doc = std::move(doc);
-
+  // create feeding request as a job
+  std::shared_ptr<FeedDocumentRequest> job =
+      std::make_shared<FeedDocumentRequest>(std::move(doc), time(NULL) + default_ttl_, watch);
   // do something here
   pipeline_->schedule(std::move(job));
 

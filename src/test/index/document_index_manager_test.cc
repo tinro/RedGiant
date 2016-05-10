@@ -119,37 +119,37 @@ private:
         {
           { space_cat, {{"1", 1.1}, {"2", 2.2}, {"3", 3.3}}},
           { space_ent, {{"AA", 0.1}, {"BB", 0.2}}},
-        }));
+        }), 1);
 
     index->update(create_document(
         "00000000-0003-0000-0000-000000000000",
         {
           { space_cat, {{"1", 1.5}, {"3", 0.2}}},
           { space_ent, {{"AA", 1.0}}},
-        }));
+        }), 1);
 
     index->update(create_document(
         "00000000-0004-0000-0000-000000000000",
         {
           { space_cat, {{"1001", 1.0}, {"1002", 1.5}}},
           { space_ent, {{"xxx", 0.5}, {"yyy", 0.5}}},
-        }));
+        }), 1);
 
     index->update(create_document(
         "00000000-0005-0000-0000-000000000000",
         {
           { space_cat, {{"1002", 2.0}, {"1003", 0.3}}},
           { space_ent, {{"xxx", 0.5}, {"zzz", 0.5}}},
-        }));
+        }), 1);
 
     index->update(create_document(
         "00000000-0002-0000-0000-000000000000",
         {
           { space_cat, {{"3", 1.5}, {"2", 1.4}}},
           { space_ent, {{"BB", 0.3}, {"CC", 1.0}}},
-        }));
+        }), 1);
 
-    index->do_maintain(-1);
+    index->do_maintain(0);
     return index;
   }
 

@@ -52,7 +52,7 @@ int DocumentIndexManager::batch_remove(const std::vector<DocId> doc_ids) {
   return index_.batch_remove(doc_ids);
 }
 
-int DocumentIndexManager::update(std::shared_ptr<Document> doc) {
+int DocumentIndexManager::update(std::shared_ptr<Document> doc, time_t expire_time) {
   StopWatch watch;
   int ret = 0;
   DocTerms weights;
@@ -63,10 +63,10 @@ int DocumentIndexManager::update(std::shared_ptr<Document> doc) {
       weights.emplace_back(feature_pair.first->get_id(), feature_pair.second);
     }
   }
-  return index_.update(doc->get_id(), weights, 0);
+  return index_.update(doc->get_id(), weights, expire_time);
 }
 
-int DocumentIndexManager::batch_update(const std::vector<std::shared_ptr<Document>>& docs) {
+int DocumentIndexManager::batch_update(const std::vector<std::shared_ptr<Document>>& docs, time_t expire_time) {
   StopWatch watch;
   std::vector<DocTuple> update_docs;
   for (const auto& doc: docs) {
@@ -78,7 +78,7 @@ int DocumentIndexManager::batch_update(const std::vector<std::shared_ptr<Documen
         weights.emplace_back(feature_pair.first->get_id(), feature_pair.second);
       }
     }
-    update_docs.emplace_back(doc->get_id(), std::move(weights), 0);
+    update_docs.emplace_back(doc->get_id(), std::move(weights), expire_time);
   }
   return index_.batch_update(update_docs);
 }

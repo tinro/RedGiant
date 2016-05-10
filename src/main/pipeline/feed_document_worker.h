@@ -2,13 +2,14 @@
 #define SRC_MAIN_FEEDING_FEED_DOCUMENT_WORKER_H_
 
 #include <memory>
-#include "pipeline/feed_document_job.h"
+
+#include "feed_document_request.h"
 #include "utils/concurrency/worker.h"
 
 namespace redgiant {
 class DocumentIndexManager;
 
-class FeedDocumentWorker: public Worker<FeedDocumentJob> {
+class FeedDocumentWorker: public Worker<FeedDocumentRequest> {
 public:
   FeedDocumentWorker(DocumentIndexManager* index)
   : index_(index) {
@@ -20,7 +21,7 @@ public:
 
   virtual void cleanup();
 
-  virtual void execute(FeedDocumentJob& job);
+  virtual void execute(FeedDocumentRequest& job);
 
 private:
   DocumentIndexManager* index_;

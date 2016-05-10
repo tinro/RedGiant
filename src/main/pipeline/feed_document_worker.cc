@@ -16,9 +16,9 @@ void FeedDocumentWorker::prepare() {
 void FeedDocumentWorker::cleanup() {
 }
 
-void FeedDocumentWorker::execute(FeedDocumentJob& job) {
+void FeedDocumentWorker::execute(FeedDocumentRequest& job) {
   LOG_DEBUG(logger, "worker received job");
-  index_->update(job.doc);
+  index_->update(job.get_doc(), job.get_expire_time());
 }
 
 } /* namespace redgiant */

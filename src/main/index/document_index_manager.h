@@ -48,9 +48,9 @@ public:
 
   int batch_remove(const std::vector<DocId> doc_ids);
 
-  int update(std::shared_ptr<Document> doc);
+  int update(std::shared_ptr<Document> doc, time_t expire_time);
 
-  int batch_update(const std::vector<std::shared_ptr<Document>>& docs);
+  int batch_update(const std::vector<std::shared_ptr<Document>>& docs, time_t expire_time);
 
   std::unique_ptr<RawReader> peek_term(TermId term_id) const;
 

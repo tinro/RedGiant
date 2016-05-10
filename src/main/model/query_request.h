@@ -21,9 +21,13 @@ public:
     query_features_(std::move(query_features)), watch_(watch), debug_(debug) {
   }
 
-  QueryRequest(const QueryRequest&) = default;
+  // no copy
+  QueryRequest(const QueryRequest&) = delete;
+  QueryRequest& operator= (const QueryRequest&) = delete;
+
+  // movable
   QueryRequest(QueryRequest&&) = default;
-  QueryRequest& operator= (const QueryRequest&) = default;
+  QueryRequest& operator= (QueryRequest&&) = default;
 
   ~QueryRequest() = default;
 
