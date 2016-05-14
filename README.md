@@ -6,6 +6,8 @@ for small scale personalized recommendation systems.
 
 Latest version: 0.0.1 (not completed yet)
 
+[![Build Status](https://travis-ci.org/tinro/RedGiant.svg?branch=master)](https://travis-ci.org/tinro/RedGiant)
+
 It is simple since:
 * All documents are consindered as a set of weighted features.
 * All inputs are sets of weighted features.
