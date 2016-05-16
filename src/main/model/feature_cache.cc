@@ -11,12 +11,14 @@ namespace redgiant {
 auto FeatureCache::create_or_get_feature(const std::string& feature_key,
     const std::string& space_name)
 -> std::shared_ptr<Feature> {
-  auto iter = spaces_.find(space_name);
-  if (iter == spaces_.end()) {
-    // space not found
-    return nullptr;
+  shared_lock<shared_mutex> lock(mutex_);
+  std::shared_ptr<FeatureSpace> space = get_space_internal(space_name);
+  lock.unlock();
+
+  if (space) {
+    return create_or_get_feature(feature_key, space);
   }
-  return create_or_get_feature(feature_key, iter->second);
+  return nullptr;
 }
 
 auto FeatureCache::create_or_get_feature(const std::string& feature_key,
@@ -27,6 +29,7 @@ auto FeatureCache::create_or_get_feature(const std::string& feature_key,
     return nullptr;
   }
 
+  std::unique_lock<shared_mutex> lock(mutex_);
   auto iter = features_.find(id);
   if (iter != features_.end()) {
     return iter->second;
