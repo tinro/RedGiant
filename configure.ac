@@ -45,6 +45,8 @@ AC_CONFIG_FILES([Makefile
                  src/main/model/Makefile
                  src/main/parser/Makefile
                  src/main/pipeline/Makefile
+                 src/main/query/Makefile
+                 src/main/ranking/Makefile
                  src/main/service/Makefile
                  src/test/Makefile
                  src/test/core_index/Makefile
@@ -54,6 +56,8 @@ AC_CONFIG_FILES([Makefile
                  src/test/model/Makefile
                  src/test/parser/Makefile
                  src/test/pipeline/Makefile
+                 src/test/query/Makefile
+                 src/test/ranking/Makefile
                  src/test/service/Makefile
                  src/test/utils/Makefile])
 AC_OUTPUT

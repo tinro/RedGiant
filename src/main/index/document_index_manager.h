@@ -56,7 +56,7 @@ public:
 
 //  std::shared_ptr<Document> peek_doc(DocId doc_id) const;
 
-  std::unique_ptr<Reader> query(const QueryRequest& request) const;
+  std::unique_ptr<Reader> query(const QueryRequest& request, const DocumentQuery& query) const;
 
 private:
   static const std::string kIndexFileNamePrefix;

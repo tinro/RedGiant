@@ -18,9 +18,8 @@ public:
   : key_(std::move(key)), id_(id) {
   }
 
-  Feature(const Feature& other) = default;
-  Feature(Feature&& other) = default;
-
+  Feature(const Feature&) = default;
+  Feature(Feature&&) = default;
   ~Feature() = default;
 
   const std::string& get_key() const {

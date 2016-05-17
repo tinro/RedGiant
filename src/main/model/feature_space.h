@@ -24,9 +24,8 @@ public:
     // TODO: id should be in range [0,254] (255 is reserved for invalid)
   }
 
-  FeatureSpace(const FeatureSpace& other) = default;
-  FeatureSpace(FeatureSpace&& other) = default;
-
+  FeatureSpace(const FeatureSpace&) = default;
+  FeatureSpace(FeatureSpace&&) = default;
   ~FeatureSpace() = default;
 
   const std::string& get_name() const {

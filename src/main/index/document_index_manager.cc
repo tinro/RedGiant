@@ -93,11 +93,10 @@ auto DocumentIndexManager::peek_term(TermId term_id) const
 //  return index_.peek(term_id);
 //}
 
-auto DocumentIndexManager::query(const QueryRequest& request) const
+auto DocumentIndexManager::query(const QueryRequest& request, const DocumentQuery& query) const
 -> std::unique_ptr<Reader> {
   StopWatch watch;
 
-  DocumentQuery query(request);
   size_t query_size = query.get_doc_queries().size();
   if (query_size == 0) {
     // do not let it be empty

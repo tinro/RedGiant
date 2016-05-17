@@ -21,9 +21,8 @@ public:
   : space_(std::move(space)) {
   }
 
-  FeatureVector(const FeatureVector& other) = default;
-  FeatureVector(FeatureVector&& other) = default;
-
+  FeatureVector(const FeatureVector&) = default;
+  FeatureVector(FeatureVector&&) = default;
   ~FeatureVector() = default;
 
   void add_feature(std::shared_ptr<Feature> feature, Weight weight) {

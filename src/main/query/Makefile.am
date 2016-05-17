@@ -1,0 +1,4 @@
+lib_LIBRARIES = libquery.a
+libquery_a_SOURCES = dummy.cc
+
+AM_CPPFLAGS = -I$(srcdir) -I$(srcdir)/.. 

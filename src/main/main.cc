@@ -51,9 +51,9 @@ int server_main() {
    * Initialization:
    * Features initialization
    */
-  FeatureCache feature_cache;
+  std::shared_ptr<FeatureCache> feature_cache = std::make_shared<FeatureCache>();
   FeatureCacheParser feature_cache_parser;
-  if (feature_cache_parser.parse_file("./conf/feature_space.json", feature_cache) < 0) {
+  if (feature_cache_parser.parse_file("./conf/feature_space.json", *feature_cache) < 0) {
     LOG_ERROR(logger, "feature cache parsing failed!");
     return -1;
   }
@@ -76,7 +76,6 @@ int server_main() {
     feed_document.stop();
   });
 
-  DocumentParser document_parser(&feature_cache);
   /*
    * Initialize:
    * Server initialization
@@ -84,7 +83,9 @@ int server_main() {
   LOG_INFO(logger, "server initializing ...");
   Server test_server(19980, 2, 1024);
   test_server.bind("/test", std::make_shared<TestHandlerFactory>());
-  test_server.bind("/document", std::make_shared<FeedDocumentHandlerFactory>(&feed_document, &document_parser, 0));
+  test_server.bind("/document", std::make_shared<FeedDocumentHandlerFactory>(
+      std::shared_ptr<ParserFactory<Document>>(new DocumentParserFactory(feature_cache)),
+      &feed_document, 0));
 
   if (test_server.initialize() < 0) {
     LOG_ERROR(logger, "test server initialization failed!");

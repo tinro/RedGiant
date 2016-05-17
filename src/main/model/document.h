@@ -27,9 +27,8 @@ public:
     id_str_ = std::move(id);
   }
 
-  Document(const Document& other) = default;
-  Document(Document&& other) = default;
-
+  Document(const Document&) = default;
+  Document(Document&&) = default;
   ~Document() = default;
 
   const DocumentId& get_id() const {

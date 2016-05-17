@@ -10,7 +10,6 @@
 
 namespace redgiant {
 class FeedDocumentRequest {
-
 public:
   FeedDocumentRequest(std::shared_ptr<Document> doc, std::time_t expire_time,
       StopWatch watch = StopWatch())

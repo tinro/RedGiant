@@ -2,18 +2,16 @@
 #define SRC_MAIN_PARSER_DOCUMENT_PARSER_H_
 
 #include <memory>
-#include <utility>
-
-#include "model/document.h"
 #include "parser/json_parser.h"
 
 namespace redgiant {
-class FeatureSpace;
+class Document;
 class FeatureCache;
+class FeatureVector;
 
 class DocumentParser: public JsonParser<Document> {
 public:
-  DocumentParser(FeatureCache* cache)
+  DocumentParser(std::shared_ptr<FeatureCache> cache)
   : cache_(std::move(cache)) {
   }
 
@@ -31,7 +29,23 @@ private:
       const Document& doc, FeatureVector& vec);
 
 private:
-  FeatureCache* cache_;
+  std::shared_ptr<FeatureCache> cache_;
+};
+
+class DocumentParserFactory: public ParserFactory<Document> {
+public:
+  DocumentParserFactory(std::shared_ptr<FeatureCache> cache)
+  : cache_(std::move(cache)) {
+  }
+
+  virtual ~DocumentParserFactory() = default;
+
+  std::unique_ptr<Parser<Document>> create_parser() {
+    return std::unique_ptr<Parser<Document>>(new DocumentParser(cache_));
+  }
+
+private:
+  std::shared_ptr<FeatureCache> cache_;
 };
 } /* namespace redgiant */
 
