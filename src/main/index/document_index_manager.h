@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-#include "model/document.h"
+#include "data/document.h"
 #include "index/document_index.h"
 #include "index/document_query.h"
 #include "index/index_manager.h"

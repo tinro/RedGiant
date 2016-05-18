@@ -5,7 +5,7 @@
 #include <memory>
 #include <utility>
 
-#include "model/document.h"
+#include "data/document.h"
 #include "utils/stop_watch.h"
 
 namespace redgiant {

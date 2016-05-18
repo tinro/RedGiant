@@ -5,10 +5,11 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+
 #include "core/reader/wand_reader.h"
 #include "core/reader/wand_reader-inl.h"
-#include "model/document.h"
-#include "model/document_id.h"
+#include "data/document.h"
+#include "data/document_id.h"
 #include "index/document_query.h"
 #include "utils/logger.h"
 #include "utils/stop_watch.h"

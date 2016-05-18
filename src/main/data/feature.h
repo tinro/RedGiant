@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_MODEL_FEATURE_H_
-#define SRC_MAIN_MODEL_FEATURE_H_
+#ifndef SRC_MAIN_DATA_FEATURE_H_
+#define SRC_MAIN_DATA_FEATURE_H_
 
 #include <string>
 #include <memory>
@@ -37,4 +37,4 @@ private:
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_MODEL_FEATURE_H_ */
+#endif /* SRC_MAIN_DATA_FEATURE_H_ */

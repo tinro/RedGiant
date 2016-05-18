@@ -1,7 +1,7 @@
 #ifndef SRC_MAIN_PARSER_FEATURE_CACHE_PARSER_H_
 #define SRC_MAIN_PARSER_FEATURE_CACHE_PARSER_H_
 
-#include "model/feature_cache.h"
+#include "data/feature_cache.h"
 #include "parser/json_parser.h"
 
 namespace redgiant {

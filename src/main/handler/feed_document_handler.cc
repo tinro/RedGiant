@@ -5,7 +5,7 @@
 #include <memory>
 #include <utility>
 
-#include "model/document.h"
+#include "data/document.h"
 #include "parser/document_parser.h"
 #include "pipeline/feed_document_request.h"
 #include "service/request_context.h"

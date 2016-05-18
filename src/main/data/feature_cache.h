@@ -1,13 +1,13 @@
-#ifndef SRC_MAIN_MODEL_FEATURE_CACHE_H_
-#define SRC_MAIN_MODEL_FEATURE_CACHE_H_
+#ifndef SRC_MAIN_DATA_FEATURE_CACHE_H_
+#define SRC_MAIN_DATA_FEATURE_CACHE_H_
 
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
 
-#include "model/feature.h"
-#include "model/feature_space.h"
+#include "data/feature.h"
+#include "data/feature_space.h"
 #include "third_party/lock/shared_lock.h"
 #include "third_party/lock/shared_mutex.h"
 
@@ -113,4 +113,4 @@ private:
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_MODEL_FEATURE_CACHE_H_ */
+#endif /* SRC_MAIN_DATA_FEATURE_CACHE_H_ */

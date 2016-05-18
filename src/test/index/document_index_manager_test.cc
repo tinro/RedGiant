@@ -10,10 +10,11 @@
 #include "index/document_query.h"
 #include "index/document_index.h"
 #include "index/document_index_manager.h"
-#include "model/feature.h"
-#include "model/feature_vector.h"
-#include "model/document.h"
-#include "model/query_request.h"
+
+#include "data/document.h"
+#include "data/feature.h"
+#include "data/feature_vector.h"
+#include "data/query_request.h"
 #include "utils/logger.h"
 
 using namespace std;

@@ -40,9 +40,9 @@ AC_CHECK_FUNCS([memset pow socket sqrt strstr strtol])
 
 AC_CONFIG_FILES([Makefile
                  src/main/Makefile
+                 src/main/data/Makefile
                  src/main/handler/Makefile
                  src/main/index/Makefile
-                 src/main/model/Makefile
                  src/main/parser/Makefile
                  src/main/pipeline/Makefile
                  src/main/query/Makefile
@@ -51,9 +51,9 @@ AC_CONFIG_FILES([Makefile
                  src/test/Makefile
                  src/test/core_index/Makefile
                  src/test/core_reader/Makefile
+                 src/test/data/Makefile
                  src/test/handler/Makefile
                  src/test/index/Makefile
-                 src/test/model/Makefile
                  src/test/parser/Makefile
                  src/test/pipeline/Makefile
                  src/test/query/Makefile

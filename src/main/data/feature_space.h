@@ -1,11 +1,11 @@
-#ifndef SRC_MAIN_MODEL_FEATURE_SPACE_H_
-#define SRC_MAIN_MODEL_FEATURE_SPACE_H_
+#ifndef SRC_MAIN_DATA_FEATURE_SPACE_H_
+#define SRC_MAIN_DATA_FEATURE_SPACE_H_
 
 #include <memory>
 #include <string>
 #include <utility>
 
-#include "model/feature.h"
+#include "data/feature.h"
 
 namespace redgiant {
 
@@ -89,4 +89,4 @@ private:
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_MODEL_FEATURE_SPACE_H_ */
+#endif /* SRC_MAIN_DATA_FEATURE_SPACE_H_ */

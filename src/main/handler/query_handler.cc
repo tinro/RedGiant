@@ -5,8 +5,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "model/query_request.h"
-#include "model/query_result.h"
+#include "data/query_request.h"
+#include "data/query_result.h"
 #include "parser/query_request_parser.h"
 #include "query/query_executor.h"
 #include "service/request_context.h"

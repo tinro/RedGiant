@@ -5,11 +5,11 @@
 #include <utility>
 #include <vector>
 
-#include "model/feature.h"
-#include "model/feature_cache.h"
-#include "model/feature_space.h"
-#include "model/feature_vector.h"
-#include "model/query_request.h"
+#include "data/feature.h"
+#include "data/feature_cache.h"
+#include "data/feature_space.h"
+#include "data/feature_vector.h"
+#include "data/query_request.h"
 #include "utils/logger.h"
 
 namespace redgiant {

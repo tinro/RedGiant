@@ -1,8 +1,9 @@
+#include "data/document_id.h"
+
 #include <iostream>
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-#include "model/document_id.h"
 
 using namespace std;
 

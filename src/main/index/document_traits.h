@@ -2,10 +2,11 @@
 #define SRC_MAIN_INDEX_DOCUMENT_TRAITS_H_
 
 #include <functional>
-#include "model/document.h"
-#include "model/document_id.h"
-#include "model/feature.h"
-#include "model/feature_vector.h"
+
+#include "data/document.h"
+#include "data/document_id.h"
+#include "data/feature.h"
+#include "data/feature_vector.h"
 
 namespace redgiant {
 class DocumentTraits {

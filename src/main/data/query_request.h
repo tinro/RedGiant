@@ -4,9 +4,10 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "data/feature.h"
+#include "data/feature_vector.h"
 #include "utils/stop_watch.h"
-#include "model/feature.h"
-#include "model/feature_vector.h"
 
 namespace redgiant {
 class QueryRequest {

@@ -1,12 +1,12 @@
-#ifndef SRC_MAIN_MODEL_FEATURE_VECTOR_H_
-#define SRC_MAIN_MODEL_FEATURE_VECTOR_H_
+#ifndef SRC_MAIN_DATA_FEATURE_VECTOR_H_
+#define SRC_MAIN_DATA_FEATURE_VECTOR_H_
 
 #include <memory>
 #include <utility>
 #include <vector>
 
-#include "model/feature.h"
-#include "model/feature_space.h"
+#include "data/feature.h"
+#include "data/feature_space.h"
 
 namespace redgiant {
 /*
@@ -52,4 +52,4 @@ private:
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_MODEL_FEATURE_VECTOR_H_ */
+#endif /* SRC_MAIN_DATA_FEATURE_VECTOR_H_ */

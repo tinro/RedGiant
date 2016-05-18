@@ -1,10 +1,11 @@
+#include "data/feature_space.h"
+
 #include <string>
 #include <memory>
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-#include "model/feature.h"
-#include "model/feature_space.h"
+#include "data/feature.h"
 
 using namespace std;
 

@@ -5,10 +5,11 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "data/query_request.h"
 #include "core/query/posting_list_query.h"
 #include "index/document_index.h"
 #include "index/document_traits.h"
-#include "model/query_request.h"
 
 namespace redgiant {
 class QueryRequest;

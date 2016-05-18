@@ -1,10 +1,10 @@
-#include "model/feature_cache.h"
+#include "data/feature_cache.h"
 
 #include <memory>
 #include <utility>
 
-#include "model/feature.h"
-#include "model/feature_space.h"
+#include "data/feature.h"
+#include "data/feature_space.h"
 
 namespace redgiant {
 

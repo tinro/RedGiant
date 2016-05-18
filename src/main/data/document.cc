@@ -1,4 +1,4 @@
-#include "model/feature_vector.h"
+#include "data/document.h"
 
 namespace redgiant {
 

@@ -5,10 +5,10 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "model/document.h"
-#include "model/feature_cache.h"
-#include "model/feature_vector.h"
 #include "parser/document_parser.h"
+#include "data/document.h"
+#include "data/feature_cache.h"
+#include "data/feature_vector.h"
 
 using namespace std;
 
