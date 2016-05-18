@@ -7,6 +7,7 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
+#include "index/document_query.h"
 #include "index/document_index.h"
 #include "index/document_index_manager.h"
 #include "model/feature.h"
@@ -53,13 +54,14 @@ public:
 
   void test_exist_query() {
     auto index = create_index_manager();
-    QueryRequest request("ID-0001", 50, {
+    QueryRequest request("ID-0001", 50, "", StopWatch(), true);
+    DocumentQuery query(50, {
         {space_cat->calculate_feature_id("3"), 2.0},
         {space_ent->calculate_feature_id("AA"), 1.0},
         {space_ent->calculate_feature_id("zzz"), 5.0},
-    }, StopWatch(), true);
+    });
 
-    auto reader = index->query(request);
+    auto reader = index->query(request, query);
     auto cur_id = DocumentId(0);
     cur_id = reader->next(cur_id);
     CPPUNIT_ASSERT_EQUAL(string("00000000-0001-0000-0000-000000000000"), cur_id.to_string());
@@ -83,12 +85,13 @@ public:
 
   void test_noexist_query() {
     auto index = create_index_manager();
-    QueryRequest request("ID-0001", 50, {
+    QueryRequest request("ID-0001", 50, "", StopWatch(), true);
+    DocumentQuery query(50, {
         {space_cat->calculate_feature_id("5"), 2.0},
         {space_ent->calculate_feature_id("ooo"), 1.0},
-    }, StopWatch(), true);
+    });
 
-    auto reader = index->query(request);
+    auto reader = index->query(request, query);
     CPPUNIT_ASSERT(!reader);
   }
 

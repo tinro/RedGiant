@@ -26,7 +26,7 @@ public:
 protected:
   void test_parser() {
     auto cache = create_cache();
-    auto parser = create_parser(cache.get());
+    auto parser = create_parser(cache);
 
     string s =
       R"({
@@ -103,7 +103,7 @@ protected:
 
   void test_parser_withoutuuid() {
     auto cache = create_cache();
-    auto parser = create_parser(cache.get());
+    auto parser = create_parser(cache);
 
     string s =
       R"({
@@ -122,8 +122,8 @@ protected:
   }
 
 private:
-  std::unique_ptr<FeatureCache> create_cache() {
-    auto cache = std::unique_ptr<FeatureCache>(new FeatureCache());
+  std::shared_ptr<FeatureCache> create_cache() {
+    auto cache = std::make_shared<FeatureCache>();
     cache->create_space("time", 1, FeatureSpace::FeatureType::kInteger);
     cache->create_space("publisher", 2, FeatureSpace::FeatureType::kString);
     cache->create_space("entity", 3, FeatureSpace::FeatureType::kString);
@@ -131,8 +131,8 @@ private:
     return cache;
   };
 
-  std::unique_ptr<DocumentParser> create_parser(FeatureCache* cache) {
-    return std::unique_ptr<DocumentParser>(new DocumentParser(cache));
+  std::unique_ptr<DocumentParser> create_parser(std::shared_ptr<FeatureCache> cache) {
+    return std::unique_ptr<DocumentParser>(new DocumentParser(std::move(cache)));
   };
 };
 
