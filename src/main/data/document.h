@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_MODEL_DOCUMENT_H_
-#define SRC_MAIN_MODEL_DOCUMENT_H_
+#ifndef SRC_MAIN_DATA_DOCUMENT_H_
+#define SRC_MAIN_DATA_DOCUMENT_H_
 
 #include <map>
 #include <memory>
@@ -7,10 +7,10 @@
 #include <utility>
 #include <vector>
 
-#include "model/document_id.h"
-#include "model/feature.h"
-#include "model/feature_space.h"
-#include "model/feature_vector.h"
+#include "data/document_id.h"
+#include "data/feature.h"
+#include "data/feature_space.h"
+#include "data/feature_vector.h"
 
 namespace redgiant {
 
@@ -27,9 +27,8 @@ public:
     id_str_ = std::move(id);
   }
 
-  Document(const Document& other) = default;
-  Document(Document&& other) = default;
-
+  Document(const Document&) = default;
+  Document(Document&&) = default;
   ~Document() = default;
 
   const DocumentId& get_id() const {
@@ -61,4 +60,4 @@ private:
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_MODEL_DOCUMENT_H_ */
+#endif /* SRC_MAIN_DATA_DOCUMENT_H_ */

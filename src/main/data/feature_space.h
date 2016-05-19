@@ -1,11 +1,11 @@
-#ifndef SRC_MAIN_MODEL_FEATURE_SPACE_H_
-#define SRC_MAIN_MODEL_FEATURE_SPACE_H_
+#ifndef SRC_MAIN_DATA_FEATURE_SPACE_H_
+#define SRC_MAIN_DATA_FEATURE_SPACE_H_
 
 #include <memory>
 #include <string>
 #include <utility>
 
-#include "model/feature.h"
+#include "data/feature.h"
 
 namespace redgiant {
 
@@ -24,9 +24,8 @@ public:
     // TODO: id should be in range [0,254] (255 is reserved for invalid)
   }
 
-  FeatureSpace(const FeatureSpace& other) = default;
-  FeatureSpace(FeatureSpace&& other) = default;
-
+  FeatureSpace(const FeatureSpace&) = default;
+  FeatureSpace(FeatureSpace&&) = default;
   ~FeatureSpace() = default;
 
   const std::string& get_name() const {
@@ -90,4 +89,4 @@ private:
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_MODEL_FEATURE_SPACE_H_ */
+#endif /* SRC_MAIN_DATA_FEATURE_SPACE_H_ */

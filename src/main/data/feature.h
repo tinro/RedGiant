@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_MODEL_FEATURE_H_
-#define SRC_MAIN_MODEL_FEATURE_H_
+#ifndef SRC_MAIN_DATA_FEATURE_H_
+#define SRC_MAIN_DATA_FEATURE_H_
 
 #include <string>
 #include <memory>
@@ -18,9 +18,8 @@ public:
   : key_(std::move(key)), id_(id) {
   }
 
-  Feature(const Feature& other) = default;
-  Feature(Feature&& other) = default;
-
+  Feature(const Feature&) = default;
+  Feature(Feature&&) = default;
   ~Feature() = default;
 
   const std::string& get_key() const {
@@ -38,4 +37,4 @@ private:
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_MODEL_FEATURE_H_ */
+#endif /* SRC_MAIN_DATA_FEATURE_H_ */

@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_MODEL_DOCUMENT_ID_H_
-#define SRC_MAIN_MODEL_DOCUMENT_ID_H_
+#ifndef SRC_MAIN_DATA_DOCUMENT_ID_H_
+#define SRC_MAIN_DATA_DOCUMENT_ID_H_
 
 #include <cstdint>
 #include <string>

@@ -7,12 +7,14 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
+#include "index/document_query.h"
 #include "index/document_index.h"
 #include "index/document_index_manager.h"
-#include "model/feature.h"
-#include "model/feature_vector.h"
-#include "model/document.h"
-#include "model/query_request.h"
+
+#include "data/document.h"
+#include "data/feature.h"
+#include "data/feature_vector.h"
+#include "data/query_request.h"
 #include "utils/logger.h"
 
 using namespace std;
@@ -53,13 +55,14 @@ public:
 
   void test_exist_query() {
     auto index = create_index_manager();
-    QueryRequest request("ID-0001", 50, {
+    QueryRequest request("ID-0001", 50, "", StopWatch(), true);
+    DocumentQuery query(50, {
         {space_cat->calculate_feature_id("3"), 2.0},
         {space_ent->calculate_feature_id("AA"), 1.0},
         {space_ent->calculate_feature_id("zzz"), 5.0},
-    }, StopWatch(), true);
+    });
 
-    auto reader = index->query(request);
+    auto reader = index->query(request, query);
     auto cur_id = DocumentId(0);
     cur_id = reader->next(cur_id);
     CPPUNIT_ASSERT_EQUAL(string("00000000-0001-0000-0000-000000000000"), cur_id.to_string());
@@ -83,12 +86,13 @@ public:
 
   void test_noexist_query() {
     auto index = create_index_manager();
-    QueryRequest request("ID-0001", 50, {
+    QueryRequest request("ID-0001", 50, "", StopWatch(), true);
+    DocumentQuery query(50, {
         {space_cat->calculate_feature_id("5"), 2.0},
         {space_ent->calculate_feature_id("ooo"), 1.0},
-    }, StopWatch(), true);
+    });
 
-    auto reader = index->query(request);
+    auto reader = index->query(request, query);
     CPPUNIT_ASSERT(!reader);
   }
 
@@ -119,37 +123,37 @@ private:
         {
           { space_cat, {{"1", 1.1}, {"2", 2.2}, {"3", 3.3}}},
           { space_ent, {{"AA", 0.1}, {"BB", 0.2}}},
-        }));
+        }), 1);
 
     index->update(create_document(
         "00000000-0003-0000-0000-000000000000",
         {
           { space_cat, {{"1", 1.5}, {"3", 0.2}}},
           { space_ent, {{"AA", 1.0}}},
-        }));
+        }), 1);
 
     index->update(create_document(
         "00000000-0004-0000-0000-000000000000",
         {
           { space_cat, {{"1001", 1.0}, {"1002", 1.5}}},
           { space_ent, {{"xxx", 0.5}, {"yyy", 0.5}}},
-        }));
+        }), 1);
 
     index->update(create_document(
         "00000000-0005-0000-0000-000000000000",
         {
           { space_cat, {{"1002", 2.0}, {"1003", 0.3}}},
           { space_ent, {{"xxx", 0.5}, {"zzz", 0.5}}},
-        }));
+        }), 1);
 
     index->update(create_document(
         "00000000-0002-0000-0000-000000000000",
         {
           { space_cat, {{"3", 1.5}, {"2", 1.4}}},
           { space_ent, {{"BB", 0.3}, {"CC", 1.0}}},
-        }));
+        }), 1);
 
-    index->do_maintain(-1);
+    index->do_maintain(0);
     return index;
   }
 

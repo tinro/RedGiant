@@ -1,11 +1,13 @@
 #include "handler/feed_document_handler.h"
 
+#include <time.h>
 #include <string>
 #include <memory>
 #include <utility>
 
-#include "model/document.h"
-#include "pipeline/feed_document_job.h"
+#include "data/document.h"
+#include "parser/document_parser.h"
+#include "pipeline/feed_document_request.h"
 #include "service/request_context.h"
 #include "service/response_writer.h"
 #include "utils/logger.h"
@@ -17,14 +19,9 @@ namespace redgiant {
 
 DECLARE_LOGGER(logger, __FILE__);
 
-FeedDocumentHandler::FeedDocumentHandler(JobExecutor<FeedDocumentJob>* doc_pipeline,
-    Parser<Document>* doc_parser, uint32_t doc_expires)
-: pipeline_(doc_pipeline), parser_(doc_parser), default_ttl_(doc_expires),
-  buf_(2 * 1024 * 1024) {
-}
-
 void FeedDocumentHandler::handle_request(const RequestContext* request, ResponseWriter* response) {
   StopWatch watch;
+
   int method = request->get_method();
   if (method != RequestContext::METHOD_PUT) {
     LOG_ERROR(logger, "method is not PUT");
@@ -32,8 +29,6 @@ void FeedDocumentHandler::handle_request(const RequestContext* request, Response
     response->send(400, NULL);
     return;
   }
-
-  int ignore_time = atoi(request->get_query_param("ignore_time").c_str());
 
   int post_len = request->get_content_length();
   if (post_len <= 0) {
@@ -59,10 +54,9 @@ void FeedDocumentHandler::handle_request(const RequestContext* request, Response
     return;
   }
 
-  std::shared_ptr<FeedDocumentJob> job = std::make_shared<FeedDocumentJob>();
-  job->expire_time = 0;
-  job->doc = std::move(doc);
-
+  // create feeding request as a job
+  std::shared_ptr<FeedDocumentRequest> job =
+      std::make_shared<FeedDocumentRequest>(std::move(doc), time(NULL) + default_ttl_, watch);
   // do something here
   pipeline_->schedule(std::move(job));
 

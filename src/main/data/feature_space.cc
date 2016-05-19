@@ -1,4 +1,4 @@
-#include "model/feature_space.h"
+#include "data/feature_space.h"
 
 #include <stdexcept>
 #include <string>

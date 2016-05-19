@@ -5,10 +5,11 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+
 #include "core/reader/wand_reader.h"
 #include "core/reader/wand_reader-inl.h"
-#include "model/document.h"
-#include "model/document_id.h"
+#include "data/document.h"
+#include "data/document_id.h"
 #include "index/document_query.h"
 #include "utils/logger.h"
 #include "utils/stop_watch.h"
@@ -52,7 +53,7 @@ int DocumentIndexManager::batch_remove(const std::vector<DocId> doc_ids) {
   return index_.batch_remove(doc_ids);
 }
 
-int DocumentIndexManager::update(std::shared_ptr<Document> doc) {
+int DocumentIndexManager::update(std::shared_ptr<Document> doc, time_t expire_time) {
   StopWatch watch;
   int ret = 0;
   DocTerms weights;
@@ -63,10 +64,10 @@ int DocumentIndexManager::update(std::shared_ptr<Document> doc) {
       weights.emplace_back(feature_pair.first->get_id(), feature_pair.second);
     }
   }
-  return index_.update(doc->get_id(), weights, 0);
+  return index_.update(doc->get_id(), weights, expire_time);
 }
 
-int DocumentIndexManager::batch_update(const std::vector<std::shared_ptr<Document>>& docs) {
+int DocumentIndexManager::batch_update(const std::vector<std::shared_ptr<Document>>& docs, time_t expire_time) {
   StopWatch watch;
   std::vector<DocTuple> update_docs;
   for (const auto& doc: docs) {
@@ -78,7 +79,7 @@ int DocumentIndexManager::batch_update(const std::vector<std::shared_ptr<Documen
         weights.emplace_back(feature_pair.first->get_id(), feature_pair.second);
       }
     }
-    update_docs.emplace_back(doc->get_id(), std::move(weights), 0);
+    update_docs.emplace_back(doc->get_id(), std::move(weights), expire_time);
   }
   return index_.batch_update(update_docs);
 }
@@ -93,11 +94,10 @@ auto DocumentIndexManager::peek_term(TermId term_id) const
 //  return index_.peek(term_id);
 //}
 
-auto DocumentIndexManager::query(const QueryRequest& request) const
+auto DocumentIndexManager::query(const QueryRequest& request, const DocumentQuery& query) const
 -> std::unique_ptr<Reader> {
   StopWatch watch;
 
-  DocumentQuery query(request);
   size_t query_size = query.get_doc_queries().size();
   if (query_size == 0) {
     // do not let it be empty

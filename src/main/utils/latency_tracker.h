@@ -9,7 +9,7 @@ template <int N>
 class LatencyTracker {
 public:
   LatencyTracker()
-  : ticks_(0) {
+  : ticks_({0L}) {
   }
 
   LatencyTracker(const LatencyTracker& other)
@@ -27,7 +27,7 @@ public:
     }
   }
 
-  long get(int i) {
+  long get(int i) const {
     if (i >=0 && i < N) {
       return ticks_[i];
     }

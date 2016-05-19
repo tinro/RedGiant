@@ -1,9 +1,10 @@
+#include "data/feature_cache.h"
+
 #include <string>
 #include <memory>
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-#include "model/feature_cache.h"
 
 using namespace std;
 
