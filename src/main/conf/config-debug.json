@@ -76,7 +76,7 @@
         { "from": "category_declared", "to": "category", "weight": 1.0 },
         { "from": "entity_inferred", "to": "entity", "weight": 2.0 },
         { "from": "entity_declared", "to": "entity", "weight": 4.0 },
-        { "from": "publisher_declared", "to": "entity", "weight": 0.5 }
+        { "from": "publisher_declared", "to": "publisher", "weight": 0.5 }
       ]}
     ]
   }
