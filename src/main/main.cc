@@ -34,13 +34,15 @@ namespace redgiant {
 
 DECLARE_LOGGER(logger, __FILE__);
 
-static const unsigned int kParseFlags = rapidjson::kParseCommentsFlag | rapidjson::kParseTrailingCommasFlag;
-static const char CONF_LOGGER_CONFIG  [] = "logger_config";
-static const char CONF_FEATURES       [] = "feature_spaces";
-static const char CONF_INDEX          [] = "index";
-static const char CONF_RANKING        [] = "ranking";
-static const char CONF_PIPELINE       [] = "pipeline";
-static const char CONF_SERVER         [] = "server";
+// constants used by configuration files
+static const unsigned int kConfigParseFlags =
+    rapidjson::kParseCommentsFlag | rapidjson::kParseTrailingCommasFlag;
+static const char kConfigKeyLoggerConfig    [] = "logger_config";
+static const char kConfigKeyFeatureSpaces   [] = "feature_spaces";
+static const char kConfigKeyIndex           [] = "index";
+static const char kConfigKeyRanking         [] = "ranking";
+static const char kConfigKeyPipeline        [] = "pipeline";
+static const char kConfigKeyServer          [] = "server";
 
 static volatile int g_exit_signal = 0;
 
@@ -66,7 +68,7 @@ static int read_config_file(const char* file_name, rapidjson::Document& config) 
 
   char readBuffer[8192];
   rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-  if (config.ParseStream<kParseFlags>(is).HasParseError()) {
+  if (config.ParseStream<kConfigParseFlags>(is).HasParseError()) {
     fprintf(stderr, "Config file parse error %d at offset %zu.\n",
         (int)config.GetParseError(), config.GetErrorOffset());
     return -1;
@@ -77,7 +79,7 @@ static int read_config_file(const char* file_name, rapidjson::Document& config) 
 }
 
 static int init_log_config(const char* file_name, const rapidjson::Value& config) {
-  if (!config.HasMember(CONF_LOGGER_CONFIG) || !config[CONF_LOGGER_CONFIG].IsString()) {
+  if (!config.HasMember(kConfigKeyLoggerConfig) || !config[kConfigKeyLoggerConfig].IsString()) {
     fprintf(stderr, "No log file configured!");
     return init_logger(NULL);
   }
@@ -93,7 +95,7 @@ static int init_log_config(const char* file_name, const rapidjson::Value& config
   }
 
   // get the file name relative to the configuration file.
-  std::string logger_file_name = dir + config[CONF_LOGGER_CONFIG].GetString();
+  std::string logger_file_name = dir + config[kConfigKeyLoggerConfig].GetString();
   return init_logger(logger_file_name.c_str());
 }
 
@@ -110,14 +112,14 @@ static int server_main(rapidjson::Value& config) {
    * Initialization:
    * Features initialization
    */
-  if (!config.HasMember(CONF_FEATURES)) {
+  if (!config.HasMember(kConfigKeyFeatureSpaces)) {
     LOG_ERROR(logger, "features configuration does not exist!");
     return -1;
   }
 
   std::shared_ptr<FeatureCache> feature_cache = std::make_shared<FeatureCache>();
   FeatureCacheParser feature_cache_parser;
-  if (feature_cache_parser.parse_json(config[CONF_FEATURES], *feature_cache) < 0) {
+  if (feature_cache_parser.parse_json(config[kConfigKeyFeatureSpaces], *feature_cache) < 0) {
     LOG_ERROR(logger, "feature cache parsing failed!");
     return -1;
   }
@@ -130,8 +132,8 @@ static int server_main(rapidjson::Value& config) {
   int document_index_max_size           = 5000000;
   int document_index_maintain_interval  = 300;
 
-  if (config.HasMember(CONF_INDEX)) {
-    auto& index_config = config[CONF_INDEX];
+  if (config.HasMember(kConfigKeyIndex)) {
+    auto& index_config = config[kConfigKeyIndex];
     if (index_config.HasMember("initial_buckets") && index_config["initial_buckets"].IsInt()) {
       document_index_initial_buckets = index_config["initial_buckets"].GetInt();
     }
@@ -152,8 +154,8 @@ static int server_main(rapidjson::Value& config) {
 
   size_t feed_document_thread_num = 4;
   size_t feed_document_queue_size = 2048;
-  if (config.HasMember(CONF_PIPELINE)) {
-    auto& pipeline_config = config[CONF_PIPELINE];
+  if (config.HasMember(kConfigKeyPipeline)) {
+    auto& pipeline_config = config[kConfigKeyPipeline];
     if (pipeline_config.HasMember("thread_num") && pipeline_config["thread_num"].IsInt()) {
       feed_document_thread_num = pipeline_config["thread_num"].GetInt();
     }
@@ -177,12 +179,12 @@ static int server_main(rapidjson::Value& config) {
   model_manager_factory.register_model_factory(std::make_shared<DefaultModelFactory>());
   model_manager_factory.register_model_factory(std::make_shared<FeatureMappingModelFactory>(feature_cache));
 
-  if (!config.HasMember(CONF_RANKING)) {
+  if (!config.HasMember(kConfigKeyRanking)) {
     LOG_ERROR(logger, "ranking model config does not exist!");
     return -1;
   }
 
-  std::unique_ptr<RankingModel> model = model_manager_factory.create_model(config[CONF_RANKING]);
+  std::unique_ptr<RankingModel> model = model_manager_factory.create_model(config[kConfigKeyRanking]);
   if (!model) {
     LOG_ERROR(logger, "ranking model initialization failed!");
     return -1;
@@ -196,8 +198,8 @@ static int server_main(rapidjson::Value& config) {
   int server_port = 19980;
   size_t server_thread_num = 4;
   size_t max_req_per_thread = 0;
-  if (config.HasMember(CONF_SERVER)) {
-    auto& server_config = config[CONF_SERVER];
+  if (config.HasMember(kConfigKeyServer)) {
+    auto& server_config = config[kConfigKeyServer];
     if (server_config.HasMember("port") && server_config["port"].IsInt()) {
       server_port = server_config["port"].GetInt();
     }
