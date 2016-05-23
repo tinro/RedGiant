@@ -1,81 +1,82 @@
 /*
  * Red Giant configuration file.
- * C-style comments are allowed by Rapidjson (http://rapidjson.org/).
+ * C-style comments are allowed by Rapidjson (http:/*rapidjson.org/).
  */
-
 {
-  // Logging configuration. A log4cxx configuration file, relative to this json config.
-  // if no configuration file is given, the default configurations are defined by log4cxx.
-  "logger_config":"log4cxx-release.xml",
+  /* Logging configuration. A log4cxx configuration file, relative to this json config.
+   * if no configuration file is given, the default configurations are defined by log4cxx. */
+  "logger_config": "log4cxx-release.xml",
 
-  // Server configurations.
+  /* Server configurations. */
   "server": {
     "port": 19980,
     "thread_num": 4,
-    // If set to a positive value, connections are closed after certain number of requests.
-    // Or the connection will keep alive continuously.
+    /* If set to a positive value, connections are closed after certain number of requests.
+     * Or the connection will keep alive continuously. */
     "max_request_per_thread": 0
   },
-  
-  // Index configurations.
+
+  /* Index configurations. */
   "index": {
-    // Number of initial hash buckets. Recommend to set to 130%~200% of estimated number of terms.
+    /* Number of initial hash buckets. Recommend to set to 130%~200% of estimated number of terms. */
     "initial_buckets": 100000,
-    // Maximum number of documents.
-    "max_size": 100000,
-    // Interval in seconds the background maintaining thread writes updates to index.
+    /* Maximum number of documents. */
+    "max_size": 10000000,
+    /* Interval in seconds the background maintaining thread writes updates to index. */
     "maintain_interval": 300
   },
 
-  // Document update pipeline configurations.
+  /* Document update pipeline configurations. */
   "pipeline": {
     "thread_num": 4,
     "queue_size": 2048
   },
-  
-  // The feature spaces referred by the data models.
+
+  /* The feature spaces referred by the data models. */
   "feature_spaces": [
-    // These features should be defined based on specific problems
-    // This example configuration demos the case that documents are tagged with categories, entities and publishers,
-    // while users' interests are sets of categories, entities and publishers that may be mined from data feedback
-    // or declared by users themselves.
-    {"id": 1, "name":"category",            "type":"integer"},
-    {"id": 2, "name":"entity",              "type":"string"},
-    {"id": 3, "name":"publisher",           "type":"string"}
-    {"id": 4, "name":"category_inferred",   "type":"integer"},
-    {"id": 5, "name":"category_declared",   "type":"integer"},
-    {"id": 6, "name":"entity_inferred",     "type":"string"},
-    {"id": 7, "name":"entity_declared",     "type":"string"},
-    {"id": 9, "name":"publisher_declared",  "type":"string"},
+    /*
+     * These features should be defined based on specific problems.
+     * This example configuration demos the case that documents are tagged with categories,
+     * entities and publishers, while users' interests are sets of categories, entities and
+     * publishers that may be mined from data feedback or declared by users themselves.
+     */
+    {"id": 1, "name": "category",           "type": "integer"},
+    {"id": 2, "name": "entity",             "type": "string"},
+    {"id": 3, "name": "publisher",          "type": "string"},
+    {"id": 4, "name": "category_inferred",  "type": "integer"},
+    {"id": 5, "name": "category_declared",  "type": "integer"},
+    {"id": 6, "name": "entity_inferred",    "type": "string"},
+    {"id": 7, "name": "entity_declared",    "type": "string"},
+    {"id": 9, "name": "publisher_declared", "type": "string"}
   ],
-  
-  // The ranking models used in the query service.
+
+  /* The ranking models used in the query service. */
   "ranking": {
     "default_model": "default",
     "models": [
-      // The default mappings, including only directly mapped feature spaces.
+      /* The default mappings, including only directly mapped feature spaces. */
       { "name": "default", "type": "default" },
-      // Dot-Product using category mappings.
+      /* Dot-Product using category mappings. */
       { "name": "category_only", "type": "mapping", "mappings": [
-        { "from": "category_inferred", "to": "category", "weight": 1.0 }, 
-        { "from": "category_declared", "to": "category", "weight": 1.0 }, 
+        { "from": "category_inferred", "to": "category", "weight": 1.0 },
+        { "from": "category_declared", "to": "category", "weight": 1.0 }
       ]},
-      // Dot-Product using entity mappings.
+      /* Dot-Product using entity mappings. */
       { "name": "entity_only", "type": "mapping", "mappings": [
-        { "from": "entity_inferred", "to": "entity", "weight": 1.0 }, 
-        { "from": "entity_declared", "to": "entity", "weight": 2.0 }, 
+        { "from": "entity_inferred", "to": "entity", "weight": 1.0 },
+        { "from": "entity_declared", "to": "entity", "weight": 2.0 }
       ]},
-      // More like a publisher subscription system.
+      /* More like a publisher subscription system. */
       { "name": "publisher_only", "type": "mapping", "mappings": [
-        { "from": "publisher_declared", "to": "publisher", "weight": 1.0 }, 
+        { "from": "publisher_declared", "to": "publisher", "weight": 1.0 }
       ]},
-      // A fully combined ranking model.
+      /* A fully combined ranking model. */
       { "name": "mixed", "type": "mapping", "mappings": [
-        { "from": "category_inferred", "to": "category", "weight": 1.0 }, 
-        { "from": "category_declared", "to": "category", "weight": 1.0 }, 
-        { "from": "entity_inferred", "to": "entity", "weight": 2.0 }, 
-        { "from": "entity_declared", "to": "entity", "weight": 4.0 }, 
-        { "from": "publisher_declared", "to": "entity", "weight": 0.5 }, 
+        { "from": "category_inferred", "to": "category", "weight": 1.0 },
+        { "from": "category_declared", "to": "category", "weight": 1.0 },
+        { "from": "entity_inferred", "to": "entity", "weight": 2.0 },
+        { "from": "entity_declared", "to": "entity", "weight": 4.0 },
+        { "from": "publisher_declared", "to": "entity", "weight": 0.5 }
       ]}
     ]
   }
