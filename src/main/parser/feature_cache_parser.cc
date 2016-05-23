@@ -8,18 +8,7 @@ namespace redgiant {
 DECLARE_LOGGER(logger, __FILE__);
 
 int FeatureCacheParser::parse_json(const rapidjson::Value& root, FeatureCache& output) {
-  if (!root.IsObject()) {
-    LOG_ERROR(logger, "document does not exist.");
-    return -1;
-  }
-
-  if (!root.HasMember("feature_spaces") || !root["feature_spaces"].IsArray()) {
-    LOG_ERROR(logger, "feature spaces not found!");
-    return -1;
-  }
-
-  const rapidjson::Value& spaces = root["feature_spaces"];
-  for (auto it = spaces.Begin(); it != spaces.End(); ++it) {
+  for (auto it = root.Begin(); it != root.End(); ++it) {
     int id;
     std::string name;
     std::string type;

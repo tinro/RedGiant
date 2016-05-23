@@ -16,12 +16,10 @@ public:
   enum TimePhase {
     kStart = 0,
     kLoadModel,
-    kQueryBuild,
     kQueryStart,
     kQueryExecute,
     kQueryRead,
     kQueryConvert,
-    kQueryDone,
     kFinalize,
 
     kTimePhaseCount
