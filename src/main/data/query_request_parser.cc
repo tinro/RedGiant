@@ -1,4 +1,4 @@
-#include "parser/query_request_parser.h"
+#include "data/query_request_parser.h"
 
 #include <memory>
 #include <string>

@@ -43,7 +43,6 @@ AC_CONFIG_FILES([Makefile
                  src/main/data/Makefile
                  src/main/handler/Makefile
                  src/main/index/Makefile
-                 src/main/parser/Makefile
                  src/main/pipeline/Makefile
                  src/main/query/Makefile
                  src/main/ranking/Makefile
@@ -54,7 +53,6 @@ AC_CONFIG_FILES([Makefile
                  src/test/data/Makefile
                  src/test/handler/Makefile
                  src/test/index/Makefile
-                 src/test/parser/Makefile
                  src/test/pipeline/Makefile
                  src/test/query/Makefile
                  src/test/ranking/Makefile

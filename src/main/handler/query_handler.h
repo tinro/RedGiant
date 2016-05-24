@@ -4,7 +4,7 @@
 #include <memory>
 #include <utility>
 
-#include "parser/parser.h"
+#include "data/parser.h"
 #include "query/query_executor.h"
 #include "service/request_handler.h"
 #include "utils/cached_buffer.h"

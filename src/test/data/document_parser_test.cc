@@ -5,7 +5,7 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "parser/document_parser.h"
+#include "data/document_parser.h"
 #include "data/document.h"
 #include "data/feature_cache.h"
 #include "data/feature_vector.h"

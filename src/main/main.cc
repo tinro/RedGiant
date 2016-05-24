@@ -8,13 +8,13 @@
 #include <libgen.h>
 #include <signal.h>
 
+#include "data/document_parser.h"
+#include "data/feature_cache.h"
+#include "data/query_request_parser.h"
 #include "handler/feed_document_handler.h"
 #include "handler/query_handler.h"
 #include "handler/test_handler.h"
 #include "index/document_index_manager.h"
-#include "parser/document_parser.h"
-#include "parser/feature_cache_parser.h"
-#include "parser/query_request_parser.h"
 #include "pipeline/feed_document_pipeline.h"
 #include "query/simple_query_executor.h"
 #include "ranking/default_model.h"
@@ -120,8 +120,7 @@ static int server_main(rapidjson::Value& config) {
   }
 
   std::shared_ptr<FeatureCache> feature_cache = std::make_shared<FeatureCache>();
-  FeatureCacheParser feature_cache_parser;
-  if (feature_cache_parser.parse_json(*config_feature_spaces, *feature_cache) < 0) {
+  if (feature_cache->initialize(*config_feature_spaces) < 0) {
     LOG_ERROR(logger, "feature cache parsing failed!");
     return -1;
   }

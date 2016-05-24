@@ -10,6 +10,7 @@
 #include "data/feature_space.h"
 #include "third_party/lock/shared_lock.h"
 #include "third_party/lock/shared_mutex.h"
+#include "third_party/rapidjson/document.h"
 
 namespace redgiant {
 
@@ -75,6 +76,8 @@ public:
 
   std::shared_ptr<Feature> create_or_get_feature(const std::string& feature_key,
       const std::shared_ptr<FeatureSpace>& space);
+
+  int initialize(const rapidjson::Value& config);
 
 private:
   // considered as already synchronized.

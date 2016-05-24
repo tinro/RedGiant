@@ -6,7 +6,7 @@
 #include <utility>
 
 #include "data/document.h"
-#include "parser/document_parser.h"
+#include "data/document_parser.h"
 #include "pipeline/feed_document_request.h"
 #include "service/request_context.h"
 #include "service/response_writer.h"
