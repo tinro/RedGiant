@@ -10,6 +10,7 @@
 #include "data/feature_cache.h"
 #include "data/feature_space.h"
 #include "data/feature_vector.h"
+#include "utils/json_utils.h"
 #include "utils/logger.h"
 
 namespace redgiant {
@@ -22,27 +23,23 @@ int DocumentParser::parse_json(const rapidjson::Value& root, Document& output) {
     return -1;
   }
 
-  if (!root.HasMember("uuid") || !root["uuid"].IsString()) {
-    LOG_ERROR(logger, "document uuid missing!");
+  const char* uuid = json_try_get_string(root, "uuid");
+  // null or empty
+  if (!uuid || !uuid[0]) {
+    LOG_ERROR(logger, "document uuid missing or empty!");
     return -1;
   }
 
-  std::string uuid;
-  uuid = root["uuid"].GetString();
-  if (uuid.empty()) {
-    LOG_ERROR(logger, "document uuid is empty!");
+  output.set_doc_id(uuid);
+  LOG_TRACE(logger, "document[%s]: parsing.", uuid);
+
+  auto features = json_try_get_object(root, "features");
+  if (!features) {
+    LOG_ERROR(logger, "document[%s]: no features found!", uuid);
     return -1;
   }
 
-  output.set_doc_id(std::move(uuid));
-  LOG_TRACE(logger, "document[%s]: parsing.", output.get_id_str().c_str());
-
-  if (!root.HasMember("features") || !root["features"].IsObject()) {
-    LOG_ERROR(logger, "document[%s]: no features found!", output.get_id_str().c_str());
-    return -1;
-  }
-
-  if (parse_feature_spaces(root["features"], output) < 0) {
+  if (parse_feature_spaces(*features, output) < 0) {
     return -1;
   }
 
@@ -51,25 +48,23 @@ int DocumentParser::parse_json(const rapidjson::Value& root, Document& output) {
 
 int DocumentParser::parse_feature_spaces(const rapidjson::Value& root, Document& doc) {
   for (auto it = root.MemberBegin(); it != root.MemberEnd(); ++it) {
-    if (it->name.IsString()) {
-      std::string space_name = it->name.GetString();
-      std::shared_ptr<FeatureSpace> space = cache_->get_space(space_name);
-      if (!space) {
-        // feature space must be pre-defined in feature cache
-        LOG_WARN(logger, "document[%s]: unknown feature space [%s], ignored.",
-            doc.get_id_str().c_str(), space_name.c_str());
-      } else {
-        LOG_TRACE(logger, "document[%s]: parsing feature space [%s]",
-            doc.get_id_str().c_str(), space_name.c_str());
+    std::string space_name = it->name.GetString();
+    std::shared_ptr<FeatureSpace> space = cache_->get_space(space_name);
+    if (!space) {
+      // feature space must be pre-defined in feature cache
+      LOG_WARN(logger, "document[%s]: unknown feature space [%s], ignored.",
+          doc.get_id_str().c_str(), space_name.c_str());
+    } else {
+      LOG_TRACE(logger, "document[%s]: parsing feature space [%s]",
+          doc.get_id_str().c_str(), space_name.c_str());
 
-        FeatureVector vec(std::move(space));
-        if (it->value.IsObject()) {
-          parse_multi_value_feature_vector(it->value, doc, vec);
-        } else if (it->value.IsString()){
-          parse_single_value_feature_vector(it->value, doc, vec);
-        }
-        doc.add_feature_vector(std::move(vec));
+      FeatureVector vec(std::move(space));
+      if (it->value.IsObject()) {
+        parse_multi_value_feature_vector(it->value, doc, vec);
+      } else if (it->value.IsString()){
+        parse_single_value_feature_vector(it->value, doc, vec);
       }
+      doc.add_feature_vector(std::move(vec));
     }
   }
   return 0;

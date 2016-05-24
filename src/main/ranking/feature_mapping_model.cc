@@ -8,7 +8,7 @@
 #include "data/feature_space.h"
 #include "data/query_request.h"
 #include "index/document_query.h"
-#include "third_party/rapidjson/document.h"
+#include "utils/json_utils.h"
 #include "utils/logger.h"
 
 namespace redgiant {
@@ -46,47 +46,48 @@ std::unique_ptr<RankingModel> FeatureMappingModelFactory::create_model(const rap
   if (!config.IsObject()) {
      LOG_ERROR(logger, "failed to parse ranking json config.");
      return nullptr;
-   }
+  }
 
-   if (!config.HasMember("mappings") || !config["mappings"].IsArray()) {
-     LOG_ERROR(logger, "models json config is missing!");
-     return nullptr;
-   }
+  auto mappings = json_try_get_array(config, "mappings");
+  if (!mappings) {
+    LOG_ERROR(logger, "models json config is missing!");
+    return nullptr;
+  }
 
-   std::unique_ptr<FeatureMappingModel> model(new FeatureMappingModel());
-   const auto& mappings = config["mappings"];
-   for (auto iter = mappings.Begin(); iter != mappings.End(); ++iter) {
-     const auto& mapping = *iter;
-     if (!mapping.HasMember("from") || !mapping["from"].IsString()
-         || !mapping.HasMember("to") || !mapping["to"].IsString()
-         || !mapping.HasMember("weight") || !mapping["weight"].IsDouble()) {
-       LOG_ERROR(logger, "unknown mapping config!");
-       continue;
-     }
+  std::unique_ptr<FeatureMappingModel> model(new FeatureMappingModel());
+  for (auto iter = mappings->Begin(); iter != mappings->End(); ++iter) {
+    const auto& mapping = *iter;
+    std::string from;
+    std::string to;
+    double weight;
 
-     std::string from = mapping["from"].GetString();
-     auto from_space = cache_->get_space(from);
-     if (!from_space) {
-       LOG_ERROR(logger, "undefined feature space %s!", from.c_str());
-       continue;
-     }
+    if (!json_try_get_string(mapping, "from", from)
+        || !json_try_get_string(mapping, "to", to)
+        || !json_try_get_double(mapping, "weight", weight)) {
+      LOG_ERROR(logger, "unknown mapping config!");
+      continue;
+    }
 
-     std::string to = mapping["to"].GetString();
-     auto to_space = cache_->get_space(to);
-     if (!to_space) {
-       LOG_ERROR(logger, "undefined feature space %s!", to.c_str());
-       continue;
-     }
+    auto from_space = cache_->get_space(from);
+    if (!from_space) {
+      LOG_ERROR(logger, "undefined feature space %s!", from.c_str());
+      continue;
+    }
 
-     double weight = mapping["weight"].GetDouble();
-     if (weight <= 0) {
-       LOG_ERROR(logger, "feature mapping weight %f is not positive!", weight);
-       continue;
-     }
+    auto to_space = cache_->get_space(to);
+    if (!to_space) {
+      LOG_ERROR(logger, "undefined feature space %s!", to.c_str());
+      continue;
+    }
 
-     model->set_mapping(std::move(from_space), std::move(to_space), weight);
-   }
-   return std::unique_ptr<RankingModel>(model.release());
+    if (weight <= 0) {
+      LOG_ERROR(logger, "feature mapping weight %f is not positive!", weight);
+      continue;
+    }
+
+    model->set_mapping(std::move(from_space), std::move(to_space), weight);
+  }
+  return std::unique_ptr<RankingModel>(model.release());
 }
 
 } /* namespace redgiant */

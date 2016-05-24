@@ -7,6 +7,7 @@
 #include <utility>
 #include "data/query_request.h"
 #include "index/document_query.h"
+#include "utils/json_utils.h"
 #include "utils/logger.h"
 
 namespace redgiant {
@@ -52,47 +53,39 @@ std::unique_ptr<RankingModel> ModelManagerFactory::create_model(const rapidjson:
     return nullptr;
   }
 
-  if (!config.HasMember("models") || !config["models"].IsArray()) {
+  auto models = json_try_get_array(config, "models");
+  if (!models) {
     LOG_ERROR(logger, "models json config is missing!");
     return nullptr;
   }
 
   std::unique_ptr<ModelManager> mm(new ModelManager());
-  if (config.HasMember("default_model") && config["default_model"].IsString()) {
-    std::string default_model = config["default_model"].GetString();
+  std::string default_model;
+  if (json_try_get_string(config, "default_model", default_model)) {
     mm->set_default_model_name(std::move(default_model));
   }
 
-  const auto& models = config["models"];
-  for (auto iter = models.Begin(); iter != models.End(); ++iter) {
+  for (auto iter = models->Begin(); iter != models->End(); ++iter) {
     const auto& model = *iter;
-    if (!model.IsObject()) {
-      LOG_ERROR(logger, "model config error!");
-      continue;
-    }
+    std::string type;
+    std::string name;
 
-    if (!model.HasMember("type") || !model["type"].IsString()) {
+    if (!json_try_get_string(model, "type", type)) {
       LOG_ERROR(logger, "model config error: type is required!");
       continue;
     }
-    std::string type = model["type"].GetString();
     auto factory_iter = model_factories_.find(type);
     if (factory_iter == model_factories_.end()) {
       LOG_WARN(logger, "ranking model type %s is unknown!", type.c_str());
       continue;
     }
 
-    if (!model.HasMember("name") || !model["name"].IsString()) {
+    if (!json_try_get_string(model, "name", name)) {
       LOG_ERROR(logger, "model config error: name is required!");
       continue;
     }
 
-    std::string name = model["name"].GetString();
     auto model_ptr = factory_iter->second->create_model(model);
-    if (!model_ptr) {
-      LOG_ERROR(logger, "create model %s failed!", name.c_str());
-      continue;
-    }
     mm->set_model(std::move(name), std::move(model_ptr));
   }
 

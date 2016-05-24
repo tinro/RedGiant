@@ -1,6 +1,8 @@
 #include "parser/feature_cache_parser.h"
 
 #include <string>
+
+#include "utils/json_utils.h"
 #include "utils/logger.h"
 
 namespace redgiant {
@@ -8,27 +10,30 @@ namespace redgiant {
 DECLARE_LOGGER(logger, __FILE__);
 
 int FeatureCacheParser::parse_json(const rapidjson::Value& root, FeatureCache& output) {
+  if (!root.IsArray()) {
+    LOG_ERROR(logger, "feature spaces should be array!");
+    return -1;
+  }
+
+
   for (auto it = root.Begin(); it != root.End(); ++it) {
     int id;
     std::string name;
     std::string type;
-    if (!it->HasMember("id") || !(*it)["id"].IsInt()) {
+    if (!json_try_get_int(*it, "id", id)) {
       LOG_ERROR(logger, "feature spaces does not contain valid id!");
       return -1;
     }
-    id = (*it)["id"].GetInt();
 
-    if (!it->HasMember("name") || !(*it)["name"].IsString()) {
+    if (!json_try_get_string(*it, "name", name)) {
       LOG_ERROR(logger, "feature spaces does not contain valid id!");
       return -1;
     }
-    name = (*it)["name"].GetString();
 
-    if (!it->HasMember("type") || !(*it)["type"].IsString()) {
+    if (!json_try_get_string(*it, "type", type)) {
       LOG_ERROR(logger, "feature spaces does not contain valid id!");
       return -1;
     }
-    type = (*it)["type"].GetString();
 
     output.create_space(name, (FeatureSpace::SpaceId)id,
         type == "string" ? FeatureSpace::kString : FeatureSpace::kInteger);
