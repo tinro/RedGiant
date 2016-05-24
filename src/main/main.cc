@@ -24,6 +24,7 @@
 #include "service/server.h"
 #include "third_party/rapidjson/document.h"
 #include "third_party/rapidjson/filereadstream.h"
+#include "utils/json_utils.h"
 #include "utils/logger.h"
 #include "utils/logger-inl.h"
 #include "utils/scope_guard.h"
@@ -79,8 +80,9 @@ static int read_config_file(const char* file_name, rapidjson::Document& config) 
 }
 
 static int init_log_config(const char* file_name, const rapidjson::Value& config) {
-  if (!config.HasMember(kConfigKeyLoggerConfig) || !config[kConfigKeyLoggerConfig].IsString()) {
-    fprintf(stderr, "No log file configured!");
+  const char* logger_file_name_str = json_try_get_string(config, kConfigKeyLoggerConfig);
+  if (!logger_file_name_str) {
+    fprintf(stderr, "Logger configuration not found! Using default configurations.");
     return init_logger(NULL);
   }
 
@@ -89,13 +91,12 @@ static int init_log_config(const char* file_name, const rapidjson::Value& config
   std::unique_ptr<char[]> file_name_buf(new char[file_name_len + 1]);
   strncpy(file_name_buf.get(), file_name, file_name_len);
   file_name_buf[file_name_len] = 0;
-  std::string dir = dirname(file_name_buf.get());
-  if (dir.back() != '/') {
+  std::string dir(dirname(file_name_buf.get()));
+  if (!dir.empty() && dir.back() != '/') {
     dir += "/";
   }
-
   // get the file name relative to the configuration file.
-  std::string logger_file_name = dir + config[kConfigKeyLoggerConfig].GetString();
+  std::string logger_file_name = dir + std::string(logger_file_name_str);
   return init_logger(logger_file_name.c_str());
 }
 
@@ -112,14 +113,15 @@ static int server_main(rapidjson::Value& config) {
    * Initialization:
    * Features initialization
    */
-  if (!config.HasMember(kConfigKeyFeatureSpaces)) {
-    LOG_ERROR(logger, "features configuration does not exist!");
+  auto config_feature_spaces = json_try_get(config, kConfigKeyFeatureSpaces);
+  if (!config_feature_spaces) {
+    LOG_ERROR(logger, "[CONF] features configuration does not exist!");
     return -1;
   }
 
   std::shared_ptr<FeatureCache> feature_cache = std::make_shared<FeatureCache>();
   FeatureCacheParser feature_cache_parser;
-  if (feature_cache_parser.parse_json(config[kConfigKeyFeatureSpaces], *feature_cache) < 0) {
+  if (feature_cache_parser.parse_json(*config_feature_spaces, *feature_cache) < 0) {
     LOG_ERROR(logger, "feature cache parsing failed!");
     return -1;
   }
@@ -132,17 +134,21 @@ static int server_main(rapidjson::Value& config) {
   int document_index_max_size           = 5000000;
   int document_index_maintain_interval  = 300;
 
-  if (config.HasMember(kConfigKeyIndex)) {
-    auto& index_config = config[kConfigKeyIndex];
-    if (index_config.HasMember("initial_buckets") && index_config["initial_buckets"].IsInt()) {
-      document_index_initial_buckets = index_config["initial_buckets"].GetInt();
-    }
-    if (index_config.HasMember("max_size") && index_config["max_size"].IsInt()) {
-      document_index_max_size = index_config["max_size"].GetInt();
-    }
-    if (index_config.HasMember("maintain_interval") && index_config["maintain_interval"].IsInt()) {
-      document_index_maintain_interval = index_config["max_size"].GetInt();
-    }
+  auto config_index = json_try_get_object(config, kConfigKeyIndex);
+  if (config_index && json_try_get_int(*config_index, "initial_buckets", document_index_initial_buckets)) {
+    LOG_DEBUG(logger, "[CONF] document index initial buckets: %d", document_index_initial_buckets);
+  } else {
+    LOG_DEBUG(logger, "[CONF] document index initial buckets not configured, use default: %d", document_index_initial_buckets);
+  }
+  if (config_index && json_try_get_int(*config_index, "max_size", document_index_max_size)) {
+    LOG_DEBUG(logger, "[CONF] document index max size: %d", document_index_max_size);
+  } else {
+    LOG_DEBUG(logger, "[CONF] document index max size not configured, use default: %d", document_index_max_size);
+  }
+  if (config_index && json_try_get_int(*config_index, "maintain_interval", document_index_maintain_interval)) {
+    LOG_DEBUG(logger, "[CONF] document index maintain interval: %d", document_index_maintain_interval);
+  } else {
+    LOG_DEBUG(logger, "[CONF] document index maintain interval not configured, use default: %d", document_index_maintain_interval);
   }
 
   DocumentIndexManager document_index(document_index_initial_buckets, document_index_max_size);
@@ -152,16 +158,19 @@ static int server_main(rapidjson::Value& config) {
     document_index.stop_maintain();
   });
 
-  size_t feed_document_thread_num = 4;
-  size_t feed_document_queue_size = 2048;
-  if (config.HasMember(kConfigKeyPipeline)) {
-    auto& pipeline_config = config[kConfigKeyPipeline];
-    if (pipeline_config.HasMember("thread_num") && pipeline_config["thread_num"].IsInt()) {
-      feed_document_thread_num = pipeline_config["thread_num"].GetInt();
-    }
-    if (pipeline_config.HasMember("queue_size") && pipeline_config["queue_size"].IsInt()) {
-      feed_document_queue_size = pipeline_config["queue_size"].GetInt();
-    }
+  uint feed_document_thread_num = 4;
+  uint feed_document_queue_size = 2048;
+
+  auto config_pipeline = json_try_get_object(config, kConfigKeyPipeline);
+  if (config_pipeline && json_try_get_uint(*config_pipeline, "thread_num", feed_document_thread_num)) {
+    LOG_DEBUG(logger, "[CONF] feed document pipeline thread num: %u", feed_document_thread_num);
+  } else {
+    LOG_DEBUG(logger, "[CONF] feed document pipeline thread num not configured, use default: %u", feed_document_thread_num);
+  }
+  if (config_pipeline && json_try_get_uint(*config_pipeline, "queue_size", feed_document_queue_size)) {
+    LOG_DEBUG(logger, "[CONF] feed document pipeline queue size: %u", feed_document_queue_size);
+  } else {
+    LOG_DEBUG(logger, "[CONF] feed document pipeline queue size not configured, use default: %u", feed_document_queue_size);
   }
 
   FeedDocumentPipeline feed_document(feed_document_thread_num, feed_document_queue_size, &document_index);
@@ -179,12 +188,13 @@ static int server_main(rapidjson::Value& config) {
   model_manager_factory.register_model_factory(std::make_shared<DefaultModelFactory>());
   model_manager_factory.register_model_factory(std::make_shared<FeatureMappingModelFactory>(feature_cache));
 
-  if (!config.HasMember(kConfigKeyRanking)) {
-    LOG_ERROR(logger, "ranking model config does not exist!");
+  auto config_ranking = json_try_get(config, kConfigKeyRanking);
+  if (!config_ranking) {
+    LOG_ERROR(logger, "[CONF] ranking model config does not exist!");
     return -1;
   }
 
-  std::unique_ptr<RankingModel> model = model_manager_factory.create_model(config[kConfigKeyRanking]);
+  std::unique_ptr<RankingModel> model = model_manager_factory.create_model(*config_ranking);
   if (!model) {
     LOG_ERROR(logger, "ranking model initialization failed!");
     return -1;
@@ -196,47 +206,51 @@ static int server_main(rapidjson::Value& config) {
    */
   LOG_INFO(logger, "server initializing ...");
   int server_port = 19980;
-  size_t server_thread_num = 4;
-  size_t max_req_per_thread = 0;
-  if (config.HasMember(kConfigKeyServer)) {
-    auto& server_config = config[kConfigKeyServer];
-    if (server_config.HasMember("port") && server_config["port"].IsInt()) {
-      server_port = server_config["port"].GetInt();
-    }
-    if (server_config.HasMember("thread_num") && server_config["thread_num"].IsInt()) {
-      server_thread_num = server_config["thread_num"].GetInt();
-    }
-    if (server_config.HasMember("max_request_per_thread") && server_config["max_request_per_thread"].IsInt()) {
-      max_req_per_thread = server_config["max_request_per_thread"].GetInt();
-    }
+  uint server_thread_num = 4;
+  uint max_req_per_thread = 0;
+
+  auto config_server = json_try_get_object(config, kConfigKeyServer);
+  if (config_server && json_try_get_int(*config_server, "port", server_port)) {
+    LOG_DEBUG(logger, "[CONF] server port: %d", server_port);
+  } else {
+    LOG_DEBUG(logger, "[CONF] server port not configured, use default: %d", server_port);
+  }
+  if (config_server && json_try_get_uint(*config_server, "thread_num", server_thread_num)) {
+    LOG_DEBUG(logger, "[CONF] server thread num: %u", server_thread_num);
+  } else {
+    LOG_DEBUG(logger, "[CONF] server thread num not configured, use default: %u", server_thread_num);
+  }
+  if (config_server && json_try_get_uint(*config_server, "max_request_per_thread", max_req_per_thread)) {
+    LOG_DEBUG(logger, "[CONF] max requests per server thread: %u", max_req_per_thread);
+  } else {
+    LOG_DEBUG(logger, "[CONF] max requests per server thread not configured, use default: %u", max_req_per_thread);
   }
 
-
-  Server test_server(server_port, server_thread_num, max_req_per_thread);
-  test_server.bind("/test", std::make_shared<TestHandlerFactory>());
-  test_server.bind("/document", std::make_shared<FeedDocumentHandlerFactory>(
+  Server server(server_port, server_thread_num, max_req_per_thread);
+  server.bind("/test", std::make_shared<TestHandlerFactory>());
+  server.bind("/document", std::make_shared<FeedDocumentHandlerFactory>(
       std::make_shared<DocumentParserFactory>(feature_cache),
       &feed_document, 0));
-  test_server.bind("/query", std::make_shared<QueryHandlerFactory>(
+  server.bind("/query", std::make_shared<QueryHandlerFactory>(
       std::make_shared<QueryRequestParserFactory>(feature_cache),
       std::make_shared<SimpleQueryExecutorFactory>(&document_index, model.get())));
 
-  if (test_server.initialize() < 0) {
-    LOG_ERROR(logger, "test server initialization failed!");
+  if (server.initialize() < 0) {
+    LOG_ERROR(logger, "server initialization failed!");
     return -1;
   }
 
-  ScopeGuard test_server_guard([&test_server] {
-    LOG_INFO(logger, "test server exiting...");
-    test_server.stop();
+  ScopeGuard server_guard([&server] {
+    LOG_INFO(logger, "server exiting...");
+    server.stop();
   });
 
-  if (test_server.start() < 0) {
-    LOG_ERROR(logger, "failed to start test server!");
+  if (server.start() < 0) {
+    LOG_ERROR(logger, "failed to start server!");
     return -1;
   }
 
-  LOG_INFO(logger, "test server stared.");
+  LOG_INFO(logger, "service started successfully.");
 
   /*
    * Main loop: wait for exit signal.
@@ -291,9 +305,9 @@ int main(int argc, char** argv) {
   }
 
   if (ret >= 0) {
-    LOG_INFO(logger, "server exit ALL OK.");
+    LOG_INFO(logger, "exit successfully.");
   } else {
-    LOG_INFO(logger, "server exit OK with failure.");
+    LOG_INFO(logger, "exit with failure.");
   }
   return ret;
 }
