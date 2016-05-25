@@ -36,12 +36,11 @@ std::unique_ptr<DocumentQuery> ModelManager::process(const QueryRequest& request
 }
 
 int ModelManagerFactory::register_model_factory(std::shared_ptr<RankingModelFactory> factory) {
-  std::string type = factory->get_type();
+  const std::string& type = factory->get_type();
   LOG_INFO(logger, "registered model type %s.", type.c_str());
-  auto ret = model_factories_.emplace(std::move(type), std::move(factory));
-
+  auto ret = model_factories_.emplace(type, std::move(factory));
   if (!ret.second) {
-    LOG_ERROR(logger, "duplicate model type %s", factory->get_type().c_str());
+    LOG_ERROR(logger, "duplicate model type %s", type.c_str());
     return -1;
   }
   return 0;

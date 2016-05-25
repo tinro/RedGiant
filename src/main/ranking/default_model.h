@@ -28,14 +28,17 @@ public:
   DefaultModelFactory() = default;
   virtual ~DefaultModelFactory() = default;
 
-  virtual std::string get_type() const {
-    return "default";
+  virtual const std::string& get_type() const {
+    return type_id_;
   }
 
   virtual std::unique_ptr<RankingModel> create_model(const rapidjson::Value& config) const {
     (void)config;
     return std::unique_ptr<RankingModel>(new DefaultModel());
   }
+
+private:
+  std::string type_id_ = "default";
 };
 } /* namespace redgiant */
 

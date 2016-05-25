@@ -58,14 +58,15 @@ public:
 
   virtual ~FeatureMappingModelFactory() = default;
 
-  virtual std::string get_type() const {
-    return "mapping";
+  virtual const std::string& get_type() const {
+    return type_id_;
   }
 
   virtual std::unique_ptr<RankingModel> create_model(const rapidjson::Value& config) const;
 
 private:
   std::shared_ptr<FeatureCache> cache_;
+  std::string type_id_ = "mapping";
 };
 } /* namespace redgiant */
 

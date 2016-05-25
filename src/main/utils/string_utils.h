@@ -15,9 +15,7 @@ std::vector<std::string> string_split(const std::string& str, char delim)  {
     }
     if (i == str.length() || str[i] == delim) {
       // skip if the start point itself is a delimiter
-      if (start != i) {
-        output.emplace_back(str.c_str() + start, str.c_str() + i);
-      }
+      output.emplace_back(str.c_str() + start, str.c_str() + i);
       start = std::string::npos;
     }
   }
