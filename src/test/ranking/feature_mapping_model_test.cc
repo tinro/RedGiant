@@ -75,7 +75,7 @@ private:
 
     auto fc = std::make_shared<FeatureCache>();
     fc->initialize(conf);
-    return std::move(fc);
+    return fc;
   }
 
   std::unique_ptr<RankingModel> create_model(std::shared_ptr<FeatureCache> fc) {

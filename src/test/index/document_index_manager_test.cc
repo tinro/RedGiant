@@ -30,7 +30,7 @@ class DocumentIndexManagerTest: public CppUnit::TestFixture {
 
 public:
   void test_peek() {
-    auto index = create_index_manager();
+    auto index = create_index();
 
     CPPUNIT_ASSERT_EQUAL(12, (int)index->get_index().get_term_count());
 
@@ -55,8 +55,8 @@ public:
   }
 
   void test_exist_query() {
-    auto index = create_index_manager();
-    QueryRequest request("ID-0001", 50, "", StopWatch(), true);
+    auto index = create_index();
+    QueryRequest request("0001", 50, "", StopWatch(), true);
     DocumentQuery query(request, IntermQuery({
         {space_cat->calculate_feature_id("3"), 2.0},
         {space_ent->calculate_feature_id("AA"), 1.0},
@@ -67,27 +67,27 @@ public:
     auto cur_id = DocumentId(0);
     cur_id = reader->next(cur_id);
     CPPUNIT_ASSERT_EQUAL(string("00000000-0001-0000-0000-000000000000"), cur_id.to_string());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(6.7, reader->read(), 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(6.7, reader->read(), 0.00001);
 
     cur_id = reader->next(cur_id);
     CPPUNIT_ASSERT_EQUAL(string("00000000-0002-0000-0000-000000000000"), cur_id.to_string());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, reader->read(), 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, reader->read(), 0.00001);
 
     cur_id = reader->next(cur_id);
     CPPUNIT_ASSERT_EQUAL(string("00000000-0003-0000-0000-000000000000"), cur_id.to_string());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.4, reader->read(), 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.4, reader->read(), 0.00001);
 
     cur_id = reader->next(cur_id);
     CPPUNIT_ASSERT_EQUAL(string("00000000-0005-0000-0000-000000000000"), cur_id.to_string());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(2.5, reader->read(), 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(2.5, reader->read(), 0.00001);
 
     cur_id = reader->next(cur_id);
     CPPUNIT_ASSERT_EQUAL(DocumentId(0).to_string(), cur_id.to_string());
   }
 
   void test_noexist_query() {
-    auto index = create_index_manager();
-    QueryRequest request("ID-0001", 50, "", StopWatch(), true);
+    auto index = create_index();
+    QueryRequest request("0001", 50, "", StopWatch(), true);
     DocumentQuery query(request, IntermQuery({
         {space_cat->calculate_feature_id("5"), 2.0},
         {space_ent->calculate_feature_id("ooo"), 1.0},
@@ -99,9 +99,9 @@ public:
 
 private:
   std::shared_ptr<FeatureSpace> space_cat =
-      std::make_shared<FeatureSpace>("categories", 1, FeatureSpace::SpaceType::kInteger);
+      std::make_shared<FeatureSpace>("category", 1, FeatureSpace::SpaceType::kInteger);
   std::shared_ptr<FeatureSpace> space_ent =
-      std::make_shared<FeatureSpace>("entities", 2, FeatureSpace::SpaceType::kString);
+      std::make_shared<FeatureSpace>("entity", 2, FeatureSpace::SpaceType::kString);
 
   std::shared_ptr<Document> create_document(std::string id,
       std::vector<std::pair<std::shared_ptr<FeatureSpace>, std::vector<std::pair<std::string, double>>>> features) {
@@ -116,7 +116,7 @@ private:
     return doc;
   }
 
-  std::unique_ptr<DocumentIndexManager> create_index_manager() {
+  std::unique_ptr<DocumentIndexManager> create_index() {
     auto index = std::unique_ptr<DocumentIndexManager>(new DocumentIndexManager(1000, 1000));
     // create document vectors
     index->update(create_document(

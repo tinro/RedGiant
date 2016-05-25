@@ -14,7 +14,7 @@ public:
   virtual ~MockModel() = default;
 
   virtual std::unique_ptr<IntermQuery> process(const QueryRequest& request) const {
-    return nullptr;
+    return std::unique_ptr<IntermQuery>(new IntermQuery({}));
   }
 };
 

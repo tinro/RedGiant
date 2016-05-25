@@ -31,10 +31,9 @@ protected:
   }
 
   void test_process() {
+    auto fc = create_feature_cache();
     auto mm = create_model();
     CPPUNIT_ASSERT(!!mm);
-
-    auto fc = create_feature_cache();
 
     auto req = mock_request_1(*fc);
     auto iq = mm->process(*req);
@@ -73,16 +72,6 @@ protected:
   }
 
 private:
-  std::unique_ptr<RankingModel> create_model() {
-    auto mmf = std::make_shared<DefaultModelFactory>();
-    char j[] = R"({ "name": "default_a", "type": "default" })";
-    rapidjson::MemoryStream ms(j, sizeof(j)/sizeof(j[0]));
-    rapidjson::Document conf;
-    conf.ParseStream(ms);
-
-    return mmf->create_model(conf);
-  }
-
   std::shared_ptr<FeatureCache> create_feature_cache() {
     char j[] = R"([
       {"id": 1, "name": "category",           "type": "integer"},
@@ -95,7 +84,17 @@ private:
 
     auto fc = std::make_shared<FeatureCache>();
     fc->initialize(conf);
-    return std::move(fc);
+    return fc;
+  }
+
+  std::unique_ptr<RankingModel> create_model() {
+    auto mmf = std::make_shared<DefaultModelFactory>();
+    char j[] = R"({ "name": "default_a", "type": "default" })";
+    rapidjson::MemoryStream ms(j, sizeof(j)/sizeof(j[0]));
+    rapidjson::Document conf;
+    conf.ParseStream(ms);
+
+    return mmf->create_model(conf);
   }
 
   std::unique_ptr<QueryRequest> mock_request_1(FeatureCache& fc) {
