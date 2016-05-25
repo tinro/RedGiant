@@ -48,12 +48,11 @@ protected:
     auto executor = create_executor(index.get(), model.get());
 
     auto request = create_request_1(*cache);
-    QueryResult result(request->get_request_id());
-    int ret = executor->execute(*request, result);
+    auto result = executor->execute(*request);
 
-    CPPUNIT_ASSERT_EQUAL(0, ret);
+    CPPUNIT_ASSERT(!!result);
 
-    auto ids = result.get_results();
+    auto ids = result->get_results();
     CPPUNIT_ASSERT_EQUAL(4, (int)ids.size());
 
     CPPUNIT_ASSERT_EQUAL(string("00000000-0001-0000-0000-000000000000"), ids[0].first);
@@ -76,12 +75,11 @@ protected:
     auto executor = create_executor(index.get(), model.get());
 
     auto request = create_request_2(*cache);
-    QueryResult result(request->get_request_id());
-    int ret = executor->execute(*request, result);
+    auto result = executor->execute(*request);
 
-    CPPUNIT_ASSERT_EQUAL(0, ret);
+    CPPUNIT_ASSERT(!!result);
 
-    auto ids = result.get_results();
+    auto ids = result->get_results();
     CPPUNIT_ASSERT_EQUAL(2, (int)ids.size());
 
     CPPUNIT_ASSERT_EQUAL(string("00000000-0001-0000-0000-000000000000"), ids[0].first);
@@ -98,12 +96,11 @@ protected:
     auto executor = create_executor(index.get(), model.get());
 
     auto request = create_request_3(*cache);
-    QueryResult result(request->get_request_id());
-    int ret = executor->execute(*request, result);
+    auto result = executor->execute(*request);
 
-    CPPUNIT_ASSERT_EQUAL(0, ret);
+    CPPUNIT_ASSERT(!!result);
 
-    auto ids = result.get_results();
+    auto ids = result->get_results();
     CPPUNIT_ASSERT_EQUAL(0, (int)ids.size());
   }
 

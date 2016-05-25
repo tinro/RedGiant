@@ -15,7 +15,7 @@ public:
 
   virtual ~SimpleQueryExecutor() = default;
 
-  virtual int execute(const QueryRequest& request, QueryResult& result);
+  virtual std::unique_ptr<QueryResult> execute(const QueryRequest& request);
 
 private:
   DocumentIndexManager* index_;

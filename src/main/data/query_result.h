@@ -26,8 +26,8 @@ public:
     kTimePhaseCount
   };
 
-  QueryResult(const std::string& request_id)
-  : request_id_(request_id) {
+  QueryResult(const std::string& request_id, const StopWatch& watch)
+  : request_id_(request_id), watch_(watch) {
   }
 
   // no copy
@@ -52,8 +52,8 @@ public:
     return results_;
   }
 
-  void track_latency(const StopWatch& watch, int i) {
-    latency_tracker_.tick(watch, i);
+  void track_latency(int i) {
+    latency_tracker_.tick(watch_, i);
   }
 
   // note: do boundary check in the caller
@@ -64,6 +64,7 @@ public:
 private:
   std::string request_id_;
   KeyScores results_;
+  StopWatch watch_;
   LatencyTracker<kTimePhaseCount> latency_tracker_;
 };
 } /* namespace redgiant */

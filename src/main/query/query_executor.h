@@ -14,7 +14,7 @@ public:
   QueryExecutor() = default;
   virtual ~QueryExecutor() = default;
 
-  virtual int execute(const QueryRequest& request, QueryResult& result) = 0;
+  virtual std::unique_ptr<QueryResult> execute(const QueryRequest& request) = 0;
 };
 
 class QueryExecutorFactory {

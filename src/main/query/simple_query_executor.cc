@@ -11,41 +11,42 @@ namespace redgiant {
 
 DECLARE_LOGGER(logger, __FILE__);
 
-int SimpleQueryExecutor::execute(const QueryRequest& request, QueryResult& result) {
+std::unique_ptr<QueryResult> SimpleQueryExecutor::execute(const QueryRequest& request) {
+  std::unique_ptr<QueryResult> result = request.create_result();
   // tracking latency of each steps of a query request.
-  result.track_latency(request.get_watch(), QueryResult::kStart);
+  result->track_latency(QueryResult::kStart);
 
   std::unique_ptr<IntermQuery> interm_query = model_->process(request);
-  result.track_latency(request.get_watch(), QueryResult::kLoadModel);
+  result->track_latency(QueryResult::kLoadModel);
 
   DocumentQuery query(request, *interm_query);
-  result.track_latency(request.get_watch(), QueryResult::kBuildQuery);
-  result.track_latency(request.get_watch(), QueryResult::kQueryStart);
+  result->track_latency(QueryResult::kBuildQuery);
+  result->track_latency(QueryResult::kQueryStart);
 
   // execute document query
   std::unique_ptr<DocumentIndexManager::Reader> results_reader = index_->query(request, query);
   size_t query_count = request.get_query_count();
-  result.track_latency(request.get_watch(), QueryResult::kQueryExecute);
+  result->track_latency(QueryResult::kQueryExecute);
 
   if (!results_reader) {
      if (request.is_debug()) {
        LOG_INFO(logger, "[query:%s] received empty document result.", request.get_request_id().c_str());
      }
-     result.track_latency(request.get_watch(), QueryResult::kFinalize);
-     return 0;
+     result->track_latency(QueryResult::kFinalize);
+     return result;
   }
 
   auto topn_results = read_topn(*results_reader, query_count);
-  result.track_latency(request.get_watch(), QueryResult::kQueryRead);
+  result->track_latency(QueryResult::kQueryRead);
 
-  auto& results = result.get_results();
+  auto& results = result->get_results();
   for (const auto& r: topn_results) {
     results.emplace_back(r.first.to_string(), r.second);
   }
-  result.track_latency(request.get_watch(), QueryResult::kResultConvert);
-  result.track_latency(request.get_watch(), QueryResult::kFinalize);
+  result->track_latency(QueryResult::kResultConvert);
+  result->track_latency(QueryResult::kFinalize);
 
-  return 0;
+  return result;
 }
 
 } /* namespace redgiant */
