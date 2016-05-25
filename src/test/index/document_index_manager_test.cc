@@ -14,6 +14,7 @@
 #include "data/document.h"
 #include "data/feature.h"
 #include "data/feature_vector.h"
+#include "data/interm_query.h"
 #include "data/query_request.h"
 #include "utils/logger.h"
 
@@ -56,11 +57,11 @@ public:
   void test_exist_query() {
     auto index = create_index_manager();
     QueryRequest request("ID-0001", 50, "", StopWatch(), true);
-    DocumentQuery query(50, {
+    DocumentQuery query(request, IntermQuery({
         {space_cat->calculate_feature_id("3"), 2.0},
         {space_ent->calculate_feature_id("AA"), 1.0},
         {space_ent->calculate_feature_id("zzz"), 5.0},
-    });
+    }));
 
     auto reader = index->query(request, query);
     auto cur_id = DocumentId(0);
@@ -87,10 +88,10 @@ public:
   void test_noexist_query() {
     auto index = create_index_manager();
     QueryRequest request("ID-0001", 50, "", StopWatch(), true);
-    DocumentQuery query(50, {
+    DocumentQuery query(request, IntermQuery({
         {space_cat->calculate_feature_id("5"), 2.0},
         {space_ent->calculate_feature_id("ooo"), 1.0},
-    });
+    }));
 
     auto reader = index->query(request, query);
     CPPUNIT_ASSERT(!reader);
@@ -98,9 +99,9 @@ public:
 
 private:
   std::shared_ptr<FeatureSpace> space_cat =
-      std::make_shared<FeatureSpace>("categories", 1, FeatureSpace::kInteger);
+      std::make_shared<FeatureSpace>("categories", 1, FeatureSpace::SpaceType::kInteger);
   std::shared_ptr<FeatureSpace> space_ent =
-      std::make_shared<FeatureSpace>("entities", 2, FeatureSpace::kString);
+      std::make_shared<FeatureSpace>("entities", 2, FeatureSpace::SpaceType::kString);
 
   std::shared_ptr<Document> create_document(std::string id,
       std::vector<std::pair<std::shared_ptr<FeatureSpace>, std::vector<std::pair<std::string, double>>>> features) {

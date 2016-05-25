@@ -1,3 +1,4 @@
+#include <string>
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -8,8 +9,8 @@ using namespace std;
 
 namespace redgiant {
 
-class StringUtilsTests : public CppUnit::TestFixture {
-  CPPUNIT_TEST_SUITE(StringUtilsTests);
+class StringUtilsTest : public CppUnit::TestFixture {
+  CPPUNIT_TEST_SUITE(StringUtilsTest);
   CPPUNIT_TEST(test_string_split);
   CPPUNIT_TEST(test_string_strip);
   CPPUNIT_TEST_SUITE_END();
@@ -73,6 +74,6 @@ protected:
   }
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(StringUtilsTests);
+CPPUNIT_TEST_SUITE_REGISTRATION(StringUtilsTest);
 }
 

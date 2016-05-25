@@ -72,7 +72,7 @@ int FeatureCache::initialize(const rapidjson::Value& root) {
     }
 
     set_space_internal(std::make_shared<FeatureSpace>(
-        name, id, type == "string" ? FeatureSpace::kString : FeatureSpace::kInteger));
+        name, id, type == "string" ? SpaceType::kString : SpaceType::kInteger));
   }
   return 0;
 

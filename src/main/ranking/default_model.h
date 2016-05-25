@@ -8,9 +8,6 @@
 #include "ranking/ranking_model.h"
 
 namespace redgiant {
-class DocumentQuery;
-class QueryRequest;
-
 /*
  * The default model directly picks all features from the query request
  *  and query them in the index.
@@ -20,7 +17,7 @@ public:
   DefaultModel() = default;
   virtual ~DefaultModel() = default;
 
-  virtual std::unique_ptr<DocumentQuery> process(const QueryRequest& request) const;
+  virtual std::unique_ptr<IntermQuery> process(const QueryRequest& request) const;
 };
 
 class DefaultModelFactory: public RankingModelFactory {

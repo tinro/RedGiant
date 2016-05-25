@@ -15,8 +15,8 @@ namespace redgiant {
 
 DECLARE_LOGGER(logger, __FILE__);
 
-std::unique_ptr<DocumentQuery> FeatureMappingModel::process(const QueryRequest& request) const {
-  std::map<DocumentQuery::TermId, Score> terms;
+std::unique_ptr<IntermQuery> FeatureMappingModel::process(const QueryRequest& request) const {
+  std::map<IntermQuery::FeatureId, IntermQuery::QueryWeight> terms;
   for (const auto& fv: request.get_feature_vectors()) {
     // find if the input feature vector exists in mappings.
     auto iter = mappings_.find(fv.get_space_name());
@@ -38,8 +38,7 @@ std::unique_ptr<DocumentQuery> FeatureMappingModel::process(const QueryRequest& 
       }
     }
   }
-  return std::unique_ptr<DocumentQuery>(new DocumentQuery(request.get_query_count(),
-      std::vector<DocumentQuery::TermPair>(terms.begin(), terms.end())));
+  return std::unique_ptr<IntermQuery>(new IntermQuery({terms.begin(), terms.end()}));
 }
 
 std::unique_ptr<RankingModel> FeatureMappingModelFactory::create_model(const rapidjson::Value& config) const {

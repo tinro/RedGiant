@@ -5,7 +5,6 @@
 
 #include "mock_model.h"
 #include "data/query_request.h"
-#include "index/document_query.h"
 #include "ranking/default_model.h"
 #include "ranking/model_manager.h"
 #include "utils/json_utils.h"
@@ -15,6 +14,7 @@ namespace redgiant {
 class ModelManagerTest: public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(ModelManagerTest);
   CPPUNIT_TEST(test_register);
+  CPPUNIT_TEST(test_create);
   CPPUNIT_TEST(test_process);
   CPPUNIT_TEST_SUITE_END();
 
@@ -32,7 +32,7 @@ protected:
     CPPUNIT_ASSERT_EQUAL(-1, ret);
   }
 
-  void test_initialize() {
+  void test_create() {
     auto mm = create_model_manager();
     CPPUNIT_ASSERT(!!mm);
 
@@ -62,12 +62,12 @@ protected:
     CPPUNIT_ASSERT(!!mm);
 
     auto req1 = mock_request_1();
-    auto dq1 = mm->process(*req1);
-    CPPUNIT_ASSERT(!!dq1);
+    auto iq1 = mm->process(*req1);
+    CPPUNIT_ASSERT(!!iq1);
 
     auto req2 = mock_request_2();
-    auto dq2 = mm->process(*req2);
-    CPPUNIT_ASSERT(!!dq2);
+    auto iq2 = mm->process(*req2);
+    CPPUNIT_ASSERT(!!iq2);
   }
 
 private:
@@ -108,5 +108,4 @@ private:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ModelManagerTest);
-
 } /* namespace redgiant */

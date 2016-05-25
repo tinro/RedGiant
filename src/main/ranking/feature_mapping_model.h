@@ -14,9 +14,6 @@
 #include "ranking/ranking_model.h"
 
 namespace redgiant {
-class QueryRequest;
-class ModelConfig;
-
 /*
  * The feature mapping model defines a group of mappings
  *  from request to document feature spaces.
@@ -31,7 +28,7 @@ public:
   FeatureMappingModel() = default;
   virtual ~FeatureMappingModel() = default;
 
-  virtual std::unique_ptr<DocumentQuery> process(const QueryRequest& request) const;
+  virtual std::unique_ptr<IntermQuery> process(const QueryRequest& request) const;
 
   void set_mapping(std::shared_ptr<FeatureSpace> from, std::shared_ptr<FeatureSpace> to, Score weight) {
     const std::string& name = from->get_name();

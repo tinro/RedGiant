@@ -5,6 +5,7 @@
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
+#include "third_party/rapidjson/document.h"
 
 using namespace std;
 
@@ -14,6 +15,7 @@ class FeatureCacheTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(test_create_feature_space);
   CPPUNIT_TEST(test_create_feature);
   CPPUNIT_TEST(test_get_feature);
+  CPPUNIT_TEST(test_initialize_from_json);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -23,9 +25,9 @@ public:
 protected:
   void test_create_feature_space() {
     auto cache = std::unique_ptr<FeatureCache>(new FeatureCache());
-    auto space_a = cache->create_space("A", 1, FeatureSpace::FeatureType::kInteger);
-    auto space_b = cache->create_space("BB", 2, FeatureSpace::FeatureType::kString);
-    auto space_c = cache->create_space("CCC", 3, FeatureSpace::FeatureType::kInteger);
+    auto space_a = cache->create_space("A", 1, FeatureSpace::SpaceType::kInteger);
+    auto space_b = cache->create_space("BB", 2, FeatureSpace::SpaceType::kString);
+    auto space_c = cache->create_space("CCC", 3, FeatureSpace::SpaceType::kInteger);
 
     CPPUNIT_ASSERT(!!space_a); // not null
     CPPUNIT_ASSERT(!!space_b); // not null
@@ -42,7 +44,7 @@ protected:
     CPPUNIT_ASSERT_EQUAL(string("BB"), bb->get_name());
 
     // replace "A"
-    auto space_d = cache->create_space("A", 4, FeatureSpace::FeatureType::kString);
+    auto space_d = cache->create_space("A", 4, FeatureSpace::SpaceType::kString);
     auto dd = cache->get_space("A");
     CPPUNIT_ASSERT(!!space_d); // not null
     CPPUNIT_ASSERT(space_d == dd);
@@ -52,9 +54,9 @@ protected:
 
   void test_create_feature() {
     auto cache = std::unique_ptr<FeatureCache>(new FeatureCache());
-    auto space_a = cache->create_space("A", 1, FeatureSpace::FeatureType::kInteger);
-    auto space_b = cache->create_space("BB", 2, FeatureSpace::FeatureType::kString);
-    auto space_c = cache->create_space("CCC", 3, FeatureSpace::FeatureType::kInteger);
+    auto space_a = cache->create_space("A", 1, FeatureSpace::SpaceType::kInteger);
+    auto space_b = cache->create_space("BB", 2, FeatureSpace::SpaceType::kString);
+    auto space_c = cache->create_space("CCC", 3, FeatureSpace::SpaceType::kInteger);
 
     auto f1 = cache->create_or_get_feature("111", "A");
     auto f2 = cache->create_or_get_feature("xxx", space_b);
@@ -73,9 +75,9 @@ protected:
 
   void test_get_feature() {
     auto cache = std::unique_ptr<FeatureCache>(new FeatureCache());
-    auto space_a = cache->create_space("A", 1, FeatureSpace::kInteger);
-    auto space_b = cache->create_space("BB", 2, FeatureSpace::kString);
-    auto space_c = cache->create_space("CCC", 3, FeatureSpace::kInteger);
+    auto space_a = cache->create_space("A", 1, FeatureSpace::SpaceType::kInteger);
+    auto space_b = cache->create_space("BB", 2, FeatureSpace::SpaceType::kString);
+    auto space_c = cache->create_space("CCC", 3, FeatureSpace::SpaceType::kInteger);
 
     auto f1 = cache->create_or_get_feature("111", "A");
     auto f2 = cache->create_or_get_feature("xxx", space_b);
@@ -84,6 +86,25 @@ protected:
 
     CPPUNIT_ASSERT(f3 == f4); // null
     CPPUNIT_ASSERT_EQUAL(string("222"), f4->get_key());
+  }
+
+  void test_initialize_from_json() {
+    char j[] = R"([
+      {"id": 1, "name": "category",           "type": "integer"},
+      {"id": 2, "name": "entity",             "type": "string"},
+      {"id": 3, "name": "publisher",          "type": "string"}
+    ])";
+    rapidjson::MemoryStream ms(j, sizeof(j)/sizeof(j[0]));
+    rapidjson::Document conf;
+    conf.ParseStream(ms);
+
+    auto cache = std::make_shared<FeatureCache>();
+    int ret = cache->initialize(conf);
+
+    CPPUNIT_ASSERT_EQUAL(0, ret);
+    CPPUNIT_ASSERT(cache->get_space("category"));
+    CPPUNIT_ASSERT(cache->get_space("entity"));
+    CPPUNIT_ASSERT(cache->get_space("publisher"));
   }
 };
 

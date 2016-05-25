@@ -15,7 +15,7 @@ public:
   ModelManager() = default;
   virtual ~ModelManager() = default;
 
-  virtual std::unique_ptr<DocumentQuery> process(const QueryRequest& request) const;
+  virtual std::unique_ptr<IntermQuery> process(const QueryRequest& request) const;
 
   void set_model(std::string name, std::unique_ptr<RankingModel> model) {
     models_.emplace(std::move(name), std::move(model));

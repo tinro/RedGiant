@@ -6,13 +6,13 @@
 #include <utility>
 #include <vector>
 
-#include "data/query_request.h"
 #include "core/query/posting_list_query.h"
 #include "index/document_index.h"
 #include "index/document_traits.h"
 
 namespace redgiant {
 class QueryRequest;
+class IntermQuery;
 
 class DocumentQuery {
 public:
@@ -21,12 +21,15 @@ public:
   typedef typename DocumentIndex::QueryPair<Score> DocQueryPair;
   typedef typename DocumentIndex::Results<Score> Results;
   typedef typename DocumentIndex::TermId TermId;
-  typedef std::pair<TermId, Score> TermPair;
 
-  DocumentQuery(size_t query_count, const std::vector<TermPair>& query_terms);
+  DocumentQuery(const QueryRequest& request, const IntermQuery& interm_query);
 
-  DocumentQuery(const DocumentQuery&) = default;
+  // no copy
+  DocumentQuery(const DocumentQuery&) = delete;
+  DocumentQuery& operator=(const DocumentQuery&) = delete;
+  // movable
   DocumentQuery(DocumentQuery&&) = default;
+
   ~DocumentQuery() = default;
 
   size_t get_query_count() const {

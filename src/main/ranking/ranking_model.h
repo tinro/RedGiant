@@ -3,10 +3,10 @@
 
 #include <memory>
 
+#include "data/interm_query.h"
 #include "third_party/rapidjson/document.h"
 
 namespace redgiant {
-class DocumentQuery;
 class QueryRequest;
 
 class RankingModel {
@@ -14,7 +14,7 @@ public:
   RankingModel() = default;
   virtual ~RankingModel() = default;
 
-  virtual std::unique_ptr<DocumentQuery> process(const QueryRequest& request) const = 0;
+  virtual std::unique_ptr<IntermQuery> process(const QueryRequest& request) const = 0;
 };
 
 class RankingModelConfig {

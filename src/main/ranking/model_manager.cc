@@ -5,8 +5,8 @@
 #include <string.h>
 #include <memory>
 #include <utility>
+
 #include "data/query_request.h"
-#include "index/document_query.h"
 #include "utils/json_utils.h"
 #include "utils/logger.h"
 
@@ -14,7 +14,7 @@ namespace redgiant {
 
 DECLARE_LOGGER(logger, __FILE__);
 
-std::unique_ptr<DocumentQuery> ModelManager::process(const QueryRequest& request) const {
+std::unique_ptr<IntermQuery> ModelManager::process(const QueryRequest& request) const {
   // dispatch the context
   const std::string* pname = &(request.get_model_name());
   if (pname->empty()) {
