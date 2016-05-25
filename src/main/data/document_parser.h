@@ -1,8 +1,8 @@
-#ifndef SRC_MAIN_PARSER_DOCUMENT_PARSER_H_
-#define SRC_MAIN_PARSER_DOCUMENT_PARSER_H_
+#ifndef SRC_MAIN_DATA_DOCUMENT_PARSER_H_
+#define SRC_MAIN_DATA_DOCUMENT_PARSER_H_
 
 #include <memory>
-#include "parser/json_parser.h"
+#include "data/json_parser.h"
 
 namespace redgiant {
 class Document;
@@ -49,4 +49,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_PARSER_DOCUMENT_PARSER_H_ */
+#endif /* SRC_MAIN_DATA_DOCUMENT_PARSER_H_ */

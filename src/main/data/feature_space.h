@@ -14,12 +14,12 @@ public:
   typedef Feature::FeatureId FeatureId;
   typedef uint32_t SpaceId;
 
-  enum FeatureType {
+  enum class SpaceType {
     kString,
     kInteger
   };
 
-  FeatureSpace(std::string name, SpaceId id, FeatureType type)
+  FeatureSpace(std::string name, SpaceId id, SpaceType type)
   : space_name_(std::move(name)), space_id_(id), type_(type) {
     // TODO: id should be in range [0,254] (255 is reserved for invalid)
   }
@@ -36,16 +36,16 @@ public:
     return space_id_;
   }
 
-  FeatureType get_type() const {
+  SpaceType get_type() const {
     return type_;
   }
 
   // for tracing
   std::string get_type_name() const {
-    if (type_ == kString) {
+    if (type_ == SpaceType::kString) {
       return "string";
     } else {
-      return "number";
+      return "integer";
     }
   }
 
@@ -84,7 +84,7 @@ private:
 
   std::string space_name_;
   SpaceId space_id_;
-  FeatureType type_;
+  SpaceType type_;
 };
 
 } /* namespace redgiant */

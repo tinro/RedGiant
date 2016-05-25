@@ -23,10 +23,10 @@ public:
 
 protected:
   void test_string_space() {
-    std::unique_ptr<FeatureSpace> space(new FeatureSpace("AAA", 1, FeatureSpace::kString));
+    std::unique_ptr<FeatureSpace> space(new FeatureSpace("AAA", 1, FeatureSpace::SpaceType::kString));
     CPPUNIT_ASSERT_EQUAL(string("AAA"), space->get_name());
     CPPUNIT_ASSERT_EQUAL(1UL, (unsigned long)space->get_id());
-    CPPUNIT_ASSERT_EQUAL(FeatureSpace::kString, space->get_type());
+    CPPUNIT_ASSERT_EQUAL(string("string"), space->get_type_name());
 
     auto f1 = space->create_feature("abc");
     CPPUNIT_ASSERT_EQUAL(string("abc"), f1->get_key());
@@ -38,10 +38,10 @@ protected:
   }
 
   void test_integer_space() {
-    std::unique_ptr<FeatureSpace> space(new FeatureSpace("BBB", 2, FeatureSpace::kInteger));
+    std::unique_ptr<FeatureSpace> space(new FeatureSpace("BBB", 2, FeatureSpace::SpaceType::kInteger));
     CPPUNIT_ASSERT_EQUAL(string("BBB"), space->get_name());
     CPPUNIT_ASSERT_EQUAL(2UL, (unsigned long)space->get_id());
-    CPPUNIT_ASSERT_EQUAL(FeatureSpace::kInteger, space->get_type());
+    CPPUNIT_ASSERT_EQUAL(string("integer"), space->get_type_name());
 
     auto f1 = space->create_feature("abc");
     CPPUNIT_ASSERT(!f1); // null
@@ -58,8 +58,8 @@ protected:
   }
 
   void test_feature_id() {
-    std::unique_ptr<FeatureSpace> s1(new FeatureSpace("AAA", 1, FeatureSpace::kString));
-    std::unique_ptr<FeatureSpace> s2(new FeatureSpace("BBB", 2, FeatureSpace::kInteger));
+    std::unique_ptr<FeatureSpace> s1(new FeatureSpace("AAA", 1, FeatureSpace::SpaceType::kString));
+    std::unique_ptr<FeatureSpace> s2(new FeatureSpace("BBB", 2, FeatureSpace::SpaceType::kInteger));
 
     auto f1 = s1->create_feature("abc");
     Feature::FeatureId id2 = s2->project_to_space(f1->get_id());

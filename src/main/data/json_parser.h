@@ -1,8 +1,8 @@
-#ifndef SRC_MAIN_PARSER_JSON_PARSER_H_
-#define SRC_MAIN_PARSER_JSON_PARSER_H_
+#ifndef SRC_MAIN_DATA_JSON_PARSER_H_
+#define SRC_MAIN_DATA_JSON_PARSER_H_
 
 #include <cstdio>
-#include "parser/parser.h"
+#include "data/parser.h"
 #include "third_party/rapidjson/document.h"
 #include "third_party/rapidjson/filereadstream.h"
 
@@ -42,4 +42,4 @@ public:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_PARSER_JSON_PARSER_H_ */
+#endif /* SRC_MAIN_DATA_JSON_PARSER_H_ */

@@ -5,7 +5,7 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "parser/document_parser.h"
+#include "data/document_parser.h"
 #include "data/document.h"
 #include "data/feature_cache.h"
 #include "data/feature_vector.h"
@@ -54,7 +54,7 @@ protected:
     // feature vector 1: publisher
     auto fv = &(vecs[0]);
     CPPUNIT_ASSERT_EQUAL(string("publisher"), fv->get_space_name());
-    CPPUNIT_ASSERT_EQUAL(FeatureSpace::kString, fv->get_space()->get_type());
+    CPPUNIT_ASSERT_EQUAL(string("string"), fv->get_space()->get_type_name());
     // only one item
     CPPUNIT_ASSERT_EQUAL(1, (int)fv->get_features().size());
     auto f = &(fv->get_features()[0]);
@@ -63,7 +63,7 @@ protected:
 
     fv = &(vecs[1]);
     CPPUNIT_ASSERT_EQUAL(string("time"), fv->get_space_name());
-    CPPUNIT_ASSERT_EQUAL(FeatureSpace::kInteger, fv->get_space()->get_type());
+    CPPUNIT_ASSERT_EQUAL(string("integer"), fv->get_space()->get_type_name());
     // only one item
     CPPUNIT_ASSERT_EQUAL(1, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);
@@ -72,7 +72,7 @@ protected:
 
     fv = &(vecs[2]);
     CPPUNIT_ASSERT_EQUAL(string("category"), fv->get_space_name());
-    CPPUNIT_ASSERT_EQUAL(FeatureSpace::kInteger, fv->get_space()->get_type());
+    CPPUNIT_ASSERT_EQUAL(string("integer"), fv->get_space()->get_type_name());
     // 3 items
     CPPUNIT_ASSERT_EQUAL(3, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);
@@ -87,7 +87,7 @@ protected:
 
     fv = &(vecs[3]);
     CPPUNIT_ASSERT_EQUAL(string("entity"), fv->get_space_name());
-    CPPUNIT_ASSERT_EQUAL(FeatureSpace::kString, fv->get_space()->get_type());
+    CPPUNIT_ASSERT_EQUAL(string("string"), fv->get_space()->get_type_name());
     // 3 items
     CPPUNIT_ASSERT_EQUAL(3, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);
@@ -124,10 +124,10 @@ protected:
 private:
   std::shared_ptr<FeatureCache> create_cache() {
     auto cache = std::make_shared<FeatureCache>();
-    cache->create_space("time", 1, FeatureSpace::FeatureType::kInteger);
-    cache->create_space("publisher", 2, FeatureSpace::FeatureType::kString);
-    cache->create_space("entity", 3, FeatureSpace::FeatureType::kString);
-    cache->create_space("category", 4, FeatureSpace::FeatureType::kInteger);
+    cache->create_space("time", 1, FeatureSpace::SpaceType::kInteger);
+    cache->create_space("publisher", 2, FeatureSpace::SpaceType::kString);
+    cache->create_space("entity", 3, FeatureSpace::SpaceType::kString);
+    cache->create_space("category", 4, FeatureSpace::SpaceType::kInteger);
     return cache;
   };
 

@@ -14,9 +14,8 @@ public:
   typedef Document Doc;
   typedef DocumentId DocId;
   typedef Feature::FeatureId TermId;
-  typedef FeatureVector::Weight TermWeight;
+  typedef FeatureVector::FeatureWeight TermWeight;
   typedef int32_t ExpireTime;
-  typedef double Score;
   typedef DocumentId::Hash DocIdHash;
   typedef std::hash<TermId> TermIdHash;
 };

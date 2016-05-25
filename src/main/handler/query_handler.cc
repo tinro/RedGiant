@@ -6,8 +6,8 @@
 #include <sstream>
 
 #include "data/query_request.h"
+#include "data/query_request_parser.h"
 #include "data/query_result.h"
-#include "parser/query_request_parser.h"
 #include "query/query_executor.h"
 #include "service/request_context.h"
 #include "service/response_writer.h"
@@ -67,9 +67,8 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
   }
 
   // run query
-  QueryResult result(request_id);
-  int query_ret = executor_->execute(query_request, result);
-  if (query_ret < 0) {
+  std::unique_ptr<QueryResult> result = executor_->execute(query_request);
+  if (!result) {
     response->add_body(R"({"error":"query_error", "results":[]})""\n");
     response->send(400, NULL);
     LOG_INFO(logger, "[query:%s] REQ_STAT error=query_error, latency=%ldus", request_id.c_str(), watch.get_ticks_us());
@@ -81,7 +80,7 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
       << R"(,"model":")" << ranking_model << '"'
       << R"(,"results":[)";
   bool first = true; // avoid trailing comma
-  for (auto& r: result.get_results()) {
+  for (auto& r: result->get_results()) {
     if (first) {
       first = false;
     } else {
@@ -96,6 +95,6 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
   response->send(200, NULL);
 
   LOG_INFO(logger, "[query:%s] REQ_STAT error=success, latency=%ldus, ret=%d, model=%s",
-      request_id.c_str(), watch.get_ticks_us(), query_ret, ranking_model.c_str());
+      request_id.c_str(), watch.get_ticks_us(), 0, ranking_model.c_str());
 }
 } /* namespace redgiant */

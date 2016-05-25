@@ -1,4 +1,4 @@
-#include "parser/query_request_parser.h"
+#include "data/query_request_parser.h"
 
 #include <memory>
 #include <string>
@@ -10,6 +10,7 @@
 #include "data/feature_space.h"
 #include "data/feature_vector.h"
 #include "data/query_request.h"
+#include "utils/json_utils.h"
 #include "utils/logger.h"
 
 namespace redgiant {
@@ -22,34 +23,27 @@ int QueryRequestParser::parse_json(const rapidjson::Value& root, QueryRequest& o
     return -1;
   }
 
-  if (!root.HasMember("id") || !root["id"].IsString()) {
-    LOG_ERROR(logger, "request id missing!");
+  const char* id = json_try_get_string(root, "id");
+  if (!id || !id[0]) {
+    LOG_ERROR(logger, "request id missing or empty!");
     return -1;
   }
 
-  std::string id;
-  id = root["id"].GetString();
-  if (id.empty()) {
-    LOG_ERROR(logger, "request id is empty!");
-    return -1;
-  }
-
-  output.set_request_id(std::move(id));
-  LOG_TRACE(logger, "request[%s]: parsing.", output.get_request_id().c_str());
+  output.set_request_id(id);
+  LOG_TRACE(logger, "request[%s]: parsing.", id);
 
   int query_count;
-  if (root.HasMember("count") && root["count"].IsInt()) {
-    if ((query_count = root["count"].GetInt()) > 0) {
-      output.set_query_count((size_t)query_count);
-    }
+  if (json_try_get_int(root, "count", query_count)) {
+    output.set_query_count((size_t)query_count);
   }
 
-  if (!root.HasMember("features") || !root["features"].IsObject()) {
-    LOG_ERROR(logger, "request[%s]: no features found!", output.get_request_id().c_str());
+  auto features = json_try_get_object(root, "features");
+  if (!features) {
+    LOG_ERROR(logger, "request[%s]: no features found!", id);
     return -1;
   }
 
-  if (parse_feature_spaces(root["features"], output) < 0) {
+  if (parse_feature_spaces(*features, output) < 0) {
     return -1;
   }
 
@@ -58,25 +52,23 @@ int QueryRequestParser::parse_json(const rapidjson::Value& root, QueryRequest& o
 
 int QueryRequestParser::parse_feature_spaces(const rapidjson::Value& root, QueryRequest& request) {
   for (auto it = root.MemberBegin(); it != root.MemberEnd(); ++it) {
-    if (it->name.IsString()) {
-      std::string space_name = it->name.GetString();
-      std::shared_ptr<FeatureSpace> space = cache_->get_space(space_name);
-      if (!space) {
-        // feature space must be pre-defined in feature cache
-        LOG_WARN(logger, "document[%s]: unknown feature space [%s], ignored.",
-            request.get_request_id().c_str(), space_name.c_str());
-      } else {
-        LOG_TRACE(logger, "document[%s]: parsing feature space [%s]",
-            request.get_request_id().c_str(), space_name.c_str());
+    std::string space_name = it->name.GetString();
+    std::shared_ptr<FeatureSpace> space = cache_->get_space(space_name);
+    if (!space) {
+      // feature space must be pre-defined in feature cache
+      LOG_WARN(logger, "document[%s]: unknown feature space [%s], ignored.",
+          request.get_request_id().c_str(), space_name.c_str());
+    } else {
+      LOG_TRACE(logger, "document[%s]: parsing feature space [%s]",
+          request.get_request_id().c_str(), space_name.c_str());
 
-        FeatureVector vec(std::move(space));
-        if (it->value.IsObject()) {
-          parse_multi_value_feature_vector(it->value, request, vec);
-        } else if (it->value.IsString()){
-          parse_single_value_feature_vector(it->value, request, vec);
-        }
-        request.add_feature_vector(std::move(vec));
+      FeatureVector vec(std::move(space));
+      if (it->value.IsObject()) {
+        parse_multi_value_feature_vector(it->value, request, vec);
+      } else if (it->value.IsString()){
+        parse_single_value_feature_vector(it->value, request, vec);
       }
+      request.add_feature_vector(std::move(vec));
     }
   }
   return 0;

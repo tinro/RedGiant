@@ -16,10 +16,6 @@ namespace redgiant {
 
 class Document {
 public:
-  typedef Feature::FeatureId FeatureId;
-  typedef FeatureSpace::SpaceId SpaceId;
-  typedef FeatureVector::Weight Weight;
-
   Document() = default;
 
   Document(std::string id)

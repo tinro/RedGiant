@@ -16,11 +16,11 @@ auto FeatureSpace::calculate_feature_id(const std::string& feature_key) const
   // use high 8 bits to store space id
   id |= ((FeatureId)space_id_ << kSpaceOffset) & kSpaceMask;
 
-  if (type_ == kString) {
+  if (type_ == SpaceType::kString) {
     // Any string literal is valid.
     // For strings, hash the string and get the lower 56 bits.
     id |= (FeatureId)string_hash(feature_key) & kFeatureMask;
-  } else if (type_ == kInteger) {
+  } else if (type_ == SpaceType::kInteger) {
     try {
       // For integers, get the lower 56 bits directly.
       unsigned long long number = stoull(feature_key);

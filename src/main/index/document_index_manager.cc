@@ -10,6 +10,7 @@
 #include "core/reader/wand_reader-inl.h"
 #include "data/document.h"
 #include "data/document_id.h"
+#include "data/query_request.h"
 #include "index/document_query.h"
 #include "utils/logger.h"
 #include "utils/stop_watch.h"

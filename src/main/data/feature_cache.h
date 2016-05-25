@@ -10,6 +10,7 @@
 #include "data/feature_space.h"
 #include "third_party/lock/shared_lock.h"
 #include "third_party/lock/shared_mutex.h"
+#include "third_party/rapidjson/document.h"
 
 namespace redgiant {
 
@@ -17,6 +18,7 @@ class FeatureCache {
 public:
   typedef Feature::FeatureId FeatureId;
   typedef FeatureSpace::SpaceId SpaceId;
+  typedef FeatureSpace::SpaceType SpaceType;
 
   FeatureCache() = default;
   ~FeatureCache() = default;
@@ -33,9 +35,10 @@ public:
     }
   }
 
-  std::shared_ptr<FeatureSpace> create_space(std::string space_name, SpaceId space_id,
-      FeatureSpace::FeatureType type) {
-    std::shared_ptr<FeatureSpace> space = std::make_shared<FeatureSpace>(space_name, space_id, type);
+  std::shared_ptr<FeatureSpace> create_space(std::string space_name,
+      SpaceId space_id, SpaceType type) {
+    std::shared_ptr<FeatureSpace> space =
+        std::make_shared<FeatureSpace>(space_name, space_id, type);
 
     std::unique_lock<shared_mutex> lock(mutex_);
     set_space_internal(space);
@@ -75,6 +78,8 @@ public:
 
   std::shared_ptr<Feature> create_or_get_feature(const std::string& feature_key,
       const std::shared_ptr<FeatureSpace>& space);
+
+  int initialize(const rapidjson::Value& config);
 
 private:
   // considered as already synchronized.

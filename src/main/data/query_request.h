@@ -1,15 +1,19 @@
 #ifndef SRC_MAIN_DATA_QUERY_REQUEST_H_
 #define SRC_MAIN_DATA_QUERY_REQUEST_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "data/feature.h"
 #include "data/feature_vector.h"
+#include "data/query_result.h"
 #include "utils/stop_watch.h"
 
 namespace redgiant {
+class QueryResult;
+
 class QueryRequest {
 public:
   QueryRequest(const std::string& request_id, size_t query_count,
@@ -27,6 +31,10 @@ public:
   QueryRequest& operator= (QueryRequest&&) = default;
 
   ~QueryRequest() = default;
+
+  std::unique_ptr<QueryResult> create_result() const {
+    return std::unique_ptr<QueryResult>(new QueryResult(request_id_, watch_));
+  }
 
   const std::string& get_request_id() const {
     return request_id_;
