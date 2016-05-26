@@ -17,7 +17,7 @@ class QueryExecutor;
 class FeedDocumentHandler: public RequestHandler {
 public:
   FeedDocumentHandler(std::unique_ptr<Parser<Document>> parser,
-      JobExecutor<FeedDocumentRequest>* pipeline, time_t default_ttl)
+      JobExecutor<FeedDocumentRequest>* pipeline, unsigned long default_ttl)
   : parser_(std::move(parser)), pipeline_(pipeline),
     default_ttl_(default_ttl), buf_(2 * 1024 * 1024) {
   }
@@ -29,14 +29,14 @@ public:
 private:
   std::shared_ptr<Parser<Document>> parser_;
   JobExecutor<FeedDocumentRequest>* pipeline_;
-  time_t default_ttl_;
+  unsigned long default_ttl_;
   CachedBuffer<char> buf_;
 };
 
 class FeedDocumentHandlerFactory: public RequestHandlerFactory {
 public:
   FeedDocumentHandlerFactory(std::shared_ptr<ParserFactory<Document>> parser_factory,
-      JobExecutor<FeedDocumentRequest>* pipeline, time_t default_ttl = 86400)
+      JobExecutor<FeedDocumentRequest>* pipeline, unsigned long default_ttl = 86400)
   : parser_factory_(std::move(parser_factory)), pipeline_(pipeline),
     default_ttl_(default_ttl) {
   }
@@ -51,7 +51,7 @@ public:
 private:
   std::shared_ptr<ParserFactory<Document>> parser_factory_;
   JobExecutor<FeedDocumentRequest>* pipeline_;
-  time_t default_ttl_;
+  unsigned long default_ttl_;
 };
 } /* namespace redgiant */
 
