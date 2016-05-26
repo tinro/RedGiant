@@ -3,31 +3,29 @@
 
 #include <memory>
 
-#include "feed_document_request.h"
+#include "data/document_update_request.h"
 #include "utils/concurrency/worker.h"
 
 namespace redgiant {
 class DocumentIndexManager;
 
-class FeedDocumentWorker: public Worker<FeedDocumentRequest> {
+class DocumentUpdateWorker: public Worker<DocumentUpdateRequest> {
 public:
-  FeedDocumentWorker(DocumentIndexManager* index)
+  DocumentUpdateWorker(DocumentIndexManager* index)
   : index_(index) {
   }
 
-  virtual ~FeedDocumentWorker() = default;
+  virtual ~DocumentUpdateWorker() = default;
 
   virtual void prepare();
-
   virtual void cleanup();
-
-  virtual void execute(FeedDocumentRequest& job);
+  virtual void execute(DocumentUpdateRequest& job);
 
 private:
   DocumentIndexManager* index_;
 };
 
-class FeedDocumentWorkerFactory: public WorkerFactory<FeedDocumentWorker> {
+class FeedDocumentWorkerFactory: public WorkerFactory<DocumentUpdateWorker> {
 public:
   FeedDocumentWorkerFactory(DocumentIndexManager* index)
   : index_(index) {
@@ -35,8 +33,8 @@ public:
 
   virtual ~FeedDocumentWorkerFactory() = default;
 
-  virtual std::unique_ptr<FeedDocumentWorker> create() {
-    return std::unique_ptr<FeedDocumentWorker>(new FeedDocumentWorker(index_));
+  virtual std::unique_ptr<DocumentUpdateWorker> create() {
+    return std::unique_ptr<DocumentUpdateWorker>(new DocumentUpdateWorker(index_));
   }
 
 private:

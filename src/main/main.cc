@@ -1,3 +1,4 @@
+#include <handler/document_handler.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -7,15 +8,14 @@
 // Linux headers
 #include <libgen.h>
 #include <signal.h>
-
 #include "data/document_parser.h"
 #include "data/feature_cache.h"
 #include "data/query_request_parser.h"
-#include "handler/feed_document_handler.h"
 #include "handler/query_handler.h"
 #include "handler/test_handler.h"
 #include "index/document_index_manager.h"
-#include "pipeline/feed_document_pipeline.h"
+#include "index/document_index_view.h"
+#include "index/document_update_pipeline.h"
 #include "query/simple_query_executor.h"
 #include "ranking/default_model.h"
 #include "ranking/feature_mapping_model.h"
@@ -42,7 +42,6 @@ static const char kConfigKeyLoggerConfig    [] = "logger_config";
 static const char kConfigKeyFeatureSpaces   [] = "feature_spaces";
 static const char kConfigKeyIndex           [] = "index";
 static const char kConfigKeyRanking         [] = "ranking";
-static const char kConfigKeyPipeline        [] = "pipeline";
 static const char kConfigKeyServer          [] = "server";
 
 static volatile int g_exit_signal = 0;
@@ -157,27 +156,33 @@ static int server_main(rapidjson::Value& config) {
     document_index.stop_maintain();
   });
 
-  uint feed_document_thread_num = 4;
-  uint feed_document_queue_size = 2048;
-
-  auto config_pipeline = json_try_get_object(config, kConfigKeyPipeline);
-  if (config_pipeline && json_try_get_uint(*config_pipeline, "thread_num", feed_document_thread_num)) {
-    LOG_DEBUG(logger, "feed document pipeline thread num: %u", feed_document_thread_num);
+  unsigned int document_update_thread_num = 4;
+  unsigned int document_update_queue_size = 2048;
+  unsigned int default_ttl = 86400;
+  if (config_index && json_try_get_uint(*config_index, "update_thread_num", document_update_thread_num)) {
+    LOG_DEBUG(logger, "feed document pipeline thread num: %u", document_update_thread_num);
   } else {
-    LOG_DEBUG(logger, "feed document pipeline thread num not configured, use default: %u", feed_document_thread_num);
+    LOG_DEBUG(logger, "feed document pipeline thread num not configured, use default: %u", document_update_thread_num);
   }
-  if (config_pipeline && json_try_get_uint(*config_pipeline, "queue_size", feed_document_queue_size)) {
-    LOG_DEBUG(logger, "feed document pipeline queue size: %u", feed_document_queue_size);
+  if (config_index && json_try_get_uint(*config_index, "update_queue_size", document_update_queue_size)) {
+    LOG_DEBUG(logger, "feed document pipeline queue size: %u", document_update_queue_size);
   } else {
-    LOG_DEBUG(logger, "feed document pipeline queue size not configured, use default: %u", feed_document_queue_size);
+    LOG_DEBUG(logger, "feed document pipeline queue size not configured, use default: %u", document_update_queue_size);
+  }
+  if (config_index && json_try_get_uint(*config_index, "default_ttl", default_ttl)) {
+    LOG_DEBUG(logger, "document update default ttl: %u", default_ttl);
+  } else {
+    LOG_DEBUG(logger, "document update default ttl not configured, use default: %u", default_ttl);
   }
 
-  FeedDocumentPipeline feed_document(feed_document_thread_num, feed_document_queue_size, &document_index);
-  feed_document.start();
-  ScopeGuard feed_document_pipeline_guard([&feed_document] {
+  DocumentUpdatePipeline document_update_pipeline(document_update_thread_num, document_update_queue_size, &document_index);
+  document_update_pipeline.start();
+  ScopeGuard feed_document_pipeline_guard([&document_update_pipeline] {
     LOG_INFO(logger, "feed document pipeline stopping...");
-    feed_document.stop();
+    document_update_pipeline.stop();
   });
+
+  DocumentIndexView document_index_view(&document_index, &document_update_pipeline);
 
   /*
    * Initialization
@@ -229,7 +234,7 @@ static int server_main(rapidjson::Value& config) {
   server.bind("/test", std::make_shared<TestHandlerFactory>());
   server.bind("/document", std::make_shared<FeedDocumentHandlerFactory>(
       std::make_shared<DocumentParserFactory>(feature_cache),
-      &feed_document, 0));
+      &document_index_view, default_ttl));
   server.bind("/query", std::make_shared<QueryHandlerFactory>(
       std::make_shared<QueryRequestParserFactory>(feature_cache),
       std::make_shared<SimpleQueryExecutorFactory>(&document_index, model.get())));

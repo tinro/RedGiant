@@ -9,9 +9,9 @@
 #include "utils/stop_watch.h"
 
 namespace redgiant {
-class FeedDocumentRequest {
+class DocumentUpdateRequest {
 public:
-  FeedDocumentRequest(std::shared_ptr<Document> doc, std::time_t expire_time,
+  DocumentUpdateRequest(std::shared_ptr<Document> doc, std::time_t expire_time,
       StopWatch watch = StopWatch())
   : doc_(std::move(doc)), expire_time_(expire_time), watch_(watch) {
   }
