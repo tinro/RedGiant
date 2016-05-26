@@ -115,7 +115,7 @@ static int server_main(rapidjson::Value& config) {
    */
   auto config_feature_spaces = json_try_get(config, kConfigKeyFeatureSpaces);
   if (!config_feature_spaces) {
-    LOG_ERROR(logger, "[CONF] features configuration does not exist!");
+    LOG_ERROR(logger, "features configuration does not exist!");
     return -1;
   }
 
@@ -135,19 +135,19 @@ static int server_main(rapidjson::Value& config) {
 
   auto config_index = json_try_get_object(config, kConfigKeyIndex);
   if (config_index && json_try_get_int(*config_index, "initial_buckets", document_index_initial_buckets)) {
-    LOG_DEBUG(logger, "[CONF] document index initial buckets: %d", document_index_initial_buckets);
+    LOG_DEBUG(logger, "document index initial buckets: %d", document_index_initial_buckets);
   } else {
-    LOG_DEBUG(logger, "[CONF] document index initial buckets not configured, use default: %d", document_index_initial_buckets);
+    LOG_DEBUG(logger, "document index initial buckets not configured, use default: %d", document_index_initial_buckets);
   }
   if (config_index && json_try_get_int(*config_index, "max_size", document_index_max_size)) {
-    LOG_DEBUG(logger, "[CONF] document index max size: %d", document_index_max_size);
+    LOG_DEBUG(logger, "document index max size: %d", document_index_max_size);
   } else {
-    LOG_DEBUG(logger, "[CONF] document index max size not configured, use default: %d", document_index_max_size);
+    LOG_DEBUG(logger, "document index max size not configured, use default: %d", document_index_max_size);
   }
   if (config_index && json_try_get_int(*config_index, "maintain_interval", document_index_maintain_interval)) {
-    LOG_DEBUG(logger, "[CONF] document index maintain interval: %d", document_index_maintain_interval);
+    LOG_DEBUG(logger, "document index maintain interval: %d", document_index_maintain_interval);
   } else {
-    LOG_DEBUG(logger, "[CONF] document index maintain interval not configured, use default: %d", document_index_maintain_interval);
+    LOG_DEBUG(logger, "document index maintain interval not configured, use default: %d", document_index_maintain_interval);
   }
 
   DocumentIndexManager document_index(document_index_initial_buckets, document_index_max_size);
@@ -162,14 +162,14 @@ static int server_main(rapidjson::Value& config) {
 
   auto config_pipeline = json_try_get_object(config, kConfigKeyPipeline);
   if (config_pipeline && json_try_get_uint(*config_pipeline, "thread_num", feed_document_thread_num)) {
-    LOG_DEBUG(logger, "[CONF] feed document pipeline thread num: %u", feed_document_thread_num);
+    LOG_DEBUG(logger, "feed document pipeline thread num: %u", feed_document_thread_num);
   } else {
-    LOG_DEBUG(logger, "[CONF] feed document pipeline thread num not configured, use default: %u", feed_document_thread_num);
+    LOG_DEBUG(logger, "feed document pipeline thread num not configured, use default: %u", feed_document_thread_num);
   }
   if (config_pipeline && json_try_get_uint(*config_pipeline, "queue_size", feed_document_queue_size)) {
-    LOG_DEBUG(logger, "[CONF] feed document pipeline queue size: %u", feed_document_queue_size);
+    LOG_DEBUG(logger, "feed document pipeline queue size: %u", feed_document_queue_size);
   } else {
-    LOG_DEBUG(logger, "[CONF] feed document pipeline queue size not configured, use default: %u", feed_document_queue_size);
+    LOG_DEBUG(logger, "feed document pipeline queue size not configured, use default: %u", feed_document_queue_size);
   }
 
   FeedDocumentPipeline feed_document(feed_document_thread_num, feed_document_queue_size, &document_index);
@@ -189,7 +189,7 @@ static int server_main(rapidjson::Value& config) {
 
   auto config_ranking = json_try_get(config, kConfigKeyRanking);
   if (!config_ranking) {
-    LOG_ERROR(logger, "[CONF] ranking model config does not exist!");
+    LOG_ERROR(logger, "ranking model config does not exist!");
     return -1;
   }
 
@@ -210,19 +210,19 @@ static int server_main(rapidjson::Value& config) {
 
   auto config_server = json_try_get_object(config, kConfigKeyServer);
   if (config_server && json_try_get_int(*config_server, "port", server_port)) {
-    LOG_DEBUG(logger, "[CONF] server port: %d", server_port);
+    LOG_DEBUG(logger, "server port: %d", server_port);
   } else {
-    LOG_DEBUG(logger, "[CONF] server port not configured, use default: %d", server_port);
+    LOG_DEBUG(logger, "server port not configured, use default: %d", server_port);
   }
   if (config_server && json_try_get_uint(*config_server, "thread_num", server_thread_num)) {
-    LOG_DEBUG(logger, "[CONF] server thread num: %u", server_thread_num);
+    LOG_DEBUG(logger, "server thread num: %u", server_thread_num);
   } else {
-    LOG_DEBUG(logger, "[CONF] server thread num not configured, use default: %u", server_thread_num);
+    LOG_DEBUG(logger, "server thread num not configured, use default: %u", server_thread_num);
   }
   if (config_server && json_try_get_uint(*config_server, "max_request_per_thread", max_req_per_thread)) {
-    LOG_DEBUG(logger, "[CONF] max requests per server thread: %u", max_req_per_thread);
+    LOG_DEBUG(logger, "max requests per server thread: %u", max_req_per_thread);
   } else {
-    LOG_DEBUG(logger, "[CONF] max requests per server thread not configured, use default: %u", max_req_per_thread);
+    LOG_DEBUG(logger, "max requests per server thread not configured, use default: %u", max_req_per_thread);
   }
 
   Server server(server_port, server_thread_num, max_req_per_thread);
@@ -239,15 +239,15 @@ static int server_main(rapidjson::Value& config) {
     return -1;
   }
 
-  ScopeGuard server_guard([&server] {
-    LOG_INFO(logger, "server exiting...");
-    server.stop();
-  });
-
   if (server.start() < 0) {
     LOG_ERROR(logger, "failed to start server!");
     return -1;
   }
+
+  ScopeGuard server_guard([&server] {
+    LOG_INFO(logger, "server exiting...");
+    server.stop();
+  });
 
   LOG_INFO(logger, "service started successfully.");
 
