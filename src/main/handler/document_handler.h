@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_HANDLER_FEED_DOCUMENT_HANDLER_H_
-#define SRC_MAIN_HANDLER_FEED_DOCUMENT_HANDLER_H_
+#ifndef SRC_MAIN_HANDLER_DOCUMENT_HANDLER_H_
+#define SRC_MAIN_HANDLER_DOCUMENT_HANDLER_H_
 
 #include <memory>
 #include <utility>
@@ -11,33 +11,32 @@
 
 namespace redgiant {
 class Document;
-class FeedDocumentRequest;
-class QueryExecutor;
+class DocumentIndexView;
 
-class FeedDocumentHandler: public RequestHandler {
+class DocumentHandler: public RequestHandler {
 public:
-  FeedDocumentHandler(std::unique_ptr<Parser<Document>> parser,
-      JobExecutor<FeedDocumentRequest>* pipeline, time_t default_ttl)
-  : parser_(std::move(parser)), pipeline_(pipeline),
+  DocumentHandler(std::unique_ptr<Parser<Document>> parser,
+      DocumentIndexView* index_view, unsigned long default_ttl)
+  : parser_(std::move(parser)), index_view_(index_view),
     default_ttl_(default_ttl), buf_(2 * 1024 * 1024) {
   }
 
-  virtual ~FeedDocumentHandler() = default;
+  virtual ~DocumentHandler() = default;
 
   virtual void handle_request(const RequestContext* request, ResponseWriter* response);
 
 private:
   std::shared_ptr<Parser<Document>> parser_;
-  JobExecutor<FeedDocumentRequest>* pipeline_;
-  time_t default_ttl_;
+  DocumentIndexView* index_view_;
+  unsigned long default_ttl_;
   CachedBuffer<char> buf_;
 };
 
 class FeedDocumentHandlerFactory: public RequestHandlerFactory {
 public:
   FeedDocumentHandlerFactory(std::shared_ptr<ParserFactory<Document>> parser_factory,
-      JobExecutor<FeedDocumentRequest>* pipeline, time_t default_ttl = 86400)
-  : parser_factory_(std::move(parser_factory)), pipeline_(pipeline),
+      DocumentIndexView* index_view, unsigned long default_ttl = 86400)
+  : parser_factory_(std::move(parser_factory)), index_view_(index_view),
     default_ttl_(default_ttl) {
   }
 
@@ -45,14 +44,14 @@ public:
 
   virtual std::unique_ptr<RequestHandler> create_handler() {
     return std::unique_ptr<RequestHandler>(
-        new FeedDocumentHandler(parser_factory_->create_parser(), pipeline_, default_ttl_));
+        new DocumentHandler(parser_factory_->create_parser(), index_view_, default_ttl_));
   }
 
 private:
   std::shared_ptr<ParserFactory<Document>> parser_factory_;
-  JobExecutor<FeedDocumentRequest>* pipeline_;
-  time_t default_ttl_;
+  DocumentIndexView* index_view_;
+  unsigned long default_ttl_;
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_HANDLER_FEED_DOCUMENT_HANDLER_H_ */
+#endif /* SRC_MAIN_HANDLER_DOCUMENT_HANDLER_H_ */

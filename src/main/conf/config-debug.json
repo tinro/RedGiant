@@ -23,13 +23,12 @@
     /* Maximum number of documents. */
     "max_size": 100000,
     /* Interval in seconds the background maintaining thread writes updates to index. */
-    "maintain_interval": 20
-  },
-
-  /* Document update pipeline configurations. */
-  "pipeline": {
-    "thread_num": 2,
-    "queue_size": 256
+    "maintain_interval": 20,
+    /* Document update pipeline configurations. */
+    "update_thread_num": 2,
+    "update_queue_size": 256,
+    /* Default TTL of documents put from server endpoints */
+    "default_ttl": 86400
   },
 
   /* The feature spaces referred by the data models. */
