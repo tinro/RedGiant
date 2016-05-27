@@ -34,6 +34,7 @@ protected:
         "features": {
           "publisher": "publisher_id_test",
           "time": "1234567",
+          "score": 2.34,
           "category": {"1": 0.1, "2":0.2, "3" : 0.3}, 
           "entity": {"ent_1":0.1, "ent_2":0.2, "ent_3" : 0.3},
           "unknown": "abc"
@@ -49,7 +50,7 @@ protected:
     CPPUNIT_ASSERT_EQUAL(string("abcd1234-9876-1234-ffff-001122ddeeff"), doc.get_id().to_string());
 
     const auto& vecs = doc.get_feature_vectors();
-    CPPUNIT_ASSERT_EQUAL(4, (int)vecs.size());
+    CPPUNIT_ASSERT_EQUAL(5, (int)vecs.size());
 
     // feature vector 1: publisher
     auto fv = &(vecs[0]);
@@ -71,6 +72,15 @@ protected:
     CPPUNIT_ASSERT_DOUBLES_EQUAL((double)1.0, f->second, 0.0001);
 
     fv = &(vecs[2]);
+    CPPUNIT_ASSERT_EQUAL(string("score"), fv->get_space_name());
+    CPPUNIT_ASSERT_EQUAL(string("integer"), fv->get_space()->get_type_name());
+    // only one item
+    CPPUNIT_ASSERT_EQUAL(1, (int)fv->get_features().size());
+    f = &(fv->get_features()[0]);
+    CPPUNIT_ASSERT_EQUAL(string("0"), f->first->get_key());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL((double)2.34, f->second, 0.0001);
+
+    fv = &(vecs[3]);
     CPPUNIT_ASSERT_EQUAL(string("category"), fv->get_space_name());
     CPPUNIT_ASSERT_EQUAL(string("integer"), fv->get_space()->get_type_name());
     // 3 items
@@ -85,7 +95,7 @@ protected:
     CPPUNIT_ASSERT_EQUAL(string("3"), f->first->get_key());
     CPPUNIT_ASSERT_DOUBLES_EQUAL((double)0.3, f->second, 0.0001);
 
-    fv = &(vecs[3]);
+    fv = &(vecs[4]);
     CPPUNIT_ASSERT_EQUAL(string("entity"), fv->get_space_name());
     CPPUNIT_ASSERT_EQUAL(string("string"), fv->get_space()->get_type_name());
     // 3 items
@@ -128,6 +138,7 @@ private:
     cache->create_space("publisher", 2, FeatureSpace::SpaceType::kString);
     cache->create_space("entity", 3, FeatureSpace::SpaceType::kString);
     cache->create_space("category", 4, FeatureSpace::SpaceType::kInteger);
+    cache->create_space("score", 99, FeatureSpace::SpaceType::kInteger);
     return cache;
   };
 
