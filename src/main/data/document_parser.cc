@@ -46,8 +46,8 @@ int DocumentParser::parse_json(const rapidjson::Value& root, Document& output) {
   return 0;
 }
 
-int DocumentParser::parse_feature_spaces(const rapidjson::Value& root, Document& doc) {
-  for (auto it = root.MemberBegin(); it != root.MemberEnd(); ++it) {
+int DocumentParser::parse_feature_spaces(const rapidjson::Value& json, Document& doc) {
+  for (auto it = json.MemberBegin(); it != json.MemberEnd(); ++it) {
     std::string space_name = it->name.GetString();
     std::shared_ptr<FeatureSpace> space = cache_->get_space(space_name);
     if (!space) {
@@ -59,21 +59,34 @@ int DocumentParser::parse_feature_spaces(const rapidjson::Value& root, Document&
           doc.get_id_str().c_str(), space_name.c_str());
 
       FeatureVector vec(std::move(space));
+      int ret = -1;
       if (it->value.IsObject()) {
-        parse_multi_value_feature_vector(it->value, doc, vec);
+        ret = parse_feature_vector_multiple_featuers(it->value, doc, vec);
       } else if (it->value.IsString()){
-        parse_single_value_feature_vector(it->value, doc, vec);
+        ret = parse_feature_vector_single_feature(it->value, doc, vec);
+      } else if (it->value.IsNumber()) {
+        ret = parse_feature_vector_single_score(it->value, doc, vec);
       }
-      doc.add_feature_vector(std::move(vec));
+
+      if (ret == 0) {
+        doc.add_feature_vector(std::move(vec));
+      } else {
+        LOG_WARN(logger, "document[%s]: cannot parse feature space [%s], ignored.",
+            doc.get_id_str().c_str(), space_name.c_str());
+      }
     }
   }
   return 0;
 }
 
-// this feature space contains just one string value as its feature key
-int DocumentParser::parse_single_value_feature_vector(const rapidjson::Value& root,
+// e.g. { "publisher" : "cnn" }, json is "cnn"
+int DocumentParser::parse_feature_vector_single_feature(const rapidjson::Value& json,
     const Document& doc, FeatureVector& vec) {
-  std::shared_ptr<Feature> feature = cache_->create_or_get_feature(root.GetString(), vec.get_space());
+  if (!json.IsString()) {
+    return -1;
+  }
+
+  std::shared_ptr<Feature> feature = cache_->create_or_get_feature(json.GetString(), vec.get_space());
   if (feature) {
     LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
         doc.get_id_str().c_str(), (unsigned long long)feature->get_id(),
@@ -83,10 +96,33 @@ int DocumentParser::parse_single_value_feature_vector(const rapidjson::Value& ro
   return 0;
 }
 
-// parse an object of feature-weight pairs
-int DocumentParser::parse_multi_value_feature_vector(const rapidjson::Value& root,
+// e.g. { "download_count" : 123456 }, json is 123456
+int DocumentParser::parse_feature_vector_single_score(const rapidjson::Value& json,
     const Document& doc, FeatureVector& vec) {
-  for (auto it = root.MemberBegin(); it != root.MemberEnd(); ++it) {
+  if (!json.IsNumber()) {
+    return -1;
+  }
+
+  // the feature key is empty, we set it to "0" and it is usually configured to integer type.
+  std::shared_ptr<Feature> feature = cache_->create_or_get_feature("0", vec.get_space());
+  if (feature) {
+    LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
+        doc.get_id_str().c_str(), (unsigned long long)feature->get_id(),
+        feature->get_key().c_str(), vec.get_space_name().c_str());
+    vec.add_feature(std::move(feature), json.GetDouble());
+  }
+  return 0;
+}
+
+// e.g. { "favorite_sports" : { "football" : 1.0, "tennis" : 2.0 } }
+// json is { "football" : 1.0, "tennis" : 2.0 }
+int DocumentParser::parse_feature_vector_multiple_featuers(const rapidjson::Value& json,
+    const Document& doc, FeatureVector& vec) {
+  if (!json.IsObject()) {
+    return -1;
+  }
+
+  for (auto it = json.MemberBegin(); it != json.MemberEnd(); ++it) {
     if (it->name.IsString() && it->value.IsNumber()) {
       std::shared_ptr<Feature> feature = cache_->create_or_get_feature(it->name.GetString(), vec.get_space());
       if (feature) {

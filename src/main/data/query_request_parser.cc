@@ -56,41 +56,37 @@ int QueryRequestParser::parse_feature_spaces(const rapidjson::Value& root, Query
     std::shared_ptr<FeatureSpace> space = cache_->get_space(space_name);
     if (!space) {
       // feature space must be pre-defined in feature cache
-      LOG_WARN(logger, "document[%s]: unknown feature space [%s], ignored.",
+      LOG_WARN(logger, "request[%s]: unknown feature space [%s], ignored.",
           request.get_request_id().c_str(), space_name.c_str());
     } else {
-      LOG_TRACE(logger, "document[%s]: parsing feature space [%s]",
+      LOG_TRACE(logger, "request[%s]: parsing feature space [%s]",
           request.get_request_id().c_str(), space_name.c_str());
 
       FeatureVector vec(std::move(space));
+      int ret = -1;
+      // only deal with feature vectors in multiple value format
       if (it->value.IsObject()) {
-        parse_multi_value_feature_vector(it->value, request, vec);
-      } else if (it->value.IsString()){
-        parse_single_value_feature_vector(it->value, request, vec);
+        ret = parse_feature_vector_multiple_featuers(it->value, request, vec);
       }
-      request.add_feature_vector(std::move(vec));
+
+      if (ret == 0) {
+        request.add_feature_vector(std::move(vec));
+      } else {
+        LOG_WARN(logger, "request[%s]: cannot parse feature space [%s], ignored.",
+            request.get_request_id().c_str(), space_name.c_str());
+      }
     }
   }
   return 0;
 }
 
-// this feature space contains just one string value as its feature key
-int QueryRequestParser::parse_single_value_feature_vector(const rapidjson::Value& root,
+int QueryRequestParser::parse_feature_vector_multiple_featuers(const rapidjson::Value& json,
     const QueryRequest& request, FeatureVector& vec) {
-  std::shared_ptr<Feature> feature = cache_->get_feature(root.GetString(), *(vec.get_space()));
-  if (feature) {
-    LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
-        request.get_request_id().c_str(), (unsigned long long)feature->get_id(),
-        feature->get_key().c_str(), vec.get_space_name().c_str());
-    vec.add_feature(std::move(feature), 1.0);
+  if (!json.IsObject()) {
+    return -1;
   }
-  return 0;
-}
 
-// parse an object of feature-weight pairs
-int QueryRequestParser::parse_multi_value_feature_vector(const rapidjson::Value& root,
-    const QueryRequest& request, FeatureVector& vec) {
-  for (auto it = root.MemberBegin(); it != root.MemberEnd(); ++it) {
+  for (auto it = json.MemberBegin(); it != json.MemberEnd(); ++it) {
     if (it->name.IsString() && it->value.IsNumber()) {
       std::shared_ptr<Feature> feature = cache_->get_feature(it->name.GetString(), *(vec.get_space()));
       if (feature) {

@@ -20,12 +20,11 @@ public:
   virtual int parse_json(const rapidjson::Value &root, QueryRequest& output);
 
 private:
-  int parse_feature_spaces(const rapidjson::Value& root, QueryRequest& request);
+  int parse_feature_spaces(const rapidjson::Value& json, QueryRequest& request);
 
-  int parse_single_value_feature_vector(const rapidjson::Value& root,
-      const QueryRequest& request, FeatureVector& vec);
-
-  int parse_multi_value_feature_vector(const rapidjson::Value& root,
+  // parse feature vector contains multiple features and their weights.
+  // e.g. { "favorite_sports" : { "football" : 1.0, "tennis" : 2.0 } }
+  int parse_feature_vector_multiple_featuers(const rapidjson::Value& json,
       const QueryRequest& request, FeatureVector& vec);
 
 private:

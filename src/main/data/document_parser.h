@@ -20,12 +20,21 @@ public:
   virtual int parse_json(const rapidjson::Value &root, Document& output);
 
 private:
-  int parse_feature_spaces(const rapidjson::Value& root, Document& doc);
+  int parse_feature_spaces(const rapidjson::Value& json, Document& doc);
 
-  int parse_single_value_feature_vector(const rapidjson::Value& root,
+  // parse feature vector contains only one single feature with no weight.
+  // e.g. { "publisher" : "cnn" }
+  int parse_feature_vector_single_feature(const rapidjson::Value& json,
       const Document& doc, FeatureVector& vec);
 
-  int parse_multi_value_feature_vector(const rapidjson::Value& root,
+  // parse feature vector contains only one single feature that is a weight.
+  // e.g. { "download_count" : 123456 }
+  int parse_feature_vector_single_score(const rapidjson::Value& json,
+      const Document& doc, FeatureVector& vec);
+
+  // parse feature vector contains multiple features and their weights.
+  // e.g. { "favorite_sports" : { "football" : 1.0, "tennis" : 2.0 } }
+  int parse_feature_vector_multiple_featuers(const rapidjson::Value& json,
       const Document& doc, FeatureVector& vec);
 
 private:
