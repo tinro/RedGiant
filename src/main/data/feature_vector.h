@@ -42,7 +42,11 @@ public:
     features_.emplace_back(space_->create_feature(feature_key), weight);
   }
 
-  const std::shared_ptr<FeatureSpace>& get_space() const {
+  const FeatureSpace& get_space() const {
+    return *space_;
+  }
+
+  std::shared_ptr<FeatureSpace> get_space_shared() const {
     return space_;
   }
 

@@ -39,7 +39,6 @@ public:
       SpaceId space_id, SpaceType type) {
     std::shared_ptr<FeatureSpace> space =
         std::make_shared<FeatureSpace>(space_name, space_id, type);
-
     std::unique_lock<shared_mutex> lock(mutex_);
     set_space_internal(space);
     return space;
@@ -73,11 +72,11 @@ public:
     }
   }
 
-  std::shared_ptr<Feature> create_or_get_feature(const std::string& feature_key,
+  std::shared_ptr<Feature> get_or_create_feature(const std::string& feature_key,
       const std::string& space_name);
 
-  std::shared_ptr<Feature> create_or_get_feature(const std::string& feature_key,
-      const std::shared_ptr<FeatureSpace>& space);
+  std::shared_ptr<Feature> get_or_create_feature(const std::string& feature_key,
+      const FeatureSpace& space);
 
   int initialize(const rapidjson::Value& config);
 

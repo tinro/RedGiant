@@ -55,7 +55,7 @@ protected:
     // feature vector 1: publisher
     auto fv = &(vecs[0]);
     CPPUNIT_ASSERT_EQUAL(string("publisher"), fv->get_space_name());
-    CPPUNIT_ASSERT_EQUAL(string("string"), fv->get_space()->get_type_name());
+    CPPUNIT_ASSERT_EQUAL(string("string"), fv->get_space().get_type_name());
     // only one item
     CPPUNIT_ASSERT_EQUAL(1, (int)fv->get_features().size());
     auto f = &(fv->get_features()[0]);
@@ -64,7 +64,7 @@ protected:
 
     fv = &(vecs[1]);
     CPPUNIT_ASSERT_EQUAL(string("time"), fv->get_space_name());
-    CPPUNIT_ASSERT_EQUAL(string("integer"), fv->get_space()->get_type_name());
+    CPPUNIT_ASSERT_EQUAL(string("integer"), fv->get_space().get_type_name());
     // only one item
     CPPUNIT_ASSERT_EQUAL(1, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);
@@ -73,7 +73,7 @@ protected:
 
     fv = &(vecs[2]);
     CPPUNIT_ASSERT_EQUAL(string("score"), fv->get_space_name());
-    CPPUNIT_ASSERT_EQUAL(string("integer"), fv->get_space()->get_type_name());
+    CPPUNIT_ASSERT_EQUAL(string("integer"), fv->get_space().get_type_name());
     // only one item
     CPPUNIT_ASSERT_EQUAL(1, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);
@@ -82,7 +82,7 @@ protected:
 
     fv = &(vecs[3]);
     CPPUNIT_ASSERT_EQUAL(string("category"), fv->get_space_name());
-    CPPUNIT_ASSERT_EQUAL(string("integer"), fv->get_space()->get_type_name());
+    CPPUNIT_ASSERT_EQUAL(string("integer"), fv->get_space().get_type_name());
     // 3 items
     CPPUNIT_ASSERT_EQUAL(3, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);
@@ -97,7 +97,7 @@ protected:
 
     fv = &(vecs[4]);
     CPPUNIT_ASSERT_EQUAL(string("entity"), fv->get_space_name());
-    CPPUNIT_ASSERT_EQUAL(string("string"), fv->get_space()->get_type_name());
+    CPPUNIT_ASSERT_EQUAL(string("string"), fv->get_space().get_type_name());
     // 3 items
     CPPUNIT_ASSERT_EQUAL(3, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);

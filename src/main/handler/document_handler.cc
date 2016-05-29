@@ -38,12 +38,19 @@ void DocumentHandler::handle_request(const RequestContext* request, ResponseWrit
     return;
   }
 
+  std::shared_ptr<Document> doc = std::make_shared<Document>();
+  std::string uuid = request->get_query_param("uuid");
+  // if there is no uuid in post content, try to get it from the query param.
+  if (!uuid.empty()) {
+    LOG_DEBUG(logger, "set document uuid from request: %s", uuid.c_str());
+    doc->set_doc_id(uuid);
+  }
+
   buf_.alloc(post_len + 1);
   char* value = buf_.data();
   int ret_len = request->get_content(value, post_len);
   value[ret_len] = '\0';
 
-  std::shared_ptr<Document> doc = std::make_shared<Document>();
   int ret = parser_->parse(value, ret_len, *doc);
   buf_.clear();
 
@@ -52,21 +59,6 @@ void DocumentHandler::handle_request(const RequestContext* request, ResponseWrit
     response->add_body("parse error\n");
     response->send(400, NULL);
     return;
-  }
-
-  std::string uuid = request->get_query_param("uuid");
-  // if there is no uuid in post content, try to get it from the query param.
-  if (!(doc->get_id())) {
-    if (!uuid.empty()) {
-      LOG_DEBUG(logger, "set document uuid from request: %s", uuid.c_str());
-      doc->set_doc_id(uuid);
-    }
-  } else if (doc->get_id_str() != uuid) {
-    LOG_ERROR(logger, "document uuid from request parameter %s conflicts with uuid from request body %s",
-        uuid.c_str(), doc->get_id_str().c_str());
-    uuid = doc->get_id_str();
-  } else {
-    uuid = doc->get_id_str();
   }
 
   std::string ttl_str = request->get_query_param("ttl");

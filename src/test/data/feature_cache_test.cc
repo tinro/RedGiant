@@ -58,9 +58,9 @@ protected:
     auto space_b = cache->create_space("BB", 2, FeatureSpace::SpaceType::kString);
     auto space_c = cache->create_space("CCC", 3, FeatureSpace::SpaceType::kInteger);
 
-    auto f1 = cache->create_or_get_feature("111", "A");
-    auto f2 = cache->create_or_get_feature("xxx", space_b);
-    auto f3 = cache->create_or_get_feature("yyy", space_c);
+    auto f1 = cache->get_or_create_feature("111", "A");
+    auto f2 = cache->get_or_create_feature("xxx", *space_b);
+    auto f3 = cache->get_or_create_feature("yyy", *space_c);
 
     CPPUNIT_ASSERT(!!f1); // not null
     CPPUNIT_ASSERT_EQUAL(string("111"), f1->get_key());
@@ -79,10 +79,10 @@ protected:
     auto space_b = cache->create_space("BB", 2, FeatureSpace::SpaceType::kString);
     auto space_c = cache->create_space("CCC", 3, FeatureSpace::SpaceType::kInteger);
 
-    auto f1 = cache->create_or_get_feature("111", "A");
-    auto f2 = cache->create_or_get_feature("xxx", space_b);
-    auto f3 = cache->create_or_get_feature("222", space_c);
-    auto f4 = cache->create_or_get_feature("222", "CCC");
+    auto f1 = cache->get_or_create_feature("111", "A");
+    auto f2 = cache->get_or_create_feature("xxx", *space_b);
+    auto f3 = cache->get_or_create_feature("222", *space_c);
+    auto f4 = cache->get_or_create_feature("222", "CCC");
 
     CPPUNIT_ASSERT(f3 == f4); // null
     CPPUNIT_ASSERT_EQUAL(string("222"), f4->get_key());

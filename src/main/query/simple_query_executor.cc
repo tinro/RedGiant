@@ -17,6 +17,19 @@ std::unique_ptr<QueryResult> SimpleQueryExecutor::execute(const QueryRequest& re
   result->track_latency(QueryResult::kStart);
 
   std::unique_ptr<IntermQuery> interm_query = model_->process(request);
+  if (!interm_query) {
+    // query empty, which means we should
+    if (request.is_debug()) {
+       LOG_INFO(logger, "[query:%s] ranking model not found!", request.get_request_id().c_str());
+     }
+     result->track_latency(QueryResult::kFinalize);
+     return result;
+  }
+
+  if (request.is_debug()) {
+    LOG_INFO(logger, "[query:%s] searching %zu features built by ranking model.",
+        request.get_request_id().c_str(), interm_query->get_features().size());
+  }
   result->track_latency(QueryResult::kLoadModel);
 
   DocumentQuery query(request, *interm_query);
@@ -29,19 +42,25 @@ std::unique_ptr<QueryResult> SimpleQueryExecutor::execute(const QueryRequest& re
   result->track_latency(QueryResult::kQueryExecute);
 
   if (!results_reader) {
-     if (request.is_debug()) {
-       LOG_INFO(logger, "[query:%s] received empty document result.", request.get_request_id().c_str());
-     }
-     result->track_latency(QueryResult::kFinalize);
-     return result;
+    if (request.is_debug()) {
+      LOG_INFO(logger, "[query:%s] received empty document result.", request.get_request_id().c_str());
+    }
+    result->track_latency(QueryResult::kFinalize);
+    return result;
   }
 
   auto topn_results = read_topn(*results_reader, query_count);
+  if (request.is_debug()) {
+    size_t n = 0;
+    for (const auto& r: topn_results) {
+      LOG_INFO(logger, "[query:%s] result %zu: id:%s, score:%lf.",
+          request.get_request_id().c_str(), n++, r.first.to_string().c_str(), r.second);
+    }
+  }
   result->track_latency(QueryResult::kQueryRead);
 
-  auto& results = result->get_results();
   for (const auto& r: topn_results) {
-    results.emplace_back(r.first.to_string(), r.second);
+    result->get_results().emplace_back(r.first.to_string(), r.second);
   }
   result->track_latency(QueryResult::kResultConvert);
   result->track_latency(QueryResult::kFinalize);

@@ -37,10 +37,18 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
     return;
   }
 
-  std::string request_id = request->get_query_param("request_id");
+  std::string request_id = request->get_query_param("id");
   std::string ranking_model = request->get_query_param("model");
-  int query_count = atoi(request->get_query_param("query_count").c_str());
+  std::string query_count_str = request->get_query_param("count");
   std::string debug = request->get_query_param("debug");
+
+  int query_count = 10;
+  if (!query_count_str.empty()) {
+    query_count = atoi(query_count_str.c_str());
+    if (query_count == 0) {
+      LOG_WARN(logger, "[query:%s] query_count is set to zero!", request_id.c_str());
+    }
+  }
 
   QueryRequest query_request(request_id, query_count, ranking_model, watch, debug == "true");
   if (query_request.is_debug()) {
@@ -49,9 +57,9 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
 
   buf_.alloc(post_len + 1);
   char* body = buf_.data();
-
   int ret_len = request->get_content(body, post_len);
   body[ret_len] = 0;
+
   if (query_request.is_debug()) {
     LOG_TRACE(logger, "[query:%s] query request: uri=%s, post=%s", request_id.c_str(), request->get_uri().c_str(), body);
   }

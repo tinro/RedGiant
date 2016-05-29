@@ -29,10 +29,7 @@ public:
     return type_id_;
   }
 
-  virtual std::unique_ptr<RankingModel> create_model(const rapidjson::Value& config) const {
-    (void)config;
-    return std::unique_ptr<RankingModel>(new DefaultModel());
-  }
+  virtual std::unique_ptr<RankingModel> create_model(const rapidjson::Value& config) const;
 
 private:
   std::string type_id_ = "default";
