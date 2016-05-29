@@ -67,7 +67,7 @@ You can put documents through RESTful json interface, such as the following
       }
     }' "http://127.0.0.1:19980/document?uuid=4e73cdd7-de87-4e2e-bc70-7336469092bf"
 
-## Requests
+## Queries
 
 Then, you can query the index using an HTTP POST request
 
@@ -83,6 +83,18 @@ Then, you can query the index using an HTTP POST request
     }' "http://127.0.0.1:19980/query?id=0002&count=10&debug=true&model=mixed"
 
 ## Features
+
+For both documents and queries, features are grouped into feature spaces. A weighted feature set in given space is called a feature vector. Two feature vectors in the same feature space could be dot-producted to calculate their similarity. This is the basic idea of dot-product based recommendation.
+
+Each feature has a unique key in a given space. Keys could be shared across different spaces. Each feature is asigned with an Id, which is a 64-bit unsigned int number. The highest 8 bits of feature Id represent Id of the feature space, and the following 56 bits are calculated from the key. An Id is considered globally unique, though it is still possible to have hash collisions. We will simply ignore the collisions. An Id with lower 56 bits set to 2^56-1 is considered as invalid.
+
+The key of features could be either integer (unsigned) or string. If the key is an integer, it should be in the range [0, 2^56-2]. If the key is a string, the lower 56-bits of its hash result is used to create feature Id. The Id of feature spaces should be in the range [0, 2^8-1]
+
+All feature spaces used in the system should be configured in the configuration file before service startup. In the `feature_spaces` section, here is an example feature space configuration.
+
+    {"id": 5,   "name": "category_declared",  "type": "integer"},
+
+The `id` field is the id of feature space, which is not required to utilize in order. The `name` field is the name of feature space, it will be referred in document and query json. The `type` field defines whether the feature keys should be `integer` or `string`, as described above.
 
 ## Ranking models
 
