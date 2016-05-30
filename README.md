@@ -164,7 +164,10 @@ Then, you can query the index using an HTTP POST request
     $ curl -XPOST -d '{
       "features": {
         "category_declared": {
-          "3": 3
+          "3": 3.0
+        },
+        "entity_inferred": {
+          "bb": 5.0
         },
         "popularity": {
           "0": 10.0
