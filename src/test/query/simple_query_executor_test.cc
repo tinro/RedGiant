@@ -7,13 +7,13 @@
 
 #include "query/simple_query_executor.h"
 
-#include "../../main/ranking/direct_model.h"
 #include "data/query_request.h"
 #include "data/query_result.h"
 #include "data/feature_cache.h"
 #include "data/feature_space.h"
 #include "data/feature_vector.h"
 #include "index/document_index_manager.h"
+#include "ranking/direct_model.h"
 #include "utils/logger.h"
 
 using namespace std;

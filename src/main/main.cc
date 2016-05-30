@@ -1,23 +1,24 @@
-#include <handler/document_handler.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <exception>
 #include <memory>
 #include <utility>
-// Linux headers
+
 #include <libgen.h>
-#include <ranking/direct_model.h>
 #include <signal.h>
+
 #include "data/document_parser.h"
 #include "data/feature_cache.h"
 #include "data/query_request_parser.h"
+#include "handler/document_handler.h"
 #include "handler/query_handler.h"
 #include "handler/test_handler.h"
 #include "index/document_index_manager.h"
 #include "index/document_index_view.h"
 #include "index/document_update_pipeline.h"
 #include "query/simple_query_executor.h"
+#include "ranking/direct_model.h"
 #include "ranking/feature_mapping_model.h"
 #include "ranking/model_manager.h"
 #include "ranking/ranking_model.h"
