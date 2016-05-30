@@ -39,14 +39,15 @@
      * entities and publishers, while users' interests are sets of categories, entities and
      * publishers that may be mined from data feedback or declared by users themselves.
      */
-    {"id": 1, "name": "category",           "type": "integer"},
-    {"id": 2, "name": "entity",             "type": "string"},
-    {"id": 3, "name": "publisher",          "type": "string"},
-    {"id": 4, "name": "category_inferred",  "type": "integer"},
-    {"id": 5, "name": "category_declared",  "type": "integer"},
-    {"id": 6, "name": "entity_inferred",    "type": "string"},
-    {"id": 7, "name": "entity_declared",    "type": "string"},
-    {"id": 9, "name": "publisher_declared", "type": "string"}
+    {"id": 1,   "name": "category",           "type": "integer"},
+    {"id": 2,   "name": "entity",             "type": "string"},
+    {"id": 3,   "name": "publisher",          "type": "string"},
+    {"id": 4,   "name": "category_inferred",  "type": "integer"},
+    {"id": 5,   "name": "category_declared",  "type": "integer"},
+    {"id": 6,   "name": "entity_inferred",    "type": "string"},
+    {"id": 7,   "name": "entity_declared",    "type": "string"},
+    {"id": 9,   "name": "publisher_declared", "type": "string"},
+    {"id": 20,  "name": "popularity",         "type": "integer"}
   ],
 
   /* The ranking models used in the query service. */
@@ -54,7 +55,7 @@
     "default_model": "default",
     "models": [
       /* The default mappings, including only directly mapped feature spaces. */
-      { "name": "default", "type": "default" },
+      { "name": "default", "type": "direct" },
       /* Dot-Product using category mappings. */
       { "name": "category_only", "type": "mapping", "mappings": [
         { "from": "category_inferred", "to": "category", "weight": 1.0 },
@@ -75,7 +76,8 @@
         { "from": "category_declared", "to": "category", "weight": 1.0 },
         { "from": "entity_inferred", "to": "entity", "weight": 2.0 },
         { "from": "entity_declared", "to": "entity", "weight": 4.0 },
-        { "from": "publisher_declared", "to": "publisher", "weight": 0.5 }
+        { "from": "publisher_declared", "to": "publisher", "weight": 0.5 },
+        { "from": "popularity", "to": "popularity", "weight": 10.0 }
       ]}
     ]
   }

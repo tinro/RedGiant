@@ -27,7 +27,7 @@ public:
   };
 
   QueryResult(const std::string& request_id, const StopWatch& watch)
-  : request_id_(request_id), watch_(watch) {
+  : request_id_(request_id), watch_(watch), error_status_(false) {
   }
 
   // no copy
@@ -61,11 +61,20 @@ public:
     return latency_tracker_.get(i);
   }
 
+  void set_error_status(bool error) {
+    error_status_ = error;
+  }
+
+  bool is_error_status() const {
+    return error_status_;
+  }
+
 private:
   std::string request_id_;
   KeyScores results_;
   StopWatch watch_;
   LatencyTracker<kTimePhaseCount> latency_tracker_;
+  bool error_status_;
 };
 } /* namespace redgiant */
 

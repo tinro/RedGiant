@@ -31,6 +31,7 @@ std::unique_ptr<IntermQuery> ModelManager::process(const QueryRequest& request) 
     return nullptr;
   }
 
+  LOG_DEBUG(logger, "[query:%s] use ranking model %s.", request.get_request_id().c_str(), pname->c_str());
   // load the model
   return iter->second->process(request);
 }

@@ -6,13 +6,14 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "query/simple_query_executor.h"
+
+#include "../../main/ranking/direct_model.h"
 #include "data/query_request.h"
 #include "data/query_result.h"
 #include "data/feature_cache.h"
 #include "data/feature_space.h"
 #include "data/feature_vector.h"
 #include "index/document_index_manager.h"
-#include "ranking/default_model.h"
 #include "utils/logger.h"
 
 using namespace std;
@@ -121,8 +122,8 @@ private:
   }
 
   std::unique_ptr<RankingModel> create_model() {
-    auto mmf = std::make_shared<DefaultModelFactory>();
-    char j[] = R"({ "name": "default", "type": "default" })";
+    auto mmf = std::make_shared<DirectModelFactory>();
+    char j[] = R"({ "name": "default", "type": "direct" })";
     rapidjson::MemoryStream ms(j, sizeof(j)/sizeof(j[0]));
     rapidjson::Document conf;
     conf.ParseStream(ms);

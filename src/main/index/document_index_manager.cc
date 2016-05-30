@@ -120,7 +120,7 @@ auto DocumentIndexManager::query(const QueryRequest& request, const DocumentQuer
     return nullptr;
   }
   if (readers.size() == 1) {
-    return std::move(readers.front().second);
+    return std::move(readers[0].second);
   }
 
   // TODO: simplify this

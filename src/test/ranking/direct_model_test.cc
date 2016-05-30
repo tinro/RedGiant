@@ -1,3 +1,5 @@
+#include "../../main/ranking/direct_model.h"
+
 #include <algorithm>
 #include <string>
 #include <utility>
@@ -8,7 +10,6 @@
 #include "data/feature_cache.h"
 #include "data/feature_vector.h"
 #include "data/query_request.h"
-#include "ranking/default_model.h"
 #include "utils/json_utils.h"
 #include "utils/logger.h"
 
@@ -27,7 +28,7 @@ protected:
   void test_create() {
     auto mm = create_model();
     CPPUNIT_ASSERT(!!mm);
-    CPPUNIT_ASSERT(dynamic_cast<DefaultModel*>(mm.get()));
+    CPPUNIT_ASSERT(dynamic_cast<DirectModel*>(mm.get()));
   }
 
   void test_process() {
@@ -88,8 +89,8 @@ private:
   }
 
   std::unique_ptr<RankingModel> create_model() {
-    auto mmf = std::make_shared<DefaultModelFactory>();
-    char j[] = R"({ "name": "default_a", "type": "default" })";
+    auto mmf = std::make_shared<DirectModelFactory>();
+    char j[] = R"({ "name": "default_a", "type": "direct" })";
     rapidjson::MemoryStream ms(j, sizeof(j)/sizeof(j[0]));
     rapidjson::Document conf;
     conf.ParseStream(ms);

@@ -5,8 +5,9 @@
 
 #include "mock_model.h"
 #include "data/query_request.h"
-#include "ranking/default_model.h"
 #include "ranking/model_manager.h"
+
+#include "../../main/ranking/direct_model.h"
 #include "utils/json_utils.h"
 #include "utils/logger.h"
 
@@ -25,10 +26,10 @@ public:
 protected:
   void test_register() {
     auto mmf = create_model_manager_factory();
-    int ret = mmf->register_model_factory(std::make_shared<DefaultModelFactory>());
+    int ret = mmf->register_model_factory(std::make_shared<DirectModelFactory>());
     CPPUNIT_ASSERT_EQUAL(0, ret);
     // duplicate
-    ret = mmf->register_model_factory(std::make_shared<DefaultModelFactory>());
+    ret = mmf->register_model_factory(std::make_shared<DirectModelFactory>());
     CPPUNIT_ASSERT_EQUAL(-1, ret);
   }
 
@@ -42,7 +43,7 @@ protected:
     // model should exist
     CPPUNIT_ASSERT(mmp->get_model("default_a"));
     // model should in type DefaultModel
-    CPPUNIT_ASSERT(dynamic_cast<const DefaultModel*>(mmp->get_model("default_a")));
+    CPPUNIT_ASSERT(dynamic_cast<const DirectModel*>(mmp->get_model("default_a")));
     // model should exist
     CPPUNIT_ASSERT(mmp->get_model("mock_b"));
     // model should in type MockModel
@@ -54,6 +55,7 @@ protected:
 
     // not exist
     CPPUNIT_ASSERT(mmp->get_model("default") == nullptr);
+    CPPUNIT_ASSERT(mmp->get_model("direct") == nullptr);
     CPPUNIT_ASSERT(mmp->get_model("") == nullptr);
   }
 
@@ -77,13 +79,13 @@ private:
 
   std::unique_ptr<RankingModel> create_model_manager() {
     auto mmf = create_model_manager_factory();
-    mmf->register_model_factory(std::make_shared<DefaultModelFactory>());
+    mmf->register_model_factory(std::make_shared<DirectModelFactory>());
     mmf->register_model_factory(std::make_shared<MockModelFactory>());
 
     char j[] = R"({
       "default_model": "default_a",
       "models": [
-        { "name": "default_a", "type": "default" },
+        { "name": "default_a", "type": "direct" },
         { "name": "mock_b", "type": "mock" },
         { "name": "mock_c", "type": "mock" }
       ]

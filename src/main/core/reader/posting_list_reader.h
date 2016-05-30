@@ -46,7 +46,7 @@ public:
 
   /*
    * -  Return size estimated size of the reader. The size may be used to optimize operations of readers.
-   * -  The size may be unable to calculated, so the default implementation is returning zero.
+   * -  It may not be possible to calculate the size trivially, so the default implementation is returning zero.
    *
    * -  This function shall return in constant time.
    */

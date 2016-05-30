@@ -17,23 +17,52 @@ DECLARE_LOGGER(logger, __FILE__);
 
 std::unique_ptr<IntermQuery> FeatureMappingModel::process(const QueryRequest& request) const {
   std::map<IntermQuery::FeatureId, IntermQuery::QueryWeight> terms;
+  if (request.is_debug()) {
+    LOG_INFO(logger, "[query:%s] using feature mapping model",
+        request.get_request_id().c_str());
+  }
+
   for (const auto& fv: request.get_feature_vectors()) {
     // find if the input feature vector exists in mappings.
     auto iter = mappings_.find(fv.get_space_name());
-    if (iter != mappings_.end()) {
-        Score weight = std::get<2>(iter->second);
-        const auto& space = *std::get<1>(iter->second);
-        if (weight > 0) {
-        for (const auto& f: fv.get_features()) {
-          // project the feature to the mapped space
-          Feature::FeatureId id = space.project_to_space(f.first->get_id());
-          Score s = static_cast<Score>(f.second) * weight;
-          // try insert the score if exists.
-          auto insert_ret = terms.emplace(id, s);
-          // or add the score to the existing scores
-          if (!insert_ret.second) {
-            insert_ret.first->second += s;
-          }
+    if (iter == mappings_.end()) {
+      if (request.is_debug()) {
+        LOG_WARN(logger, "[query:%s] feature space %s not found in model mappings!",
+            request.get_request_id().c_str(), fv.get_space_name().c_str());
+      }
+      continue;
+    }
+
+    Score weight = std::get<2>(iter->second);
+    const auto& space = *std::get<1>(iter->second);
+    if (weight <= 0) {
+      if (request.is_debug()) {
+        LOG_WARN(logger, "[query:%s] feature space %s weight %lf is not positive!",
+            request.get_request_id().c_str(), fv.get_space_name().c_str(), weight);
+      }
+      continue;
+    }
+
+    // load features from request
+    for (const auto& f: fv.get_features()) {
+      // project the feature to the mapped space
+      Feature::FeatureId id = space.project_to_space(f.first->get_id());
+      Score s = static_cast<Score>(f.second) * weight;
+      // try insert the score if exists.
+      auto insert_ret = terms.emplace(id, s);
+      // or add the score to the existing scores
+      if (!insert_ret.second) {
+        insert_ret.first->second += s;
+        if (request.is_debug()) {
+          LOG_TRACE(logger, "[query:%s] build feature 0x%016llx from 0x%016llx, update weight to %lf",
+              request.get_request_id().c_str(), (unsigned long long)id,
+              (unsigned long long)(f.first->get_id()), insert_ret.first->second);
+        }
+      } else {
+        if (request.is_debug()) {
+          LOG_TRACE(logger, "[query:%s] build feature 0x%016llx from 0x%016llx, insert with weight %lf",
+              request.get_request_id().c_str(), (unsigned long long)id,
+              (unsigned long long)(f.first->get_id()), insert_ret.first->second);
         }
       }
     }
@@ -45,6 +74,12 @@ std::unique_ptr<RankingModel> FeatureMappingModelFactory::create_model(const rap
   if (!config.IsObject()) {
      LOG_ERROR(logger, "failed to parse ranking json config.");
      return nullptr;
+  }
+
+  std::string name;
+  std::string type;
+  if (json_try_get_string(config, "name", name) && json_try_get_string(config, "type", type)) {
+    LOG_DEBUG(logger, "creating model %s in type %s", name.c_str(), type.c_str());
   }
 
   auto mappings = json_try_get_array(config, "mappings");
@@ -84,6 +119,8 @@ std::unique_ptr<RankingModel> FeatureMappingModelFactory::create_model(const rap
       continue;
     }
 
+    LOG_DEBUG(logger, "mapping feature space %s to %s with weight %lf",
+        from_space->get_name().c_str(), to_space->get_name().c_str(), weight);
     model->set_mapping(std::move(from_space), std::move(to_space), weight);
   }
   return std::unique_ptr<RankingModel>(model.release());

@@ -12,7 +12,7 @@ namespace redgiant {
 
 DECLARE_LOGGER(logger, __FILE__);
 
-auto FeatureCache::create_or_get_feature(const std::string& feature_key,
+auto FeatureCache::get_or_create_feature(const std::string& feature_key,
     const std::string& space_name)
 -> std::shared_ptr<Feature> {
   shared_lock<shared_mutex> lock(mutex_);
@@ -20,15 +20,15 @@ auto FeatureCache::create_or_get_feature(const std::string& feature_key,
   lock.unlock();
 
   if (space) {
-    return create_or_get_feature(feature_key, space);
+    return get_or_create_feature(feature_key, *space);
   }
   return nullptr;
 }
 
-auto FeatureCache::create_or_get_feature(const std::string& feature_key,
-    const std::shared_ptr<FeatureSpace>& space)
+auto FeatureCache::get_or_create_feature(const std::string& feature_key,
+    const FeatureSpace& space)
 -> std::shared_ptr<Feature> {
-  FeatureId id = space->calculate_feature_id(feature_key);
+  FeatureId id = space.calculate_feature_id(feature_key);
   if (id == FeatureSpace::kInvalidId) {
     return nullptr;
   }
