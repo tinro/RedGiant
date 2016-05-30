@@ -1,4 +1,3 @@
-#include "../../main/ranking/direct_model.h"
 
 #include <algorithm>
 #include <string>
@@ -10,6 +9,7 @@
 #include "data/feature_cache.h"
 #include "data/feature_vector.h"
 #include "data/query_request.h"
+#include "ranking/direct_model.h"
 #include "utils/json_utils.h"
 #include "utils/logger.h"
 

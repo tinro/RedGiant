@@ -5,9 +5,8 @@
 
 #include "mock_model.h"
 #include "data/query_request.h"
+#include "ranking/direct_model.h"
 #include "ranking/model_manager.h"
-
-#include "../../main/ranking/direct_model.h"
 #include "utils/json_utils.h"
 #include "utils/logger.h"
 
