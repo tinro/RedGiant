@@ -23,21 +23,6 @@ int QueryRequestParser::parse_json(const rapidjson::Value& root, QueryRequest& o
     return -1;
   }
 
-  if (output.get_request_id().empty()) {
-    const char* id = json_try_get_string(root, "id");
-    if (!id || !id[0]) {
-      LOG_ERROR(logger, "request id missing or empty!");
-      return -1;
-    }
-    LOG_TRACE(logger, "request[%s]: read id from json.", id);
-    output.set_request_id(id);
-  }
-
-  int query_count;
-  if (json_try_get_int(root, "count", query_count)) {
-    output.set_query_count((size_t)query_count);
-  }
-
   auto features = json_try_get_object(root, "features");
   if (!features) {
     LOG_ERROR(logger, "request[%s]: no features found!", output.get_request_id().c_str());

@@ -55,7 +55,7 @@
     "default_model": "default",
     "models": [
       /* The default mappings, including only directly mapped feature spaces. */
-      { "name": "default", "type": "default" },
+      { "name": "default", "type": "direct" },
       /* Dot-Product using category mappings. */
       { "name": "category_only", "type": "mapping", "mappings": [
         { "from": "category_inferred", "to": "category", "weight": 1.0 },
@@ -65,6 +65,10 @@
       { "name": "entity_only", "type": "mapping", "mappings": [
         { "from": "entity_inferred", "to": "entity", "weight": 1.0 },
         { "from": "entity_declared", "to": "entity", "weight": 2.0 }
+      ]},
+      /* The most popular documents. */
+      { "name": "popularity_only", "type": "mapping", "mappings": [
+        { "from": "popularity", "to": "popularity", "weight": 1.0 }
       ]},
       /* More like a publisher subscription system. */
       { "name": "publisher_only", "type": "mapping", "mappings": [

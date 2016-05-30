@@ -7,6 +7,7 @@
 #include <utility>
 // Linux headers
 #include <libgen.h>
+#include <ranking/direct_model.h>
 #include <signal.h>
 #include "data/document_parser.h"
 #include "data/feature_cache.h"
@@ -17,7 +18,6 @@
 #include "index/document_index_view.h"
 #include "index/document_update_pipeline.h"
 #include "query/simple_query_executor.h"
-#include "ranking/default_model.h"
 #include "ranking/feature_mapping_model.h"
 #include "ranking/model_manager.h"
 #include "ranking/ranking_model.h"
@@ -189,7 +189,7 @@ static int server_main(rapidjson::Value& config) {
    * Query and ranking models
    */
   ModelManagerFactory model_manager_factory;
-  model_manager_factory.register_model_factory(std::make_shared<DefaultModelFactory>());
+  model_manager_factory.register_model_factory(std::make_shared<DirectModelFactory>());
   model_manager_factory.register_model_factory(std::make_shared<FeatureMappingModelFactory>(feature_cache));
 
   auto config_ranking = json_try_get(config, kConfigKeyRanking);

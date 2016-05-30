@@ -1,4 +1,4 @@
-#include "ranking/default_model.h"
+#include "direct_model.h"
 
 #include <vector>
 #include <utility>
@@ -12,9 +12,9 @@ namespace redgiant {
 
 DECLARE_LOGGER(logger, __FILE__);
 
-std::unique_ptr<IntermQuery> DefaultModel::process(const QueryRequest& request) const {
+std::unique_ptr<IntermQuery> DirectModel::process(const QueryRequest& request) const {
   if (request.is_debug()) {
-    LOG_INFO(logger, "[query:%s] using default model",
+    LOG_INFO(logger, "[query:%s] using direct model",
         request.get_request_id().c_str());
   }
 
@@ -31,14 +31,14 @@ std::unique_ptr<IntermQuery> DefaultModel::process(const QueryRequest& request) 
   return std::unique_ptr<IntermQuery>(new IntermQuery(std::move(terms)));
 }
 
-std::unique_ptr<RankingModel> DefaultModelFactory::create_model(const rapidjson::Value& config) const {
+std::unique_ptr<RankingModel> DirectModelFactory::create_model(const rapidjson::Value& config) const {
   std::string name;
   std::string type;
   if (json_try_get_string(config, "name", name) && json_try_get_string(config, "type", type)) {
     LOG_DEBUG(logger, "creating model %s in type %s", name.c_str(), type.c_str());
   }
 
-  return std::unique_ptr<RankingModel>(new DefaultModel());
+  return std::unique_ptr<RankingModel>(new DirectModel());
 }
 
 

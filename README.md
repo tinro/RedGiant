@@ -178,7 +178,7 @@ Here are supported request parameters
 
 | Name    | Type    | Requirement | Description |
 |---------|---------|-------------|-------------|
-| id      | string  | optional    | The id of the query request, in string format defined by users. If omitted, an "id" field in JSON body is required. This id is used in server logs, and it is the callers resposibility to make it valid and unique. |
+| id      | string  | required    | The id of the query request, in string format defined by users, used in server logs. It is the caller's resposibility to make it valid and unique. |
 | count   | integer | required    | Maximum number of documents to retrieve from the index. |
 | model   | integer | optional    | Name of the ranking model. If omitted, the default model configured is used. |
 | debug   | boolean | optional    | Whether to print debug logs on the server, default to false. It is the caller's resposiblity to ensure it is not abused. |
@@ -187,7 +187,6 @@ Here are the fields in the JSON body
 
 | Name    | Type    | Requirement | Description |
 |---------|---------|-------------|-------------|
-| id      | string  | optional    | The id of the query request. Required if id is not specified in query parameters . |
 | features | JSON Object | required | The weighted features of the query request. |
 
 The `features` field is also key-value pairs of feature spaces similar as documents. However only the complete format is supported. So that the values of feature spaces should be JSON objects containing key-value pairs of weighted featurs.

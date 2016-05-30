@@ -18,12 +18,13 @@ std::unique_ptr<QueryResult> SimpleQueryExecutor::execute(const QueryRequest& re
 
   std::unique_ptr<IntermQuery> interm_query = model_->process(request);
   if (!interm_query) {
-    // query empty, which means we should
+    // query empty, which means some error happens to the ranking model.
     if (request.is_debug()) {
        LOG_INFO(logger, "[query:%s] ranking model not found!", request.get_request_id().c_str());
-     }
-     result->track_latency(QueryResult::kFinalize);
-     return result;
+    }
+    result->set_error_status(true);
+    result->track_latency(QueryResult::kFinalize);
+    return result;
   }
 
   if (request.is_debug()) {

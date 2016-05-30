@@ -46,7 +46,10 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
   if (!query_count_str.empty()) {
     query_count = atoi(query_count_str.c_str());
     if (query_count == 0) {
-      LOG_WARN(logger, "[query:%s] query_count is set to zero!", request_id.c_str());
+      response->add_body(R"({"error":"param_error", "results":[]})""\n");
+      response->send(400, NULL);
+      LOG_INFO(logger, "[query:%s] error=param_error, latency=%ldus", request_id.c_str(), watch.get_ticks_us());
+      return;
     }
   }
 
@@ -76,9 +79,9 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
 
   // run query
   std::unique_ptr<QueryResult> result = executor_->execute(query_request);
-  if (!result) {
+  if (!result || result->is_error_status()) {
     response->add_body(R"({"error":"query_error", "results":[]})""\n");
-    response->send(400, NULL);
+    response->send(500, NULL);
     LOG_INFO(logger, "[query:%s] REQ_STAT error=query_error, latency=%ldus", request_id.c_str(), watch.get_ticks_us());
     return;
   }
