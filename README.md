@@ -16,18 +16,18 @@ NOTE: Currently this project is only for research and study, it is not recommend
 ### Features
 
 Supported features in version 0.1
-* Reverse indexing to documents that are sets of weighted features.
+* Reverse indexing to documents consist of sets of weighted features.
 * Defining named feature spaces that are groups of features.
 * Retrieving documents with weighted features, combined by AND, OR and WAND operators.
 * Defining multiple retrieval models which build different retrieval expressions.
 * Recieving realtime updates and apply changes periodically.
 
-To keep it simple, there are following assumptions and limitations.
-* All documents and searches are sets of weighted features.
-* Document metadata is not stored in this service. You may want to retrieve these metadata from other typical key-value services.
-* The retrieval models are only linear combinations of vector products.
-* No L2 ranking. If in need, you may have to build another external service to do this.
-* No clustering feature, the size of index should be capable for a single server instance (usually no more than 100M documents).
+To keep it simple, there are following assumptions or limitations.
+* Documents and searches are defined by preprocessed weighted features. There is no built-in text processor.
+* Document metadata is not stored. You may need to retrieve metadata from external key-value stores.
+* The ranking models are linear combinations of vector dot-products.
+* No L2 ranking. You may have to build an external service to do this if in need.
+* No cluster service. The size of index should be capable for a single server instance (usually no more than 100M documents). If you have more documents you may need to handle sharding and replica from the caller side.
 
 ### Build 
 
