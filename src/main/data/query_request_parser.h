@@ -5,14 +5,14 @@
 #include "data/json_parser.h"
 
 namespace redgiant {
-class FeatureCache;
+class FeatureSpaceManager;
 class FeatureVector;
 class QueryRequest;
 
 class QueryRequestParser: public JsonParser<QueryRequest> {
 public:
-  QueryRequestParser(std::shared_ptr<FeatureCache> cache)
-  : cache_(std::move(cache)) {
+  QueryRequestParser(std::shared_ptr<FeatureSpaceManager> feature_spaces)
+  : feature_spaces_(std::move(feature_spaces)) {
   }
 
   virtual ~QueryRequestParser() = default;
@@ -28,23 +28,23 @@ private:
       const QueryRequest& request, FeatureVector& vec);
 
 private:
-  std::shared_ptr<FeatureCache> cache_;
+  std::shared_ptr<FeatureSpaceManager> feature_spaces_;
 };
 
 class QueryRequestParserFactory: public ParserFactory<QueryRequest> {
 public:
-  QueryRequestParserFactory(std::shared_ptr<FeatureCache> cache)
-  : cache_(std::move(cache)) {
+  QueryRequestParserFactory(std::shared_ptr<FeatureSpaceManager> feature_spaces)
+  : feature_spaces_(std::move(feature_spaces)) {
   }
 
   virtual ~QueryRequestParserFactory() = default;
 
   std::unique_ptr<Parser<QueryRequest>> create_parser() {
-    return std::unique_ptr<Parser<QueryRequest>>(new QueryRequestParser(cache_));
+    return std::unique_ptr<Parser<QueryRequest>>(new QueryRequestParser(feature_spaces_));
   }
 
 private:
-  std::shared_ptr<FeatureCache> cache_;
+  std::shared_ptr<FeatureSpaceManager> feature_spaces_;
 };
 } /* namespace redgiant */
 

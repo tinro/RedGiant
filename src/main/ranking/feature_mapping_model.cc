@@ -6,6 +6,7 @@
 
 #include "data/feature.h"
 #include "data/feature_space.h"
+#include "data/feature_space_manager.h"
 #include "data/query_request.h"
 #include "index/document_query.h"
 #include "utils/json_utils.h"
@@ -102,13 +103,13 @@ std::unique_ptr<RankingModel> FeatureMappingModelFactory::create_model(const rap
       continue;
     }
 
-    auto from_space = cache_->get_space(from);
+    std::shared_ptr<FeatureSpace> from_space = feature_spaces_->get_space(from);
     if (!from_space) {
       LOG_ERROR(logger, "undefined feature space %s!", from.c_str());
       continue;
     }
 
-    auto to_space = cache_->get_space(to);
+    std::shared_ptr<FeatureSpace> to_space = feature_spaces_->get_space(to);
     if (!to_space) {
       LOG_ERROR(logger, "undefined feature space %s!", to.c_str());
       continue;

@@ -7,8 +7,8 @@
 
 #include "data/document.h"
 #include "data/feature.h"
-#include "data/feature_cache.h"
 #include "data/feature_space.h"
+#include "data/feature_space_manager.h"
 #include "data/feature_vector.h"
 #include "utils/json_utils.h"
 #include "utils/logger.h"
@@ -51,9 +51,9 @@ int DocumentParser::parse_json(const rapidjson::Value& root, Document& output) {
 int DocumentParser::parse_feature_spaces(const rapidjson::Value& json, Document& doc) {
   for (auto it = json.MemberBegin(); it != json.MemberEnd(); ++it) {
     std::string space_name = it->name.GetString();
-    std::shared_ptr<FeatureSpace> space = cache_->get_space(space_name);
+    std::shared_ptr<FeatureSpace> space = feature_spaces_->get_space(space_name);
     if (!space) {
-      // feature space must be pre-defined in feature cache
+      // feature space must be pre-defined
       LOG_WARN(logger, "document[%s]: unknown feature space [%s], ignored.",
           doc.get_id_str().c_str(), space_name.c_str());
     } else {
@@ -88,7 +88,7 @@ int DocumentParser::parse_feature_vector_single_feature(const rapidjson::Value& 
     return -1;
   }
 
-  std::shared_ptr<Feature> feature = cache_->get_or_create_feature(json.GetString(), vec.get_space());
+  std::shared_ptr<Feature> feature = vec.get_space().create_feature(json.GetString());
   if (feature) {
     LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
         doc.get_id_str().c_str(), (unsigned long long)feature->get_id(),
@@ -106,7 +106,7 @@ int DocumentParser::parse_feature_vector_single_score(const rapidjson::Value& js
   }
 
   // the feature key is empty, we set it to "0" and it is usually configured to integer type.
-  std::shared_ptr<Feature> feature = cache_->get_or_create_feature("0", vec.get_space());
+  std::shared_ptr<Feature> feature =  vec.get_space().create_feature("0");
   if (feature) {
     LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
         doc.get_id_str().c_str(), (unsigned long long)feature->get_id(),
@@ -126,7 +126,7 @@ int DocumentParser::parse_feature_vector_multiple_featuers(const rapidjson::Valu
 
   for (auto it = json.MemberBegin(); it != json.MemberEnd(); ++it) {
     if (it->name.IsString() && it->value.IsNumber()) {
-      std::shared_ptr<Feature> feature = cache_->get_or_create_feature(it->name.GetString(), vec.get_space());
+      std::shared_ptr<Feature> feature = vec.get_space().create_feature(it->name.GetString());
       if (feature) {
         LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
             doc.get_id_str().c_str(), (unsigned long long)feature->get_id(),

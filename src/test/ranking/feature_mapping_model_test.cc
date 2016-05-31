@@ -1,11 +1,13 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "mock_model.h"
-#include "data/feature_cache.h"
+#include "data/feature_space.h"
+#include "data/feature_space_manager.h"
 #include "data/feature_vector.h"
 #include "data/query_request.h"
 #include "ranking/feature_mapping_model.h"
@@ -25,43 +27,43 @@ public:
 
 protected:
   void test_create() {
-    auto fc = create_feature_cache();
-    auto mm = create_model(fc);
+    auto feature_spaces = create_feature_spaces();
+    auto mm = create_model(feature_spaces);
     CPPUNIT_ASSERT(!!mm);
     CPPUNIT_ASSERT(dynamic_cast<FeatureMappingModel*>(mm.get()));
   }
 
   void test_process() {
-    auto fc = create_feature_cache();
-    auto mm = create_model(fc);
+    auto feature_spaces = create_feature_spaces();
+    auto mm = create_model(feature_spaces);
     CPPUNIT_ASSERT(!!mm);
 
-    auto req = mock_request_1(*fc);
+    auto req = mock_request_1(*feature_spaces);
     auto iq = mm->process(*req);
     CPPUNIT_ASSERT(!!iq);
 
     const auto& features = iq->get_features();
     CPPUNIT_ASSERT_EQUAL(4, (int)features.size());
 
-    auto iter = find_interm_query_pair(features, *fc, "category", "123");
+    auto iter = find_interm_query_pair(features, *feature_spaces, "category", "123");
     CPPUNIT_ASSERT(iter != features.end());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0, iter->second, 0.00001);
 
-    iter = find_interm_query_pair(features, *fc, "category", "456");
+    iter = find_interm_query_pair(features, *feature_spaces, "category", "456");
     CPPUNIT_ASSERT(iter != features.end());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(13.0, iter->second, 0.00001);
 
-    iter = find_interm_query_pair(features, *fc, "category", "789");
+    iter = find_interm_query_pair(features, *feature_spaces, "category", "789");
     CPPUNIT_ASSERT(iter != features.end());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(6.0, iter->second, 0.00001);
 
-    iter = find_interm_query_pair(features, *fc, "category", "1000");
+    iter = find_interm_query_pair(features, *feature_spaces, "category", "1000");
     CPPUNIT_ASSERT(iter != features.end());
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, iter->second, 0.00001);
   }
 
 private:
-  std::shared_ptr<FeatureCache> create_feature_cache() {
+  std::shared_ptr<FeatureSpaceManager> create_feature_spaces() {
     char j[] = R"([
       {"id": 1, "name": "category",           "type": "integer"},
       {"id": 2, "name": "entity",             "type": "string"},
@@ -73,13 +75,13 @@ private:
     rapidjson::Document conf;
     conf.ParseStream(ms);
 
-    auto fc = std::make_shared<FeatureCache>();
-    fc->initialize(conf);
-    return fc;
+    auto feature_spaces = std::make_shared<FeatureSpaceManager>();
+    feature_spaces->initialize(conf);
+    return feature_spaces;
   }
 
-  std::unique_ptr<RankingModel> create_model(std::shared_ptr<FeatureCache> fc) {
-    auto mmf = std::make_shared<FeatureMappingModelFactory>(std::move(fc));
+  std::unique_ptr<RankingModel> create_model(std::shared_ptr<FeatureSpaceManager> feature_spaces) {
+    auto mmf = std::make_shared<FeatureMappingModelFactory>(std::move(feature_spaces));
     char j[] = R"({ "name": "category_only", "type": "mapping", "mappings": [
       { "from": "category_inferred", "to": "category", "weight": 2.0 },
       { "from": "category_declared", "to": "category", "weight": 3.0 }
@@ -90,32 +92,32 @@ private:
     return mmf->create_model(conf);
   }
 
-  std::unique_ptr<QueryRequest> mock_request_1(FeatureCache& fc) {
+  std::unique_ptr<QueryRequest> mock_request_1(FeatureSpaceManager& feature_spaces) {
     std::unique_ptr<QueryRequest> req(new QueryRequest("0001", 10, "default_a", StopWatch(), true));
-    req->add_feature_vector(FeatureVector(fc.get_space("category_inferred"), {
+    req->add_feature_vector(FeatureVector(feature_spaces.get_space("category_inferred"), {
         {"123", 1.0},
         {"456", 2.0},
         {"789", 3.0}
     }));
-    req->add_feature_vector(FeatureVector(fc.get_space("category_declared"), {
+    req->add_feature_vector(FeatureVector(feature_spaces.get_space("category_declared"), {
         {"456", 3.0},
         {"1000", 1.0}
     }));
-    req->add_feature_vector(FeatureVector(fc.get_space("entity"), {
+    req->add_feature_vector(FeatureVector(feature_spaces.get_space("entity"), {
         {"abc", 1.0},
         {"def", 2.0},
         {"ghi", 3.0}
     }));
-    req->add_feature_vector(FeatureVector(fc.get_space("publisher"), {
+    req->add_feature_vector(FeatureVector(feature_spaces.get_space("publisher"), {
         {"xyz", 1.0}
     }));
     return req;
   }
 
   auto find_interm_query_pair(const IntermQuery::QueryFeatures& features,
-      const FeatureCache& fc, const std::string& space_name, const std::string& feature_key)
+      const FeatureSpaceManager& feature_spaces, const std::string& space_name, const std::string& feature_key)
   -> IntermQuery::QueryFeatures::const_iterator {
-    IntermQuery::FeatureId id = fc.get_space(space_name)->calculate_feature_id(feature_key);
+    IntermQuery::FeatureId id = feature_spaces.get_space(space_name)->calculate_feature_id(feature_key);
     return find_if(features.begin(), features.end(),
         [id]
         (const std::pair<IntermQuery::FeatureId, IntermQuery::QueryWeight>& f) {

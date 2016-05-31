@@ -2,17 +2,17 @@
 #include <cmath>
 #include <memory>
 #include <vector>
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-#include "query/simple_query_executor.h"
-
 #include "data/query_request.h"
 #include "data/query_result.h"
-#include "data/feature_cache.h"
 #include "data/feature_space.h"
 #include "data/feature_vector.h"
+#include "data/feature_space_manager.h"
 #include "index/document_index_manager.h"
+#include "query/simple_query_executor.h"
 #include "ranking/direct_model.h"
 #include "utils/logger.h"
 
@@ -33,9 +33,9 @@ public:
 
 protected:
   void test_create() {
-    auto cache = create_feature_cache();
+    auto feature_spaces = create_feature_spaces();
     auto model = create_model();
-    auto index = create_index(*cache);
+    auto index = create_index(*feature_spaces);
     auto executor = create_executor(index.get(), model.get());
 
     CPPUNIT_ASSERT(!!executor);
@@ -43,12 +43,12 @@ protected:
   }
 
   void test_execute_1() {
-    auto cache = create_feature_cache();
+    auto feature_spaces = create_feature_spaces();
     auto model = create_model();
-    auto index = create_index(*cache);
+    auto index = create_index(*feature_spaces);
     auto executor = create_executor(index.get(), model.get());
 
-    auto request = create_request_1(*cache);
+    auto request = create_request_1(*feature_spaces);
     auto result = executor->execute(*request);
 
     CPPUNIT_ASSERT(!!result);
@@ -70,12 +70,12 @@ protected:
   }
 
   void test_execute_2() {
-    auto cache = create_feature_cache();
+    auto feature_spaces = create_feature_spaces();
     auto model = create_model();
-    auto index = create_index(*cache);
+    auto index = create_index(*feature_spaces);
     auto executor = create_executor(index.get(), model.get());
 
-    auto request = create_request_2(*cache);
+    auto request = create_request_2(*feature_spaces);
     auto result = executor->execute(*request);
 
     CPPUNIT_ASSERT(!!result);
@@ -91,12 +91,12 @@ protected:
   }
 
   void test_execute_3() {
-    auto cache = create_feature_cache();
+    auto feature_spaces = create_feature_spaces();
     auto model = create_model();
-    auto index = create_index(*cache);
+    auto index = create_index(*feature_spaces);
     auto executor = create_executor(index.get(), model.get());
 
-    auto request = create_request_3(*cache);
+    auto request = create_request_3(*feature_spaces);
     auto result = executor->execute(*request);
 
     CPPUNIT_ASSERT(!!result);
@@ -106,19 +106,19 @@ protected:
   }
 
 private:
-  std::shared_ptr<FeatureCache> create_feature_cache() {
+  std::shared_ptr<FeatureSpaceManager> create_feature_spaces() {
     char j[] = R"([
-      {"id": 1, "name": "category",           "type": "integer"},
-      {"id": 2, "name": "entity",             "type": "string"},
-      {"id": 3, "name": "publisher",          "type": "string"}
+      {"id": 1, "name": "category",  "type": "integer"},
+      {"id": 2, "name": "entity",    "type": "string"},
+      {"id": 3, "name": "publisher", "type": "string"}
     ])";
     rapidjson::MemoryStream ms(j, sizeof(j)/sizeof(j[0]));
     rapidjson::Document conf;
     conf.ParseStream(ms);
 
-    auto fc = std::make_shared<FeatureCache>();
-    fc->initialize(conf);
-    return fc;
+    auto feature_spaces = std::make_shared<FeatureSpaceManager>();
+    feature_spaces->initialize(conf);
+    return feature_spaces;
   }
 
   std::unique_ptr<RankingModel> create_model() {
@@ -144,10 +144,10 @@ private:
     return doc;
   }
 
-  std::unique_ptr<DocumentIndexManager> create_index(FeatureCache& cache) {
+  std::unique_ptr<DocumentIndexManager> create_index(FeatureSpaceManager& feature_spaces) {
     auto index = std::unique_ptr<DocumentIndexManager>(new DocumentIndexManager(1000, 1000));
-    auto space_cat = cache.get_space("category");
-    auto space_ent = cache.get_space("entity");
+    auto space_cat = feature_spaces.get_space("category");
+    auto space_ent = feature_spaces.get_space("entity");
     // create document vectors
     index->update(create_document(
         "00000000-0001-0000-0000-000000000000",
@@ -193,10 +193,10 @@ private:
     return factory->create_executor();
   }
 
-  std::shared_ptr<QueryRequest> create_request_1(FeatureCache& cache) {
+  std::shared_ptr<QueryRequest> create_request_1(FeatureSpaceManager& feature_spaces) {
     auto request = std::make_shared<QueryRequest>("0001", 50, "", StopWatch(), true);
-    auto space_cat = cache.get_space("category");
-    auto space_ent = cache.get_space("entity");
+    auto space_cat = feature_spaces.get_space("category");
+    auto space_ent = feature_spaces.get_space("entity");
     request->add_feature_vector(FeatureVector(space_cat, {
         {"3", 2.0}
     }));
@@ -207,19 +207,19 @@ private:
     return request;
   }
 
-  std::shared_ptr<QueryRequest> create_request_2(FeatureCache& cache) {
+  std::shared_ptr<QueryRequest> create_request_2(FeatureSpaceManager& feature_spaces) {
     auto request = std::make_shared<QueryRequest>("0002", 2, "", StopWatch(), true);
-    auto space_cat = cache.get_space("category");
+    auto space_cat = feature_spaces.get_space("category");
     request->add_feature_vector(FeatureVector(space_cat, {
         {"3", 2.0}
     }));
     return request;
   }
 
-  std::shared_ptr<QueryRequest> create_request_3(FeatureCache& cache) {
+  std::shared_ptr<QueryRequest> create_request_3(FeatureSpaceManager& feature_spaces) {
     auto request = std::make_shared<QueryRequest>("0003", 50, "", StopWatch(), true);
-    auto space_cat = cache.get_space("category");
-    auto space_ent = cache.get_space("entity");
+    auto space_cat = feature_spaces.get_space("category");
+    auto space_ent = feature_spaces.get_space("entity");
     request->add_feature_vector(FeatureVector(space_cat, {
         {"9999", 2.0}
     }));
