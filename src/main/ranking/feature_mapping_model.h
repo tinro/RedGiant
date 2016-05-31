@@ -8,12 +8,13 @@
 #include <utility>
 #include <vector>
 
-#include "data/feature_cache.h"
-#include "data/feature_space.h"
 #include "index/document_query.h"
 #include "ranking/ranking_model.h"
 
 namespace redgiant {
+class FeatureSpace;
+class FeatureSpaceManager;
+
 /*
  * The feature mapping model defines a group of mappings
  *  from request to document feature spaces.
@@ -49,8 +50,8 @@ public:
 
   typedef std::vector<Mapping> MappingVector;
 
-  FeatureMappingModelFactory(std::shared_ptr<FeatureCache> cache)
-  : cache_(std::move(cache)) {
+  FeatureMappingModelFactory(std::shared_ptr<FeatureSpaceManager> feature_spaces)
+  : feature_spaces_(std::move(feature_spaces)) {
   }
 
   virtual ~FeatureMappingModelFactory() = default;
@@ -62,7 +63,7 @@ public:
   virtual std::unique_ptr<RankingModel> create_model(const rapidjson::Value& config) const;
 
 private:
-  std::shared_ptr<FeatureCache> cache_;
+  std::shared_ptr<FeatureSpaceManager> feature_spaces_;
   std::string type_id_ = "mapping";
 };
 } /* namespace redgiant */

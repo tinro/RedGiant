@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "data/feature.h"
-#include "data/feature_cache.h"
 #include "data/feature_space.h"
+#include "data/feature_space_manager.h"
 #include "data/feature_vector.h"
 #include "data/query_request.h"
 #include "utils/json_utils.h"
@@ -39,9 +39,9 @@ int QueryRequestParser::parse_json(const rapidjson::Value& root, QueryRequest& o
 int QueryRequestParser::parse_feature_spaces(const rapidjson::Value& root, QueryRequest& request) {
   for (auto it = root.MemberBegin(); it != root.MemberEnd(); ++it) {
     std::string space_name = it->name.GetString();
-    std::shared_ptr<FeatureSpace> space = cache_->get_space(space_name);
+    std::shared_ptr<FeatureSpace> space = feature_spaces_->get_space(space_name);
     if (!space) {
-      // feature space must be pre-defined in feature cache
+      // feature space must be pre-defined
       LOG_WARN(logger, "request[%s]: unknown feature space [%s], ignored.",
           request.get_request_id().c_str(), space_name.c_str());
     } else {
@@ -74,7 +74,7 @@ int QueryRequestParser::parse_feature_vector_multiple_featuers(const rapidjson::
 
   for (auto it = json.MemberBegin(); it != json.MemberEnd(); ++it) {
     if (it->name.IsString() && it->value.IsNumber()) {
-      std::shared_ptr<Feature> feature = cache_->get_or_create_feature(it->name.GetString(), vec.get_space());
+      std::shared_ptr<Feature> feature = vec.get_space().create_feature(it->name.GetString());
       if (feature) {
         LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
             request.get_request_id().c_str(), (unsigned long long)feature->get_id(),

@@ -6,13 +6,13 @@
 
 namespace redgiant {
 class Document;
-class FeatureCache;
+class FeatureSpaceManager;
 class FeatureVector;
 
 class DocumentParser: public JsonParser<Document> {
 public:
-  DocumentParser(std::shared_ptr<FeatureCache> cache)
-  : cache_(std::move(cache)) {
+  DocumentParser(std::shared_ptr<FeatureSpaceManager> feature_spaces)
+  : feature_spaces_(std::move(feature_spaces)) {
   }
 
   virtual ~DocumentParser() = default;
@@ -38,23 +38,23 @@ private:
       const Document& doc, FeatureVector& vec);
 
 private:
-  std::shared_ptr<FeatureCache> cache_;
+  std::shared_ptr<FeatureSpaceManager> feature_spaces_;
 };
 
 class DocumentParserFactory: public ParserFactory<Document> {
 public:
-  DocumentParserFactory(std::shared_ptr<FeatureCache> cache)
-  : cache_(std::move(cache)) {
+  DocumentParserFactory(std::shared_ptr<FeatureSpaceManager> feature_spaces)
+  : feature_spaces_(std::move(feature_spaces)) {
   }
 
   virtual ~DocumentParserFactory() = default;
 
   std::unique_ptr<Parser<Document>> create_parser() {
-    return std::unique_ptr<Parser<Document>>(new DocumentParser(cache_));
+    return std::unique_ptr<Parser<Document>>(new DocumentParser(feature_spaces_));
   }
 
 private:
-  std::shared_ptr<FeatureCache> cache_;
+  std::shared_ptr<FeatureSpaceManager> feature_spaces_;
 };
 } /* namespace redgiant */
 

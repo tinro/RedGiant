@@ -5,9 +5,12 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "data/document_parser.h"
+
 #include "data/document.h"
-#include "data/feature_cache.h"
+#include "data/document_parser.h"
+#include "data/feature.h"
+#include "data/feature_space.h"
+#include "data/feature_space_manager.h"
 #include "data/feature_vector.h"
 
 using namespace std;
@@ -25,8 +28,8 @@ public:
 
 protected:
   void test_parser() {
-    auto cache = create_cache();
-    auto parser = create_parser(cache);
+    auto feature_spaces = create_feature_spaces();
+    auto parser = create_parser(feature_spaces);
 
     string s =
       R"({
@@ -112,8 +115,8 @@ protected:
   }
 
   void test_parser_withoutuuid() {
-    auto cache = create_cache();
-    auto parser = create_parser(cache);
+    auto feature_spaces = create_feature_spaces();
+    auto parser = create_parser(feature_spaces);
 
     string s =
       R"({
@@ -132,18 +135,18 @@ protected:
   }
 
 private:
-  std::shared_ptr<FeatureCache> create_cache() {
-    auto cache = std::make_shared<FeatureCache>();
-    cache->create_space("time", 1, FeatureSpace::SpaceType::kInteger);
-    cache->create_space("publisher", 2, FeatureSpace::SpaceType::kString);
-    cache->create_space("entity", 3, FeatureSpace::SpaceType::kString);
-    cache->create_space("category", 4, FeatureSpace::SpaceType::kInteger);
-    cache->create_space("score", 99, FeatureSpace::SpaceType::kInteger);
-    return cache;
+  std::shared_ptr<FeatureSpaceManager> create_feature_spaces() {
+    auto feature_spaces = std::make_shared<FeatureSpaceManager>();
+    feature_spaces->create_space("time", 1, FeatureSpace::SpaceType::kInteger);
+    feature_spaces->create_space("publisher", 2, FeatureSpace::SpaceType::kString);
+    feature_spaces->create_space("entity", 3, FeatureSpace::SpaceType::kString);
+    feature_spaces->create_space("category", 4, FeatureSpace::SpaceType::kInteger);
+    feature_spaces->create_space("score", 99, FeatureSpace::SpaceType::kInteger);
+    return feature_spaces;
   };
 
-  std::unique_ptr<DocumentParser> create_parser(std::shared_ptr<FeatureCache> cache) {
-    return std::unique_ptr<DocumentParser>(new DocumentParser(std::move(cache)));
+  std::unique_ptr<DocumentParser> create_parser(std::shared_ptr<FeatureSpaceManager> feature_spaces) {
+    return std::unique_ptr<DocumentParser>(new DocumentParser(std::move(feature_spaces)));
   };
 };
 

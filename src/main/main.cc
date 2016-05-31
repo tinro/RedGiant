@@ -1,3 +1,4 @@
+#include <data/feature_space_manager.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -9,7 +10,6 @@
 #include <signal.h>
 
 #include "data/document_parser.h"
-#include "data/feature_cache.h"
 #include "data/query_request_parser.h"
 #include "handler/document_handler.h"
 #include "handler/query_handler.h"
@@ -119,7 +119,7 @@ static int server_main(rapidjson::Value& config) {
     return -1;
   }
 
-  std::shared_ptr<FeatureCache> feature_cache = std::make_shared<FeatureCache>();
+  std::shared_ptr<FeatureSpaceManager> feature_cache = std::make_shared<FeatureSpaceManager>();
   if (feature_cache->initialize(*config_feature_spaces) < 0) {
     LOG_ERROR(logger, "feature cache parsing failed!");
     return -1;
