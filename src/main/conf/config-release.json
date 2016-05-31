@@ -24,6 +24,12 @@
     "max_size": 10000000,
     /* Interval in seconds the background maintaining thread writes updates to index. */
     "maintain_interval": 300,
+    /* Automatically dump index to snapshot on exit */
+    "dump_on_exit": true,
+    /* Automatically restore index from snapshot on startup */
+    "restore_on_startup": true,
+    /* File prefix of snapshot files. The path must exist. */
+    "snapshot_prefix": "logs/snapshot-",
     /* Document update pipeline configurations. */
     "update_thread_num": 4,
     "update_queue_size": 2048,
