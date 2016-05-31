@@ -25,7 +25,7 @@ int DocumentParser::parse_json(const rapidjson::Value& root, Document& output) {
 
   // if uuid is not already set
   if (!output.get_id()) {
-    const char* uuid = json_try_get_string(root, "uuid");
+    const char* uuid = json_get_str(root, "uuid");
     // null or empty
     if (!uuid || !uuid[0]) {
       LOG_ERROR(logger, "document uuid missing or empty!");
@@ -35,7 +35,7 @@ int DocumentParser::parse_json(const rapidjson::Value& root, Document& output) {
     output.set_doc_id(uuid);
   }
 
-  auto features = json_try_get_object(root, "features");
+  auto features = json_get_object(root, "features");
   if (!features) {
     LOG_ERROR(logger, "document[%s]: no features found!", output.get_id_str().c_str());
     return -1;

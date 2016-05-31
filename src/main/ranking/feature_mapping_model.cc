@@ -79,11 +79,11 @@ std::unique_ptr<RankingModel> FeatureMappingModelFactory::create_model(const rap
 
   std::string name;
   std::string type;
-  if (json_try_get_string(config, "name", name) && json_try_get_string(config, "type", type)) {
+  if (json_try_get_value(config, "name", name) && json_try_get_value(config, "type", type)) {
     LOG_DEBUG(logger, "creating model %s in type %s", name.c_str(), type.c_str());
   }
 
-  auto mappings = json_try_get_array(config, "mappings");
+  auto mappings = json_get_array(config, "mappings");
   if (!mappings) {
     LOG_ERROR(logger, "models json config is missing!");
     return nullptr;
@@ -96,9 +96,9 @@ std::unique_ptr<RankingModel> FeatureMappingModelFactory::create_model(const rap
     std::string to;
     double weight;
 
-    if (!json_try_get_string(mapping, "from", from)
-        || !json_try_get_string(mapping, "to", to)
-        || !json_try_get_double(mapping, "weight", weight)) {
+    if (!json_try_get_value(mapping, "from", from)
+        || !json_try_get_value(mapping, "to", to)
+        || !json_try_get_value(mapping, "weight", weight)) {
       LOG_ERROR(logger, "unknown mapping config!");
       continue;
     }
@@ -120,7 +120,7 @@ std::unique_ptr<RankingModel> FeatureMappingModelFactory::create_model(const rap
       continue;
     }
 
-    LOG_DEBUG(logger, "mapping feature space %s to %s with weight %lf",
+    LOG_TRACE(logger, "mapping feature space %s to %s with weight %lf",
         from_space->get_name().c_str(), to_space->get_name().c_str(), weight);
     model->set_mapping(std::move(from_space), std::move(to_space), weight);
   }
