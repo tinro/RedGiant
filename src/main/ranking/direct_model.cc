@@ -34,7 +34,7 @@ std::unique_ptr<IntermQuery> DirectModel::process(const QueryRequest& request) c
 std::unique_ptr<RankingModel> DirectModelFactory::create_model(const rapidjson::Value& config) const {
   std::string name;
   std::string type;
-  if (json_try_get_string(config, "name", name) && json_try_get_string(config, "type", type)) {
+  if (json_try_get_value(config, "name", name) && json_try_get_value(config, "type", type)) {
     LOG_DEBUG(logger, "creating model %s in type %s", name.c_str(), type.c_str());
   }
 

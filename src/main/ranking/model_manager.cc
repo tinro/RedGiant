@@ -53,16 +53,16 @@ std::unique_ptr<RankingModel> ModelManagerFactory::create_model(const rapidjson:
     return nullptr;
   }
 
-  auto models = json_try_get_array(config, "models");
+  auto models = json_get_array(config, "models");
   if (!models) {
     LOG_ERROR(logger, "models json config is missing!");
     return nullptr;
   }
 
   std::unique_ptr<ModelManager> mm(new ModelManager());
-  std::string default_model;
-  if (json_try_get_string(config, "default_model", default_model)) {
-    mm->set_default_model_name(std::move(default_model));
+  const char* default_model = json_get_str(config, "default_model");
+  if (default_model && default_model[0]) {
+    mm->set_default_model_name(default_model);
   }
 
   for (auto iter = models->Begin(); iter != models->End(); ++iter) {
@@ -70,7 +70,7 @@ std::unique_ptr<RankingModel> ModelManagerFactory::create_model(const rapidjson:
     std::string type;
     std::string name;
 
-    if (!json_try_get_string(model, "type", type)) {
+    if (!json_try_get_value(model, "type", type)) {
       LOG_ERROR(logger, "model config error: type is required!");
       continue;
     }
@@ -80,7 +80,7 @@ std::unique_ptr<RankingModel> ModelManagerFactory::create_model(const rapidjson:
       continue;
     }
 
-    if (!json_try_get_string(model, "name", name)) {
+    if (!json_try_get_value(model, "name", name)) {
       LOG_ERROR(logger, "model config error: name is required!");
       continue;
     }

@@ -23,15 +23,15 @@ int FeatureSpaceManager::initialize(const rapidjson::Value& root) {
     int id;
     std::string name;
     std::string type;
-    if (!json_try_get_int(*it, "id", id)) {
+    if (!json_try_get_value(*it, "id", id)) {
       LOG_ERROR(logger, "feature spaces does not contain valid id!");
       return -1;
     }
-    if (!json_try_get_string(*it, "name", name)) {
+    if (!json_try_get_value(*it, "name", name)) {
       LOG_ERROR(logger, "feature spaces does not contain valid id!");
       return -1;
     }
-    if (!json_try_get_string(*it, "type", type)) {
+    if (!json_try_get_value(*it, "type", type)) {
       LOG_ERROR(logger, "feature spaces does not contain valid id!");
       return -1;
     }

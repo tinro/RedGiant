@@ -24,11 +24,17 @@
     "max_size": 100000,
     /* Interval in seconds the background maintaining thread writes updates to index. */
     "maintain_interval": 20,
+    /* Automatically dump index to snapshot on exit */
+    "dump_on_exit": true,
+    /* Automatically restore index from snapshot on startup */
+    "restore_on_startup": true,
+    /* File prefix of snapshot files. The path must exist. */
+    "snapshot_prefix": "logs/snapshot-",
     /* Document update pipeline configurations. */
     "update_thread_num": 2,
     "update_queue_size": 256,
     /* Default TTL of documents put from server endpoints */
-    "default_ttl": 86400
+    "default_ttl": 86400,
   },
 
   /* The feature spaces referred by the data models. */

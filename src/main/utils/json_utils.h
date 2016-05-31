@@ -5,7 +5,7 @@
 
 namespace redgiant {
 
-inline const rapidjson::Value* json_try_get(const rapidjson::Value& json, const char* key) {
+inline const rapidjson::Value* json_get_node(const rapidjson::Value& json, const char* key) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     return &(iter->value);
@@ -13,7 +13,7 @@ inline const rapidjson::Value* json_try_get(const rapidjson::Value& json, const 
   return nullptr;
 }
 
-inline const rapidjson::Value* json_try_get_array(const rapidjson::Value& json, const char* key) {
+inline const rapidjson::Value* json_get_array(const rapidjson::Value& json, const char* key) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;
@@ -24,7 +24,7 @@ inline const rapidjson::Value* json_try_get_array(const rapidjson::Value& json, 
   return nullptr;
 }
 
-inline const rapidjson::Value* json_try_get_object(const rapidjson::Value& json, const char* key) {
+inline const rapidjson::Value* json_get_object(const rapidjson::Value& json, const char* key) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;
@@ -35,7 +35,7 @@ inline const rapidjson::Value* json_try_get_object(const rapidjson::Value& json,
   return nullptr;
 }
 
-inline const char* json_try_get_string(const rapidjson::Value& json, const char* key) {
+inline const char* json_get_str(const rapidjson::Value& json, const char* key) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;
@@ -46,7 +46,11 @@ inline const char* json_try_get_string(const rapidjson::Value& json, const char*
   return nullptr;
 }
 
-inline bool json_try_get_string(const rapidjson::Value& json, const char* key, std::string& ret) {
+template <typename T>
+inline bool json_try_get_value(const rapidjson::Value& json, const char* key, T& ret);
+
+template <>
+inline bool json_try_get_value(const rapidjson::Value& json, const char* key, std::string& ret) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;
@@ -58,7 +62,8 @@ inline bool json_try_get_string(const rapidjson::Value& json, const char* key, s
   return false;
 }
 
-inline bool json_try_get_int(const rapidjson::Value& json, const char* key, int& ret) {
+template <>
+inline bool json_try_get_value(const rapidjson::Value& json, const char* key, int& ret) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;
@@ -70,7 +75,8 @@ inline bool json_try_get_int(const rapidjson::Value& json, const char* key, int&
   return false;
 }
 
-inline bool json_try_get_uint(const rapidjson::Value& json, const char* key, unsigned int & ret) {
+template <>
+inline bool json_try_get_value(const rapidjson::Value& json, const char* key, unsigned int & ret) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;
@@ -82,7 +88,8 @@ inline bool json_try_get_uint(const rapidjson::Value& json, const char* key, uns
   return false;
 }
 
-inline bool json_try_get_int64(const rapidjson::Value& json, const char* key, int64_t& ret) {
+template <>
+inline bool json_try_get_value(const rapidjson::Value& json, const char* key, int64_t& ret) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;
@@ -94,7 +101,8 @@ inline bool json_try_get_int64(const rapidjson::Value& json, const char* key, in
   return false;
 }
 
-inline bool json_try_get_int64(const rapidjson::Value& json, const char* key, uint64_t& ret) {
+template <>
+inline bool json_try_get_value(const rapidjson::Value& json, const char* key, uint64_t& ret) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;
@@ -106,7 +114,8 @@ inline bool json_try_get_int64(const rapidjson::Value& json, const char* key, ui
   return false;
 }
 
-inline bool json_try_get_double(const rapidjson::Value& json, const char* key, double& ret) {
+template <>
+inline bool json_try_get_value(const rapidjson::Value& json, const char* key, double& ret) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;
@@ -118,7 +127,8 @@ inline bool json_try_get_double(const rapidjson::Value& json, const char* key, d
   return false;
 }
 
-inline bool json_try_get_float(const rapidjson::Value& json, const char* key, float& ret) {
+template <>
+inline bool json_try_get_value(const rapidjson::Value& json, const char* key, float& ret) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;
@@ -130,7 +140,8 @@ inline bool json_try_get_float(const rapidjson::Value& json, const char* key, fl
   return false;
 }
 
-inline bool json_try_get_bool(const rapidjson::Value& json, const char* key, bool& ret) {
+template <>
+inline bool json_try_get_value(const rapidjson::Value& json, const char* key, bool& ret) {
   auto iter = json.FindMember(key);
   if (iter != json.MemberEnd()) {
     const auto& value = iter->value;

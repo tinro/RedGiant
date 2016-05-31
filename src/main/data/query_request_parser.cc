@@ -23,7 +23,7 @@ int QueryRequestParser::parse_json(const rapidjson::Value& root, QueryRequest& o
     return -1;
   }
 
-  auto features = json_try_get_object(root, "features");
+  auto features = json_get_object(root, "features");
   if (!features) {
     LOG_ERROR(logger, "request[%s]: no features found!", output.get_request_id().c_str());
     return -1;

@@ -1,4 +1,3 @@
-#include <data/feature_space_manager.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -10,6 +9,7 @@
 #include <signal.h>
 
 #include "data/document_parser.h"
+#include "data/feature_space_manager.h"
 #include "data/query_request_parser.h"
 #include "handler/document_handler.h"
 #include "handler/query_handler.h"
@@ -80,7 +80,7 @@ static int read_config_file(const char* file_name, rapidjson::Document& config) 
 }
 
 static int init_log_config(const char* file_name, const rapidjson::Value& config) {
-  const char* logger_file_name_str = json_try_get_string(config, kConfigKeyLoggerConfig);
+  const char* logger_file_name_str = json_get_str(config, kConfigKeyLoggerConfig);
   if (!logger_file_name_str) {
     fprintf(stderr, "Logger configuration not found! Using default configurations.");
     return init_logger(NULL);
@@ -100,7 +100,7 @@ static int init_log_config(const char* file_name, const rapidjson::Value& config
   return init_logger(logger_file_name.c_str());
 }
 
-static int server_main(rapidjson::Value& config) {
+static int server_main(const rapidjson::Value& config) {
   /*
    * Initialize signal handler
    */
@@ -113,14 +113,14 @@ static int server_main(rapidjson::Value& config) {
    * Initialization:
    * Features initialization
    */
-  auto config_feature_spaces = json_try_get(config, kConfigKeyFeatureSpaces);
+  const rapidjson::Value* config_feature_spaces = json_get_node(config, kConfigKeyFeatureSpaces);
   if (!config_feature_spaces) {
     LOG_ERROR(logger, "features configuration does not exist!");
     return -1;
   }
 
-  std::shared_ptr<FeatureSpaceManager> feature_cache = std::make_shared<FeatureSpaceManager>();
-  if (feature_cache->initialize(*config_feature_spaces) < 0) {
+  std::shared_ptr<FeatureSpaceManager> feature_spaces = std::make_shared<FeatureSpaceManager>();
+  if (feature_spaces->initialize(*config_feature_spaces) < 0) {
     LOG_ERROR(logger, "feature cache parsing failed!");
     return -1;
   }
@@ -129,61 +129,113 @@ static int server_main(rapidjson::Value& config) {
    * Initialization:
    * Index initialization
    */
-  int document_index_initial_buckets    = 100000;
-  int document_index_max_size           = 5000000;
-  int document_index_maintain_interval  = 300;
-
-  auto config_index = json_try_get_object(config, kConfigKeyIndex);
-  if (config_index && json_try_get_int(*config_index, "initial_buckets", document_index_initial_buckets)) {
-    LOG_DEBUG(logger, "document index initial buckets: %d", document_index_initial_buckets);
-  } else {
-    LOG_DEBUG(logger, "document index initial buckets not configured, use default: %d", document_index_initial_buckets);
-  }
-  if (config_index && json_try_get_int(*config_index, "max_size", document_index_max_size)) {
-    LOG_DEBUG(logger, "document index max size: %d", document_index_max_size);
-  } else {
-    LOG_DEBUG(logger, "document index max size not configured, use default: %d", document_index_max_size);
-  }
-  if (config_index && json_try_get_int(*config_index, "maintain_interval", document_index_maintain_interval)) {
-    LOG_DEBUG(logger, "document index maintain interval: %d", document_index_maintain_interval);
-  } else {
-    LOG_DEBUG(logger, "document index maintain interval not configured, use default: %d", document_index_maintain_interval);
+  const rapidjson::Value* config_index = json_get_object(config, kConfigKeyIndex);
+  if (!config_index) {
+    LOG_ERROR(logger, "index configuration does not exist!");
+    return -1;
   }
 
-  DocumentIndexManager document_index(document_index_initial_buckets, document_index_max_size);
-  document_index.start_maintain(document_index_maintain_interval, document_index_maintain_interval);
-  ScopeGuard feed_document_index_guard([&document_index] {
-    LOG_INFO(logger, "document index maintain thread stopping...");
-    document_index.stop_maintain();
+  int index_initial_buckets    = 100000;
+  int index_max_size           = 5000000;
+  int index_maintain_interval  = 300;
+
+  if (config_index && json_try_get_value(*config_index, "initial_buckets", index_initial_buckets)) {
+    LOG_DEBUG(logger, "index initial buckets: %d", index_initial_buckets);
+  } else {
+    LOG_DEBUG(logger, "index initial buckets not configured, use default: %d", index_initial_buckets);
+  }
+  if (config_index && json_try_get_value(*config_index, "max_size", index_max_size)) {
+    LOG_DEBUG(logger, "index max size: %d", index_max_size);
+  } else {
+    LOG_DEBUG(logger, "index max size not configured, use default: %d", index_max_size);
+  }
+  if (config_index && json_try_get_value(*config_index, "maintain_interval", index_maintain_interval)) {
+    LOG_DEBUG(logger, "index maintain interval: %d", index_maintain_interval);
+  } else {
+    LOG_DEBUG(logger, "index maintain interval not configured, use default: %d", index_maintain_interval);
+  }
+
+  bool restore_on_startup = false;
+  bool dump_on_exit = false;
+  std::string snapshot_prefix = "";
+
+  if (config_index && json_try_get_value(*config_index, "restore_on_startup", restore_on_startup)) {
+    LOG_DEBUG(logger, "index restore on startup: %s", restore_on_startup ? "true" : "false");
+  } else {
+    LOG_DEBUG(logger, "index restore on startup not configured, use default: %s", restore_on_startup ? "true" : "false");
+  }
+  if (config_index && json_try_get_value(*config_index, "dump_on_exit", dump_on_exit)) {
+    LOG_DEBUG(logger, "index dump on exit: %s", dump_on_exit ? "true" : "false");
+  } else {
+    LOG_DEBUG(logger, "index dump on exit not configured, use default: %s", dump_on_exit ? "true" : "false");
+  }
+  if (config_index && json_try_get_value(*config_index, "snapshot_prefix", snapshot_prefix)) {
+    LOG_DEBUG(logger, "index snapshot prefix: %s", snapshot_prefix.c_str());
+  } else {
+    LOG_DEBUG(logger, "index snapshot prefix not configured, use default: %s", snapshot_prefix.c_str());
+  }
+
+  std::unique_ptr<DocumentIndexManager> index;
+  if (restore_on_startup) {
+    LOG_INFO(logger, "loading index from snapshot %s", snapshot_prefix.c_str());
+    try {
+      index.reset(new DocumentIndexManager(
+          index_initial_buckets, index_max_size, snapshot_prefix));
+    } catch (std::ios_base::failure& e) {
+      LOG_ERROR(logger, "failed restore index. reason:%s", e.what());
+      // continue
+    }
+  }
+
+  if (!index) {
+    LOG_INFO(logger, "creating an empty index ...");
+    index.reset(new DocumentIndexManager(
+        index_initial_buckets, index_max_size));
+  }
+
+  index->start_maintain(index_maintain_interval, index_maintain_interval);
+  ScopeGuard feed_index_guard([&index, dump_on_exit, &snapshot_prefix] {
+    if (dump_on_exit) {
+      LOG_INFO(logger, "dumping index to snapshot %s", snapshot_prefix.c_str());
+      try {
+        index->dump(snapshot_prefix);
+      } catch (std::ios_base::failure& e) {
+        LOG_ERROR(logger, "failed dump index. reason:%s", e.what());
+        // continue
+      }
+    }
+    LOG_INFO(logger, "index maintain thread stopping...");
+    index->stop_maintain();
   });
 
   unsigned int document_update_thread_num = 4;
   unsigned int document_update_queue_size = 2048;
   unsigned int default_ttl = 86400;
-  if (config_index && json_try_get_uint(*config_index, "update_thread_num", document_update_thread_num)) {
+
+  if (config_index && json_try_get_value(*config_index, "update_thread_num", document_update_thread_num)) {
     LOG_DEBUG(logger, "feed document pipeline thread num: %u", document_update_thread_num);
   } else {
     LOG_DEBUG(logger, "feed document pipeline thread num not configured, use default: %u", document_update_thread_num);
   }
-  if (config_index && json_try_get_uint(*config_index, "update_queue_size", document_update_queue_size)) {
+  if (config_index && json_try_get_value(*config_index, "update_queue_size", document_update_queue_size)) {
     LOG_DEBUG(logger, "feed document pipeline queue size: %u", document_update_queue_size);
   } else {
     LOG_DEBUG(logger, "feed document pipeline queue size not configured, use default: %u", document_update_queue_size);
   }
-  if (config_index && json_try_get_uint(*config_index, "default_ttl", default_ttl)) {
+  if (config_index && json_try_get_value(*config_index, "default_ttl", default_ttl)) {
     LOG_DEBUG(logger, "document update default ttl: %u", default_ttl);
   } else {
     LOG_DEBUG(logger, "document update default ttl not configured, use default: %u", default_ttl);
   }
 
-  DocumentUpdatePipeline document_update_pipeline(document_update_thread_num, document_update_queue_size, &document_index);
+  DocumentUpdatePipeline document_update_pipeline(document_update_thread_num, document_update_queue_size, index.get());
   document_update_pipeline.start();
-  ScopeGuard feed_document_pipeline_guard([&document_update_pipeline] {
+  ScopeGuard document_update_pipeline_guard([&document_update_pipeline] {
     LOG_INFO(logger, "feed document pipeline stopping...");
     document_update_pipeline.stop();
   });
 
-  DocumentIndexView document_index_view(&document_index, &document_update_pipeline);
+  DocumentIndexView index_view(index.get(), &document_update_pipeline);
 
   /*
    * Initialization
@@ -191,9 +243,9 @@ static int server_main(rapidjson::Value& config) {
    */
   ModelManagerFactory model_manager_factory;
   model_manager_factory.register_model_factory(std::make_shared<DirectModelFactory>());
-  model_manager_factory.register_model_factory(std::make_shared<FeatureMappingModelFactory>(feature_cache));
+  model_manager_factory.register_model_factory(std::make_shared<FeatureMappingModelFactory>(feature_spaces));
 
-  auto config_ranking = json_try_get(config, kConfigKeyRanking);
+  const rapidjson::Value* config_ranking = json_get_node(config, kConfigKeyRanking);
   if (!config_ranking) {
     LOG_ERROR(logger, "ranking model config does not exist!");
     return -1;
@@ -214,18 +266,18 @@ static int server_main(rapidjson::Value& config) {
   uint server_thread_num = 4;
   uint max_req_per_thread = 0;
 
-  auto config_server = json_try_get_object(config, kConfigKeyServer);
-  if (config_server && json_try_get_int(*config_server, "port", server_port)) {
+  const rapidjson::Value* config_server = json_get_object(config, kConfigKeyServer);
+  if (config_server && json_try_get_value(*config_server, "port", server_port)) {
     LOG_DEBUG(logger, "server port: %d", server_port);
   } else {
     LOG_DEBUG(logger, "server port not configured, use default: %d", server_port);
   }
-  if (config_server && json_try_get_uint(*config_server, "thread_num", server_thread_num)) {
+  if (config_server && json_try_get_value(*config_server, "thread_num", server_thread_num)) {
     LOG_DEBUG(logger, "server thread num: %u", server_thread_num);
   } else {
     LOG_DEBUG(logger, "server thread num not configured, use default: %u", server_thread_num);
   }
-  if (config_server && json_try_get_uint(*config_server, "max_request_per_thread", max_req_per_thread)) {
+  if (config_server && json_try_get_value(*config_server, "max_request_per_thread", max_req_per_thread)) {
     LOG_DEBUG(logger, "max requests per server thread: %u", max_req_per_thread);
   } else {
     LOG_DEBUG(logger, "max requests per server thread not configured, use default: %u", max_req_per_thread);
@@ -234,11 +286,11 @@ static int server_main(rapidjson::Value& config) {
   Server server(server_port, server_thread_num, max_req_per_thread);
   server.bind("/test", std::make_shared<TestHandlerFactory>());
   server.bind("/document", std::make_shared<FeedDocumentHandlerFactory>(
-      std::make_shared<DocumentParserFactory>(feature_cache),
-      &document_index_view, default_ttl));
+      std::make_shared<DocumentParserFactory>(feature_spaces),
+      &index_view, default_ttl));
   server.bind("/query", std::make_shared<QueryHandlerFactory>(
-      std::make_shared<QueryRequestParserFactory>(feature_cache),
-      std::make_shared<SimpleQueryExecutorFactory>(&document_index, model.get())));
+      std::make_shared<QueryRequestParserFactory>(feature_spaces),
+      std::make_shared<SimpleQueryExecutorFactory>(index.get(), model.get())));
 
   if (server.initialize() < 0) {
     LOG_ERROR(logger, "server initialization failed!");
