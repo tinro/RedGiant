@@ -24,17 +24,17 @@ void DocumentHandler::handle_request(const RequestContext* request, ResponseWrit
 
   int method = request->get_method();
   if (method != RequestContext::METHOD_PUT) {
-    LOG_ERROR(logger, "method is not PUT");
-    response->add_body("method is not PUT\n");
+    response->add_body("method should be PUT\n");
     response->send(400, NULL);
+    LOG_ERROR(logger, "method is not PUT");
     return;
   }
 
   int post_len = request->get_content_length();
   if (post_len <= 0) {
-    LOG_ERROR(logger, "content is missing");
     response->add_body("content is missing\n");
     response->send(400, NULL);
+    LOG_ERROR(logger, "content is missing");
     return;
   }
 

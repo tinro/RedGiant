@@ -13,6 +13,7 @@
 #include "data/query_request_parser.h"
 #include "handler/document_handler.h"
 #include "handler/query_handler.h"
+#include "handler/snapshot_handler.h"
 #include "handler/test_handler.h"
 #include "index/document_index_manager.h"
 #include "index/document_index_view.h"
@@ -291,6 +292,7 @@ static int server_main(const rapidjson::Value& config) {
   server.bind("/query", std::make_shared<QueryHandlerFactory>(
       std::make_shared<QueryRequestParserFactory>(feature_spaces),
       std::make_shared<SimpleQueryExecutorFactory>(index.get(), model.get())));
+  server.bind("/snapshot", std::make_shared<SnapshotHandlerFactory>(&index_view, snapshot_prefix));
 
   if (server.initialize() < 0) {
     LOG_ERROR(logger, "server initialization failed!");

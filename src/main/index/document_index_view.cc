@@ -28,5 +28,8 @@ void DocumentIndexView::remove_document(const std::string& uuid) {
   index_->remove(DocumentId(uuid));
 }
 
+void DocumentIndexView::dump(const std::string& snapshot_prefix) {
+  index_->dump(snapshot_prefix);
+}
 
 } /* namespace redgiant */
