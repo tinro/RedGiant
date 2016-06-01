@@ -5,7 +5,7 @@ for small scale personalized recommendation systems.
 
 ## Release
 
-**Latest release: 0.1**
+**Latest release: 0.2.0**
 
 [![Build Status](https://travis-ci.org/tinro/RedGiant.svg?branch=master)](https://travis-ci.org/tinro/RedGiant)
 
@@ -15,12 +15,13 @@ NOTE: Currently this project is only for research and study, it is not recommend
 
 ### Features
 
-Supported features in version 0.1
+Supported features in version 0.2.0
 * Reverse indexing to documents consist of sets of weighted features.
 * Defining named feature spaces that are groups of features.
 * Retrieving documents with weighted features, combined by AND, OR and WAND operators.
 * Defining multiple retrieval models which build different retrieval expressions.
 * Recieving realtime updates and apply changes periodically.
+* Persist index to files and / or restore index from files.
 
 To keep it simple, there are following assumptions or limitations.
 * Documents and searches are defined by preprocessed weighted features. There is no built-in text processor.
@@ -194,6 +195,12 @@ Here are the fields in the JSON body
 
 The `features` field is also key-value pairs of feature spaces similar as documents. However only the complete format is supported. So that the values of feature spaces should be JSON objects containing key-value pairs of weighted featurs.
 
-### Misc
+### Dump and Restore
 
-N/A
+The index could be persisted to file(s), and restored from file(s). There is a `snapshot_prefix` configuration in the `index` section. There may be one or multiple files generated, and the paths to the files are started with this prefix string. The prefix could be either absolute or relative path, ends in either directory seperator ('/') or file name prefix. The directories should exist before persistence happens.
+
+There are mainly two ways to persist index.
+
+* Configure `dump_on_exit` and `restore_on_startup`, then the index will automatically dump to snapshot files on exit, and restored from snapshot on startup. If there are configuration changes during service outage, please make sure that the `id` of feature spaces are not changed.
+* Call `/snapshot` endpoint, then the service will update the snapshot files. During snapshot creation, changes to index are temporarily disabled (async update is still available), while the service is still able to deal with search queries.
+
