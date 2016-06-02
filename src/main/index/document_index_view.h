@@ -26,6 +26,8 @@ public:
 
   //std::shared_ptr<Document> peek_document(const std::string& uuid);
 
+  void dump(const std::string& snapshot_prefix);
+
 private:
   DocumentIndexManager* index_;
   JobExecutor<DocumentUpdateRequest>* update_pipeline_;

@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "data/feature.h"
-#include "data/feature_space.h"
 #include "data/feature_space_manager.h"
+#include "data/feature_vector.h"
 #include "data/query_request.h"
 #include "index/document_query.h"
 #include "utils/json_utils.h"
@@ -23,10 +23,10 @@ std::unique_ptr<IntermQuery> FeatureMappingModel::process(const QueryRequest& re
         request.get_request_id().c_str());
   }
 
-  for (const auto& fv: request.get_feature_vectors()) {
-    // find if the input feature vector exists in mappings.
-    auto iter = mappings_.find(fv.get_space_name());
-    if (iter == mappings_.end()) {
+  for (const FeatureVector& fv: request.get_feature_vectors()) {
+    // find the mapped feature spaces. there may be multiple target spaces
+    auto range = mappings_.equal_range(fv.get_space().get_id());
+    if (range.first == mappings_.end()) {
       if (request.is_debug()) {
         LOG_WARN(logger, "[query:%s] feature space %s not found in model mappings!",
             request.get_request_id().c_str(), fv.get_space_name().c_str());
@@ -34,40 +34,43 @@ std::unique_ptr<IntermQuery> FeatureMappingModel::process(const QueryRequest& re
       continue;
     }
 
-    Score weight = std::get<2>(iter->second);
-    const auto& space = *std::get<1>(iter->second);
-    if (weight <= 0) {
-      if (request.is_debug()) {
-        LOG_WARN(logger, "[query:%s] feature space %s weight %lf is not positive!",
-            request.get_request_id().c_str(), fv.get_space_name().c_str(), weight);
+    // for all mapped spaces
+    for (auto iter = range.first; iter != range.second; ++iter) {
+      Score weight = std::get<2>(iter->second);
+      const auto& space = *std::get<1>(iter->second);
+      if (weight <= 0) {
+        if (request.is_debug()) {
+          LOG_WARN(logger, "[query:%s] feature space %s weight %lf is not positive!",
+              request.get_request_id().c_str(), fv.get_space_name().c_str(), weight);
+        }
+        continue;
       }
-      continue;
-    }
 
-    // load features from request
-    for (const auto& f: fv.get_features()) {
-      // project the feature to the mapped space
-      Feature::FeatureId id = space.project_to_space(f.first->get_id());
-      Score s = static_cast<Score>(f.second) * weight;
-      // try insert the score if exists.
-      auto insert_ret = terms.emplace(id, s);
-      // or add the score to the existing scores
-      if (!insert_ret.second) {
-        insert_ret.first->second += s;
-        if (request.is_debug()) {
-          LOG_TRACE(logger, "[query:%s] build feature 0x%016llx from 0x%016llx, update weight to %lf",
-              request.get_request_id().c_str(), (unsigned long long)id,
-              (unsigned long long)(f.first->get_id()), insert_ret.first->second);
-        }
-      } else {
-        if (request.is_debug()) {
-          LOG_TRACE(logger, "[query:%s] build feature 0x%016llx from 0x%016llx, insert with weight %lf",
-              request.get_request_id().c_str(), (unsigned long long)id,
-              (unsigned long long)(f.first->get_id()), insert_ret.first->second);
-        }
-      }
-    }
-  }
+      // load features from request
+      for (const FeatureVector::FeaturePair& feature_pair: fv.get_features()) {
+        // project the feature to the mapped space
+        Feature::FeatureId id = space.project_to_space(feature_pair.first->get_id());
+        Score s = static_cast<Score>(feature_pair.second) * weight;
+        // try insert the score if exists.
+        auto insert_ret = terms.emplace(id, s);
+        // or add the score to the existing scores
+        if (!insert_ret.second) {
+          insert_ret.first->second += s;
+          if (request.is_debug()) {
+            LOG_TRACE(logger, "[query:%s] build feature 0x%016llx from 0x%016llx, update weight to %lf",
+                request.get_request_id().c_str(), (unsigned long long)id,
+                (unsigned long long)(feature_pair.first->get_id()), insert_ret.first->second);
+          }
+        } else {
+          if (request.is_debug()) {
+            LOG_TRACE(logger, "[query:%s] build feature 0x%016llx from 0x%016llx, insert with weight %lf",
+                request.get_request_id().c_str(), (unsigned long long)id,
+                (unsigned long long)(feature_pair.first->get_id()), insert_ret.first->second);
+          }
+        } // terms.emplace
+      } // for feature_pair
+    } // for iter in range
+  } // for fv
   return std::unique_ptr<IntermQuery>(new IntermQuery({terms.begin(), terms.end()}));
 }
 

@@ -23,7 +23,7 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
 
   int method = request->get_method();
   if (method != RequestContext::METHOD_POST) {
-    response->add_body("method is not POST\n");
+    response->add_body("method should be POST\n");
     response->send(400, NULL);
     LOG_ERROR(logger, "method is not POST");
     return;
@@ -46,7 +46,7 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
   if (!query_count_str.empty()) {
     query_count = atoi(query_count_str.c_str());
     if (query_count == 0) {
-      response->add_body(R"({"error":"param_error", "results":[]})""\n");
+      response->add_body(R"({"ret":"param_error", "results":[]})""\n");
       response->send(400, NULL);
       LOG_INFO(logger, "[query:%s] error=param_error, latency=%ldus", request_id.c_str(), watch.get_ticks_us());
       return;
@@ -71,7 +71,7 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
   buf_.clear();
 
   if (parse_ret < 0) {
-    response->add_body(R"({"error":"parse_error", "results":[]})""\n");
+    response->add_body(R"({"ret":"parse_error", "results":[]})""\n");
     response->send(400, NULL);
     LOG_INFO(logger, "[query:%s] error=parse_error, latency=%ldus", request_id.c_str(), watch.get_ticks_us());
     return;
@@ -80,15 +80,14 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
   // run query
   std::unique_ptr<QueryResult> result = executor_->execute(query_request);
   if (!result || result->is_error_status()) {
-    response->add_body(R"({"error":"query_error", "results":[]})""\n");
+    response->add_body(R"({"ret":"query_error", "results":[]})""\n");
     response->send(500, NULL);
     LOG_INFO(logger, "[query:%s] REQ_STAT error=query_error, latency=%ldus", request_id.c_str(), watch.get_ticks_us());
     return;
   }
 
   std::ostringstream os; // output
-  os  << R"({"error":"success")"
-      << R"(,"model":")" << ranking_model << '"'
+  os  << R"({"ret":"success")"
       << R"(,"results":[)";
   bool first = true; // avoid trailing comma
   for (auto& r: result->get_results()) {
@@ -105,7 +104,8 @@ void QueryHandler::handle_request(const RequestContext* request, ResponseWriter*
   response->add_body(os.str());
   response->send(200, NULL);
 
-  LOG_INFO(logger, "[query:%s] REQ_STAT error=success, latency=%ldus, ret=%d, model=%s",
-      request_id.c_str(), watch.get_ticks_us(), 0, ranking_model.c_str());
+  LOG_INFO(logger, "[query:%s] REQ_STAT ret=success, count=%zu, latency=%ldus",
+      request_id.c_str(), result->get_results().size(), watch.get_ticks_us());
 }
+
 } /* namespace redgiant */

@@ -8,11 +8,11 @@
 #include <utility>
 #include <vector>
 
+#include "data/feature_space.h"
 #include "index/document_query.h"
 #include "ranking/ranking_model.h"
 
 namespace redgiant {
-class FeatureSpace;
 class FeatureSpaceManager;
 
 /*
@@ -24,16 +24,17 @@ public:
   typedef DocumentQuery::Score Score;
   // Tuple of: [Original space, mapped space, and weight]
   typedef std::tuple<std::shared_ptr<FeatureSpace>, std::shared_ptr<FeatureSpace>, Score> SingleMapping;
-  typedef std::unordered_map<std::string, SingleMapping> MappingHashMap;
+  typedef std::unordered_multimap<FeatureSpace::SpaceId, SingleMapping> MappingHashMap;
 
   FeatureMappingModel() = default;
   virtual ~FeatureMappingModel() = default;
 
   virtual std::unique_ptr<IntermQuery> process(const QueryRequest& request) const;
 
+  // N-N mapping of feature spaces
   void set_mapping(std::shared_ptr<FeatureSpace> from, std::shared_ptr<FeatureSpace> to, Score weight) {
-    const std::string& name = from->get_name();
-    mappings_[name] = std::make_tuple(std::move(from), std::move(to), weight);
+    FeatureSpace::SpaceId id = from->get_id();
+    mappings_.emplace(std::make_pair(id, std::make_tuple(std::move(from), std::move(to), weight)));
   }
 
 private:

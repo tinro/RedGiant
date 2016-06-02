@@ -18,7 +18,8 @@ namespace redgiant {
 class FeatureMappingModelTest: public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(FeatureMappingModelTest);
   CPPUNIT_TEST(test_create);
-  CPPUNIT_TEST(test_process);
+  CPPUNIT_TEST(test_process_1);
+  CPPUNIT_TEST(test_process_2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -28,14 +29,14 @@ public:
 protected:
   void test_create() {
     auto feature_spaces = create_feature_spaces();
-    auto mm = create_model(feature_spaces);
+    auto mm = create_model_1(feature_spaces);
     CPPUNIT_ASSERT(!!mm);
     CPPUNIT_ASSERT(dynamic_cast<FeatureMappingModel*>(mm.get()));
   }
 
-  void test_process() {
+  void test_process_1() {
     auto feature_spaces = create_feature_spaces();
-    auto mm = create_model(feature_spaces);
+    auto mm = create_model_1(feature_spaces);
     CPPUNIT_ASSERT(!!mm);
 
     auto req = mock_request_1(*feature_spaces);
@@ -62,6 +63,35 @@ protected:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, iter->second, 0.00001);
   }
 
+  void test_process_2() {
+    auto feature_spaces = create_feature_spaces();
+    auto mm = create_model_2(feature_spaces);
+    CPPUNIT_ASSERT(!!mm);
+
+    auto req = mock_request_1(*feature_spaces);
+    auto iq = mm->process(*req);
+    CPPUNIT_ASSERT(!!iq);
+
+    const auto& features = iq->get_features();
+    CPPUNIT_ASSERT_EQUAL(4, (int)features.size());
+
+    auto iter = find_interm_query_pair(features, *feature_spaces, "entity_title", "abc");
+    CPPUNIT_ASSERT(iter != features.end());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(12.0, iter->second, 0.00001);
+
+    iter = find_interm_query_pair(features, *feature_spaces, "entity_title", "def");
+    CPPUNIT_ASSERT(iter != features.end());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4.0, iter->second, 0.00001);
+
+    iter = find_interm_query_pair(features, *feature_spaces, "entity_content", "abc");
+    CPPUNIT_ASSERT(iter != features.end());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, iter->second, 0.00001);
+
+    iter = find_interm_query_pair(features, *feature_spaces, "entity_content", "def");
+    CPPUNIT_ASSERT(iter != features.end());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0, iter->second, 0.00001);
+  }
+
 private:
   std::shared_ptr<FeatureSpaceManager> create_feature_spaces() {
     char j[] = R"([
@@ -69,7 +99,9 @@ private:
       {"id": 2, "name": "entity",             "type": "string"},
       {"id": 3, "name": "publisher",          "type": "string"},
       {"id": 4, "name": "category_inferred",  "type": "integer"},
-      {"id": 5, "name": "category_declared",  "type": "integer"}
+      {"id": 5, "name": "category_declared",  "type": "integer"},
+      {"id": 6, "name": "entity_title",       "type": "string"},
+      {"id": 7, "name": "entity_content",     "type": "string"}
     ])";
     rapidjson::MemoryStream ms(j, sizeof(j)/sizeof(j[0]));
     rapidjson::Document conf;
@@ -80,11 +112,24 @@ private:
     return feature_spaces;
   }
 
-  std::unique_ptr<RankingModel> create_model(std::shared_ptr<FeatureSpaceManager> feature_spaces) {
+  std::unique_ptr<RankingModel> create_model_1(std::shared_ptr<FeatureSpaceManager> feature_spaces) {
     auto mmf = std::make_shared<FeatureMappingModelFactory>(std::move(feature_spaces));
     char j[] = R"({ "name": "category_only", "type": "mapping", "mappings": [
       { "from": "category_inferred", "to": "category", "weight": 2.0 },
       { "from": "category_declared", "to": "category", "weight": 3.0 }
+    ]})";
+    rapidjson::MemoryStream ms(j, sizeof(j)/sizeof(j[0]));
+    rapidjson::Document conf;
+    conf.ParseStream(ms);
+    return mmf->create_model(conf);
+  }
+
+  std::unique_ptr<RankingModel> create_model_2(std::shared_ptr<FeatureSpaceManager> feature_spaces) {
+    auto mmf = std::make_shared<FeatureMappingModelFactory>(std::move(feature_spaces));
+    char j[] = R"({ "name": "category_only", "type": "mapping", "mappings": [
+      { "from": "entity_title",   "to": "entity_title",   "weight": 5.0 },
+      { "from": "entity_content", "to": "entity_content", "weight": 1.0 },
+      { "from": "entity_content", "to": "entity_title",   "weight": 2.0 }
     ]})";
     rapidjson::MemoryStream ms(j, sizeof(j)/sizeof(j[0]));
     rapidjson::Document conf;
@@ -103,10 +148,12 @@ private:
         {"456", 3.0},
         {"1000", 1.0}
     }));
-    req->add_feature_vector(FeatureVector(feature_spaces.get_space("entity"), {
+    req->add_feature_vector(FeatureVector(feature_spaces.get_space("entity_title"), {
+        {"abc", 2.0},
+    }));
+    req->add_feature_vector(FeatureVector(feature_spaces.get_space("entity_content"), {
         {"abc", 1.0},
-        {"def", 2.0},
-        {"ghi", 3.0}
+        {"def", 2.0}
     }));
     req->add_feature_vector(FeatureVector(feature_spaces.get_space("publisher"), {
         {"xyz", 1.0}
