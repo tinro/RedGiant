@@ -62,12 +62,14 @@ int DocumentParser::parse_feature_spaces(const rapidjson::Value& json, Document&
 
       FeatureVector vec(std::move(space));
       int ret = -1;
-      if (it->value.IsObject()) {
-        ret = parse_feature_vector_multiple_featuers(it->value, doc, vec);
+      if (it->value.IsNumber()) {
+        ret = parse_feature_vector_single_weighted(it->value, doc, vec);
       } else if (it->value.IsString()){
-        ret = parse_feature_vector_single_feature(it->value, doc, vec);
-      } else if (it->value.IsNumber()) {
-        ret = parse_feature_vector_single_score(it->value, doc, vec);
+        ret = parse_feature_vector_single_unitary(it->value, doc, vec);
+      } else if (it->value.IsObject()) {
+        ret = parse_feature_vector_multiple_weighted(it->value, doc, vec);
+      } else if (it->value.IsArray()) {
+        ret = parse_feature_vector_multiple_unitary(it->value, doc, vec);
       }
 
       if (ret == 0) {
@@ -81,25 +83,8 @@ int DocumentParser::parse_feature_spaces(const rapidjson::Value& json, Document&
   return 0;
 }
 
-// e.g. { "publisher" : "cnn" }, json is "cnn"
-int DocumentParser::parse_feature_vector_single_feature(const rapidjson::Value& json,
-    const Document& doc, FeatureVector& vec) {
-  if (!json.IsString()) {
-    return -1;
-  }
-
-  std::shared_ptr<Feature> feature = vec.get_space().create_feature(json.GetString());
-  if (feature) {
-    LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
-        doc.get_id_str().c_str(), (unsigned long long)feature->get_id(),
-        feature->get_key().c_str(), vec.get_space_name().c_str());
-    vec.add_feature(std::move(feature), 1.0);
-  }
-  return 0;
-}
-
 // e.g. { "download_count" : 123456 }, json is 123456
-int DocumentParser::parse_feature_vector_single_score(const rapidjson::Value& json,
+int DocumentParser::parse_feature_vector_single_weighted(const rapidjson::Value& json,
     const Document& doc, FeatureVector& vec) {
   if (!json.IsNumber()) {
     return -1;
@@ -116,9 +101,26 @@ int DocumentParser::parse_feature_vector_single_score(const rapidjson::Value& js
   return 0;
 }
 
+// e.g. { "publisher" : "cnn" }, json is "cnn"
+int DocumentParser::parse_feature_vector_single_unitary(const rapidjson::Value& json,
+    const Document& doc, FeatureVector& vec) {
+  if (!json.IsString()) {
+    return -1;
+  }
+
+  std::shared_ptr<Feature> feature = vec.get_space().create_feature(json.GetString());
+  if (feature) {
+    LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
+        doc.get_id_str().c_str(), (unsigned long long)feature->get_id(),
+        feature->get_key().c_str(), vec.get_space_name().c_str());
+    vec.add_feature(std::move(feature), 1.0);
+  }
+  return 0;
+}
+
 // e.g. { "favorite_sports" : { "football" : 1.0, "tennis" : 2.0 } }
 // json is { "football" : 1.0, "tennis" : 2.0 }
-int DocumentParser::parse_feature_vector_multiple_featuers(const rapidjson::Value& json,
+int DocumentParser::parse_feature_vector_multiple_weighted(const rapidjson::Value& json,
     const Document& doc, FeatureVector& vec) {
   if (!json.IsObject()) {
     return -1;
@@ -137,5 +139,28 @@ int DocumentParser::parse_feature_vector_multiple_featuers(const rapidjson::Valu
   }
   return 0;
 }
+
+// e.g. { "favorite_sports" : [ "football", "tennis" ] }
+// json is [ "football", "tennis" ]
+int DocumentParser::parse_feature_vector_multiple_unitary(const rapidjson::Value& json,
+    const Document& doc, FeatureVector& vec) {
+  if (!json.IsArray()) {
+    return -1;
+  }
+
+  for (auto it = json.Begin(); it != json.End(); ++it) {
+    if (it->IsString()) {
+      std::shared_ptr<Feature> feature = vec.get_space().create_feature(it->GetString());
+      if (feature) {
+        LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
+            doc.get_id_str().c_str(), (unsigned long long)feature->get_id(),
+            feature->get_key().c_str(), vec.get_space_name().c_str());
+        vec.add_feature(std::move(feature), 1.0);
+      }
+    }
+  }
+  return 0;
+}
+
 
 } /* namespace redgiant */

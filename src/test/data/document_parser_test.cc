@@ -38,7 +38,7 @@ protected:
           "publisher": "publisher_id_test",
           "time": "1234567",
           "score": 2.34,
-          "category": {"1": 0.1, "2":0.2, "3" : 0.3}, 
+          "category": ["1", "2", "3"], 
           "entity": {"ent_1":0.1, "ent_2":0.2, "ent_3" : 0.3},
           "unknown": "abc"
         }
@@ -90,13 +90,13 @@ protected:
     CPPUNIT_ASSERT_EQUAL(3, (int)fv->get_features().size());
     f = &(fv->get_features()[0]);
     CPPUNIT_ASSERT_EQUAL(string("1"), f->first->get_key());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL((double)0.1, f->second, 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL((double)1.0, f->second, 0.0001);
     f = &(fv->get_features()[1]);
     CPPUNIT_ASSERT_EQUAL(string("2"), f->first->get_key());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL((double)0.2, f->second, 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL((double)1.0, f->second, 0.0001);
     f = &(fv->get_features()[2]);
     CPPUNIT_ASSERT_EQUAL(string("3"), f->first->get_key());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL((double)0.3, f->second, 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL((double)1.0, f->second, 0.0001);
 
     fv = &(vecs[4]);
     CPPUNIT_ASSERT_EQUAL(string("entity"), fv->get_space_name());
@@ -123,7 +123,7 @@ protected:
         "features": {
           "publisher": "publisher_id_test",
           "time": "1234567",
-          "category": {"1": 0.1, "2":0.2, "3" : 0.3}, 
+          "category": ["1", "2", "3"], 
           "entity": {"ent_1":0.1, "ent_2":0.2, "ent_3" : 0.3},
           "unknown": "abc"
         }

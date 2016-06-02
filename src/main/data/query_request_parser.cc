@@ -50,9 +50,10 @@ int QueryRequestParser::parse_feature_spaces(const rapidjson::Value& root, Query
 
       FeatureVector vec(std::move(space));
       int ret = -1;
-      // only deal with feature vectors in multiple value format
-      if (it->value.IsObject()) {
-        ret = parse_feature_vector_multiple_featuers(it->value, request, vec);
+      if (it->value.IsNumber()) {
+        ret = parse_feature_vector_single_weighted(it->value, request, vec);
+      } else if (it->value.IsObject()) {
+        ret = parse_feature_vector_multiple_weighted(it->value, request, vec);
       }
 
       if (ret == 0) {
@@ -66,7 +67,27 @@ int QueryRequestParser::parse_feature_spaces(const rapidjson::Value& root, Query
   return 0;
 }
 
-int QueryRequestParser::parse_feature_vector_multiple_featuers(const rapidjson::Value& json,
+// e.g. { "download_count" : 123456 }, json is 123456
+int QueryRequestParser::parse_feature_vector_single_weighted(const rapidjson::Value& json,
+    const QueryRequest& request, FeatureVector& vec) {
+  if (!json.IsNumber()) {
+    return -1;
+  }
+
+  // the feature key is empty, we set it to "0" and it is usually configured to integer type.
+  std::shared_ptr<Feature> feature =  vec.get_space().create_feature("0");
+  if (feature) {
+    LOG_TRACE(logger, "request[%s], created feature %016llx (%s) in feature space [%s]",
+        request.get_request_id().c_str(), (unsigned long long)feature->get_id(),
+        feature->get_key().c_str(), vec.get_space_name().c_str());
+    vec.add_feature(std::move(feature), json.GetDouble());
+  }
+  return 0;
+}
+
+// e.g. { "favorite_sports" : { "football" : 1.0, "tennis" : 2.0 } }
+// json is { "football" : 1.0, "tennis" : 2.0 }
+int QueryRequestParser::parse_feature_vector_multiple_weighted(const rapidjson::Value& json,
     const QueryRequest& request, FeatureVector& vec) {
   if (!json.IsObject()) {
     return -1;
@@ -76,7 +97,7 @@ int QueryRequestParser::parse_feature_vector_multiple_featuers(const rapidjson::
     if (it->name.IsString() && it->value.IsNumber()) {
       std::shared_ptr<Feature> feature = vec.get_space().create_feature(it->name.GetString());
       if (feature) {
-        LOG_TRACE(logger, "document[%s], created feature %016llx (%s) in feature space [%s]",
+        LOG_TRACE(logger, "request[%s], created feature %016llx (%s) in feature space [%s]",
             request.get_request_id().c_str(), (unsigned long long)feature->get_id(),
             feature->get_key().c_str(), vec.get_space_name().c_str());
         vec.add_feature(std::move(feature), it->value.GetDouble());

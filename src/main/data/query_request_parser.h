@@ -22,9 +22,14 @@ public:
 private:
   int parse_feature_spaces(const rapidjson::Value& json, QueryRequest& request);
 
+  // parse feature vector contains only one single feature that is a weight.
+  // e.g. { "download_count" : 1.0 }
+  int parse_feature_vector_single_weighted(const rapidjson::Value& json,
+      const QueryRequest& request, FeatureVector& vec);
+
   // parse feature vector contains multiple features and their weights.
   // e.g. { "favorite_sports" : { "football" : 1.0, "tennis" : 2.0 } }
-  int parse_feature_vector_multiple_featuers(const rapidjson::Value& json,
+  int parse_feature_vector_multiple_weighted(const rapidjson::Value& json,
       const QueryRequest& request, FeatureVector& vec);
 
 private:
