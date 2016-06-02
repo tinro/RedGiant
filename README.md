@@ -109,17 +109,16 @@ Here is an example request:
 
     $ curl -XPUT -d '{
       "features": {
-        "publisher": "id_test",
-        "category": {
-          "1": 0.1,
-          "2": 0.2,
-          "3": 0.3
-        },
+        "category": [
+          "111",
+          "222"
+        ],
         "entity": {
           "aa": 0.1,
           "bb": 0.2,
           "cc": 0.3
         },
+        "publisher": "id_test",
         "popularity": 0.6
       }
     }' "http://127.0.0.1:19980/document?uuid=4e73cdd7-de87-4e2e-bc70-7336469092bf"
@@ -142,9 +141,10 @@ Here are the fields in the JSON body
 
 The `features` field contains key-value pairs as JSON objects. They keys are name of feature spaces and the values define weighted features in that feature space. There are basically three formats of feature spaces:
 
-* Complete format: the value of feature space is a JSON object which is they key-value pairs of weighted features, keys are keys of features and values are weights. For example `"category": { "1": 0.1, "2": 0.2, "3": 0.3 }`.
-* Single feature: the value of feature space is string that is the only feature key in the feature space. Its weight is considered as 1.0. For example `"publisher": "id_test"` is a shortcut to `"publisher": { "id_test": 1.0 }`.
-* Single value: the value of feature space is a number that is the weight of the only feature in the feature space. The key of the feature is considered as `"0"` and usually represented as an integer. For example: `"popularity": 0.6` is a shortcut to `"popularity": { "0": "0.6" }`.
+* Multiple weighted features: the value of feature space is a JSON object which contains key-value pairs of weighted features, keys are keys of features and values are weights. For example `"entity": { "aa": 0.1, "bb": 0.2, "cc": 0.3 }`.
+* Multiple unitary features: the value of feature space is a JSON array which contains keys of features. The weights of features are 1.0. For example `"category": ["111", "222"]`.
+* Single unitary feature: the value of feature space is key of the only feature in the feature space. Its weight is set to 1.0. For example `"publisher": "id_test"` is a shortcut to `"publisher": { "id_test": 1.0 }`.
+* Single weight: there is only one valid feature in this feature space. The value of feature space is a non-negative number which is the weight of the feature. The key of the feature is always set to `"0"`, and may be parsed as integer or string (usually it is  defined as an integer). For example: `"popularity": 0.6` is a shortcut to `"popularity": { "0": "0.6" }`.
 
 #### Read document(s)
 
@@ -170,9 +170,7 @@ Then, you can query the index using an HTTP POST request
         "entity_inferred": {
           "bb": 5.0
         },
-        "popularity": {
-          "0": 10.0
-        }
+        "popularity": 10.0
       }
     }' "http://127.0.0.1:19980/query?id=0002&count=10&debug=true&model=mixed"
 
@@ -193,7 +191,7 @@ Here are the fields in the JSON body
 |---------|---------|-------------|-------------|
 | features | JSON Object | required | The weighted features of the query request. |
 
-The `features` field is also key-value pairs of feature spaces similar as documents. However only the complete format is supported. So that the values of feature spaces should be JSON objects containing key-value pairs of weighted featurs.
+The `features` field is also key-value pairs of feature spaces similar as documents.
 
 ### Dump and Restore
 
