@@ -5,6 +5,7 @@
 #include <mutex>
 #include <utility>
 #include <unordered_map>
+#include <vector>
 
 #include "core/impl/freezable_posting_list.h"
 #include "core/index/posting_list.h"

@@ -8,7 +8,6 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "../core_reader/mock_reader.h"
-
 #include "core/index/posting_list.h"
 #include "core/index/btree_posting_list.h"
 #include "core/reader/posting_list_reader.h"

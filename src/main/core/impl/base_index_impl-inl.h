@@ -90,8 +90,9 @@ auto BaseIndexImpl<DocTraits>::query(TermId term_id, const Query<Score>& query) 
   // allow stored posting list to be empty, means no data stored
   if (iter != index_.end()) {
     // release the lock earlier by copy the shared_ptr out.
-    std::shared_ptr<FreezablePList> plist = iter->second;
-    lock_query.unlock(); // read the value, and unlock
+    // read the value, and unlock
+    std::shared_ptr<PList> plist = iter->second;
+    lock_query.unlock();
     return query.query(create_reader_shared(std::move(plist)));
   }
   return nullptr;
@@ -221,6 +222,7 @@ int BaseIndexImpl<DocTraits>::apply_internal() {
       ++ret;
     }
   }
+  changed_index_.clear();
   return ret;
 }
 
