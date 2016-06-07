@@ -1,21 +1,34 @@
-#ifndef SRC_MAIN_CORE_IMPL_BASE_INDEX_H_
-#define SRC_MAIN_CORE_IMPL_BASE_INDEX_H_
+#ifndef SRC_MAIN_CORE_IMPL_BASE_INDEX_IMPL_H_
+#define SRC_MAIN_CORE_IMPL_BASE_INDEX_IMPL_H_
 
-#include <map>
 #include <memory>
 #include <mutex>
 #include <utility>
 #include <unordered_map>
-#include <unordered_set>
+
+#include "core/impl/freezable_posting_list.h"
 #include "core/index/posting_list.h"
 #include "core/query/posting_list_query.h"
 #include "core/reader/posting_list_reader.h"
 #include "third_party/lock/shared_mutex.h"
 
 namespace redgiant {
+/*
+ * - This class implements the reverse index based on hash map, where keys are
+ *   TermIds and values are posting lists. All changes to the index are
+ *   deferred and wrote to pending change list. Changes take effect only after
+ *   apply() calls.
+ * - The posting lists stored in this index are FreezablePostingList(s), the
+ *   posting lists should be frozen before it become valid for reading. Frozen
+ *   means the wrapped posting list will not allow subsequent changes (but it
+ *   is still valid to switch to another posting list).
+ * - Once a posting list is read from index, it should be safe to read from the
+ *   reader at any time later.
+ */
 template <typename DocTraits>
-class BaseIndex {
+class BaseIndexImpl {
 public:
+  friend class BaseIndexImplTest;
   typedef typename DocTraits::DocId DocId;
   typedef typename DocTraits::TermId TermId;
   typedef typename DocTraits::TermWeight TermWeight;
@@ -35,16 +48,16 @@ public:
   template <typename Score>
   using Results = std::vector<std::pair<DocId, Score>>;
 
-  BaseIndex(size_t initial_buckets);
+  BaseIndexImpl(size_t initial_buckets);
 
   // create from snapshot
   // may throw exception: std::ios_base::failure
   // Loader&& accepts both lvalues and rvalues (for temporarily constructed loader)
   template <typename Loader>
-  BaseIndex(size_t initial_buckets, Loader&& loader);
+  BaseIndexImpl(size_t initial_buckets, Loader&& loader);
 
   // g++ has bug with =default destructor for extern declared templates.
-  ~BaseIndex() { }
+  ~BaseIndexImpl() { }
 
   size_t get_term_count() const;
 
@@ -58,23 +71,24 @@ public:
   std::unique_ptr<Reader<Score>> query(TermId term_id, const Query<Score>& query) const;
 
   template <typename Score>
-  int batch_query(const std::vector<QueryPair<Score>>& queries, std::vector<ReaderPair<Score>>* readers) const;
+  std::vector<ReaderPair<Score>> batch_query(const std::vector<QueryPair<Score>>& queries) const;
 
 protected:
   typedef PostingList<DocId, TermWeight> PList;
+  typedef FreezablePostingList<DocId, TermWeight> FreezablePList;
   typedef PostingListFactory<DocId, TermWeight> PListFactory;
 
-  template <typename Changeset>
-  int create_update_internal(DocId doc_id, TermId term_id, const TermWeight& weights, Changeset& changeset);
+  std::shared_ptr<PList> query_internal(TermId term_id);
 
-  template <typename Changeset>
-  int remove_internal(DocId doc_id, TermId term_id, Changeset& changeset);
+  std::shared_ptr<FreezablePList> change_internal(TermId term_id);
 
-  template <typename Changeset>
-  int remove_internal(DocId doc_id, std::vector<TermId> terms, Changeset& changeset);
+  int create_update_internal(DocId doc_id, TermId term_id, const TermWeight& weights);
 
-  template <typename Changeset>
-  int apply_internal(Changeset& changeset);
+  int remove_internal(DocId doc_id, TermId term_id);
+
+  int remove_internal(DocId doc_id, std::vector<TermId> terms);
+
+  int apply_internal();
 
   // dump to snapshot
   // may throw exception: std::ios_base::failure
@@ -83,11 +97,15 @@ protected:
   size_t dump_internal(Dumper&& dumper);
 
 protected:
-  std::unordered_map<TermId, std::shared_ptr<PList>> index_;
-  std::unique_ptr<PListFactory> safe_factory_;
   mutable shared_mutex query_mutex_;
+  mutable std::mutex change_mutex_;
+  // protected by query_mutex_
+  std::unordered_map<TermId, std::shared_ptr<PList>> index_;
+  // protected by change_mutex_
+  std::unordered_map<TermId, std::shared_ptr<FreezablePList>> changed_index_;
+  std::unique_ptr<PListFactory> factory_;
 };
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_CORE_IMPL_BASE_INDEX_H_ */
+#endif /* SRC_MAIN_CORE_IMPL_BASE_INDEX_IMPL_H_ */

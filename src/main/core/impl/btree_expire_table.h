@@ -1,9 +1,11 @@
-#ifndef SRC_MAIN_CORE_INDEX_BTREE_EXPIRE_TABLE_H_
-#define SRC_MAIN_CORE_INDEX_BTREE_EXPIRE_TABLE_H_
+#ifndef SRC_MAIN_CORE_IMPL_BTREE_EXPIRE_TABLE_H_
+#define SRC_MAIN_CORE_IMPL_BTREE_EXPIRE_TABLE_H_
 
 #include <map>
 #include <memory>
 #include <utility>
+#include <vector>
+
 #include "third_party/btree/btree_set.h"
 
 namespace redgiant {
@@ -66,7 +68,7 @@ public:
       expire_table_.erase(*(insert_pair.first));
       insert_pair.first->second = expire_time;
     }
-    // normally the expire_time is continously increasing, so we have a hint to insert at the end.
+    // normally the expire_time is continuously increasing, so we have a hint to insert at the end.
     expire_table_.insert(expire_table_.end(), *(insert_pair.first));
     return 1;
   }
@@ -165,4 +167,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_CORE_INDEX_BTREE_EXPIRE_TABLE_H_ */
+#endif /* SRC_MAIN_CORE_IMPL_BTREE_EXPIRE_TABLE_H_ */

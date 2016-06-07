@@ -47,6 +47,7 @@ AC_CONFIG_FILES([Makefile
                  src/main/ranking/Makefile
                  src/main/service/Makefile
                  src/test/Makefile
+                 src/test/core_impl/Makefile
                  src/test/core_index/Makefile
                  src/test/core_reader/Makefile
                  src/test/data/Makefile

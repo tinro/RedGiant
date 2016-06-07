@@ -1,3 +1,5 @@
+#include "core/impl/btree_expire_table.h"
+
 #include <algorithm>
 #include <memory>
 #include <utility>
@@ -5,8 +7,6 @@
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-
-#include "core/index/btree_expire_table.h"
 
 namespace redgiant {
 class BTreeExpireTableTest: public CppUnit::TestFixture {

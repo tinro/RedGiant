@@ -105,9 +105,7 @@ auto DocumentIndexManager::query(const QueryRequest& request, const DocumentQuer
     return nullptr;
   }
 
-  std::vector<ReaderPair> readers;
-  readers.reserve(query_size);
-  index_.batch_query(query.get_doc_queries(), &readers);
+  std::vector<ReaderPair> readers = index_.batch_query(query.get_doc_queries());
 
   if (request.is_debug()) {
     LOG_INFO(logger, "[query:%s] document query %zu terms, found %zu terms.",

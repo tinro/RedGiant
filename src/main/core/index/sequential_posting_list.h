@@ -45,10 +45,6 @@ public:
     return 0;
   }
 
-  virtual void apply() {
-    (void) expire_time;
-  }
-
   virtual std::unique_ptr<Reader> create_reader(std::shared_ptr<PList> shared_list) const;
 
 private:
@@ -119,15 +115,15 @@ public:
 
   virtual ~SequentialPostingListFactory() = default;
 
-  virtual std::shared_ptr<PList> create_posting_list() {
+  virtual std::shared_ptr<PList> create_posting_list() const {
     return std::shared_ptr<PList>(new SequentialPostingList<DocId, Weight>());
   }
 
-  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByVal> reader) {
+  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByVal> reader) const {
     return std::shared_ptr<PList>(new SequentialPostingList<DocId, Weight>(*reader));
   }
 
-  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByRef> reader) {
+  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByRef> reader) const {
     return std::shared_ptr<PList>(new SequentialPostingList<DocId, Weight>(*reader));
   }
 };

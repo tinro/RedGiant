@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_CORE_IMPL_BASE_DOCUMENT_INDEX_H_
-#define SRC_MAIN_CORE_IMPL_BASE_DOCUMENT_INDEX_H_
+#ifndef SRC_MAIN_CORE_IMPL_ROW_INDEX_IMPL_H_
+#define SRC_MAIN_CORE_IMPL_ROW_INDEX_IMPL_H_
 
 #include <map>
 #include <set>
@@ -7,15 +7,25 @@
 #include <tuple>
 #include <utility>
 #include <vector>
-#include "core/impl/base_index.h"
-#include "core/index/btree_expire_table.h"
+
+#include "core/impl/base_index_impl.h"
+#include "core/impl/base_index_impl-inl.h"
+#include "core/impl/btree_expire_table.h"
 
 namespace redgiant {
+/*
+ * - This class implements the index that are updated by rows. Typically, each
+ *   update is a doc_id with a vector of terms and weights. Each row (doc) has
+ *   an expire time. The whole row gets removed on expiration.
+ * - We also have to remember the relationship between docs and terms. Once the
+ *   row is updated or removed, we need to remove the doc_id from posting lists
+ *   associated with all terms within the doc.
+ */
 template <typename DocTraits>
-class BaseDocumentIndex: public BaseIndex<DocTraits> {
-
+class RowIndexImpl: public BaseIndexImpl<DocTraits> {
 public:
-  typedef BaseIndex<DocTraits> Base;
+  friend class RowIndexImplTest;
+  typedef BaseIndexImpl<DocTraits> Base;
   typedef typename Base::DocId DocId;
   typedef typename Base::TermId TermId;
   typedef typename Base::TermWeight TermWeight;
@@ -25,20 +35,18 @@ public:
   typedef std::pair<TermId, TermWeight> TermPair;
   typedef std::vector<TermPair> DocTerms;
   typedef std::tuple<DocId, DocTerms, ExpireTime> DocTuple;
-  friend class RemoveDocHandlerTest;
-  friend class DocumentIndexTest;
 
-  BaseDocumentIndex(size_t initial_buckets, size_t max_size)
+  RowIndexImpl(size_t initial_buckets, size_t max_size)
   : Base(initial_buckets), max_size_(max_size) {
   }
 
   // create from snapshot
   // may throw exception: std::ios_base::failure
   template <typename Loader>
-  BaseDocumentIndex(size_t initial_buckets, size_t max_size, Loader&& loader);
+  RowIndexImpl(size_t initial_buckets, size_t max_size, Loader&& loader);
 
   // gcc has bug with =default
-  ~BaseDocumentIndex() { }
+  ~RowIndexImpl() { }
 
   size_t get_expire_table_size() const;
 
@@ -63,13 +71,18 @@ public:
   size_t dump(Dumper&& dumper);
 
 protected:
+  typedef BTreeExpireTable<DocId, ExpireTime> ExpTable;
+  typedef std::map<DocId, std::vector<TermId>> DocTermMap;
+
   using Base::create_update_internal;
   using Base::apply_internal;
   using Base::dump_internal;
   using Base::remove_internal;
 
   void update_expire_internal(DocId doc_id, ExpireTime expire_time);
+
   void update_docterm_map_internal(DocId doc_id, const DocTerms& terms);
+
   int remove_doc_internal(DocId doc_id);
 
   template <typename Loader>
@@ -79,16 +92,15 @@ protected:
   size_t dump_docterm_map_internal(Dumper&& dumper) const;
 
 protected:
-  typedef BTreeExpireTable<DocId, ExpireTime> ExpTable;
-  typedef typename ExpTable::ExpireVec ExpVec;
-  typedef std::map<DocId, std::vector<TermId>> DocTermMap;
+  using Base::query_mutex_;
+  using Base::change_mutex_;
 
   size_t max_size_;
+  // protected by change_mutex_
   ExpTable expire_;
+  // protected by change_mutex_
   DocTermMap doc_term_map_;
-  std::unordered_set<TermId> changeset_;
-  mutable std::mutex changeset_mutex_;
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_CORE_IMPL_BASE_DOCUMENT_INDEX_H_ */
+#endif /* SRC_MAIN_CORE_IMPL_ROW_INDEX_IMPL_H_ */

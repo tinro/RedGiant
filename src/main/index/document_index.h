@@ -1,17 +1,17 @@
 #ifndef SRC_MAIN_INDEX_DOCUMENT_INDEX_H_
 #define SRC_MAIN_INDEX_DOCUMENT_INDEX_H_
 
-#include "core/impl/base_document_index.h"
-#include "core/impl/base_document_index-inl.h"
-#include "document_traits.h"
+#include "core/impl/row_index_impl.h"
+#include "core/impl/row_index_impl-inl.h"
+#include "index/document_traits.h"
 
 namespace redgiant {
-extern template class BaseDocumentIndex<DocumentTraits>;
-extern template class BaseIndex<DocumentTraits>;
+extern template class BaseIndexImpl<DocumentTraits>;
+extern template class RowIndexImpl<DocumentTraits>;
 
-class DocumentIndex: public BaseDocumentIndex<DocumentTraits> {
+class DocumentIndex: public RowIndexImpl<DocumentTraits> {
 public:
-  typedef BaseDocumentIndex<DocumentTraits> Base;
+  typedef RowIndexImpl<DocumentTraits> Base;
 
   DocumentIndex(size_t initial_buckets, size_t max_size)
   : Base(initial_buckets, max_size) {

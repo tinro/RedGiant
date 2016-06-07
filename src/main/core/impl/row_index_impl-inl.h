@@ -1,47 +1,45 @@
-#ifndef SRC_MAIN_CORE_IMPL_BASE_DOCUMENT_INDEX_INL_H_
-#define SRC_MAIN_CORE_IMPL_BASE_DOCUMENT_INDEX_INL_H_
+#ifndef SRC_MAIN_CORE_IMPL_ROW_INDEX_IMPL_INL_H_
+#define SRC_MAIN_CORE_IMPL_ROW_INDEX_IMPL_INL_H_
 
-#include "core/impl/base_document_index.h"
-#include "core/impl/base_index.h"
-#include "core/impl/base_index-inl.h"
+#include "core/impl/row_index_impl.h"
 
 namespace redgiant {
 
 template <typename DocTraits>
 template <typename Loader>
-BaseDocumentIndex<DocTraits>::BaseDocumentIndex(size_t initial_buckets, size_t max_size, Loader&& loader)
+RowIndexImpl<DocTraits>::RowIndexImpl(size_t initial_buckets, size_t max_size, Loader&& loader)
 : Base(initial_buckets, loader), max_size_(max_size), expire_(loader) {
 
   load_docterm_internal(loader);
 }
 
 template <typename DocTraits>
-size_t BaseDocumentIndex<DocTraits>::get_expire_table_size() const {
-  std::unique_lock<std::mutex> lock_change(changeset_mutex_);
+size_t RowIndexImpl<DocTraits>::get_expire_table_size() const {
+  std::unique_lock<std::mutex> lock_change(change_mutex_);
   return expire_.size();
 }
 
 template <typename DocTraits>
-int BaseDocumentIndex<DocTraits>::update(DocId doc_id, const DocTerms& terms, ExpireTime expire_time) {
+int RowIndexImpl<DocTraits>::update(DocId doc_id, const DocTerms& terms, ExpireTime expire_time) {
   int ret = 0;
-  std::unique_lock<std::mutex> lock_change(changeset_mutex_);
+  std::unique_lock<std::mutex> lock_change(change_mutex_);
   update_expire_internal(doc_id, expire_time);
   update_docterm_map_internal(doc_id, terms);
   for (const TermPair& term_pair: terms) {
-    ret += create_update_internal(doc_id, term_pair.first, term_pair.second, changeset_);
+    ret += create_update_internal(doc_id, term_pair.first, term_pair.second);
   }
   return ret;
 }
 
 template <typename DocTraits>
-int BaseDocumentIndex<DocTraits>::batch_update(const std::vector<DocTuple>& batch) {
+int RowIndexImpl<DocTraits>::batch_update(const std::vector<DocTuple>& batch) {
   int ret = 0;
-  std::unique_lock<std::mutex> lock_change(changeset_mutex_);
+  std::unique_lock<std::mutex> lock_change(change_mutex_);
   for (const DocTuple& tuple: batch) {
     update_expire_internal(std::get<0>(tuple), std::get<2>(tuple));
     update_docterm_map_internal(std::get<0>(tuple), std::get<1>(tuple));
     for (const TermPair& term_pair: std::get<1>(tuple)) {
-      ret += create_update_internal(std::get<0>(tuple), term_pair.first, term_pair.second, changeset_);
+      ret += create_update_internal(std::get<0>(tuple), term_pair.first, term_pair.second);
     }
   }
   return ret;
@@ -49,14 +47,14 @@ int BaseDocumentIndex<DocTraits>::batch_update(const std::vector<DocTuple>& batc
 
 
 template <typename DocTraits>
-int BaseDocumentIndex<DocTraits>::remove(const DocId doc_id) {
-  std::unique_lock<std::mutex> lock_change(changeset_mutex_);
+int RowIndexImpl<DocTraits>::remove(const DocId doc_id) {
+  std::unique_lock<std::mutex> lock_change(change_mutex_);
   return remove_doc_internal(doc_id);
 }
 
 template <typename DocTraits>
-int BaseDocumentIndex<DocTraits>::batch_remove(const std::vector<DocId> doc_ids) {
-  std::unique_lock<std::mutex> lock_change(changeset_mutex_);
+int RowIndexImpl<DocTraits>::batch_remove(const std::vector<DocId> doc_ids) {
+  std::unique_lock<std::mutex> lock_change(change_mutex_);
   int ret = 0;
   for (DocId doc_id : doc_ids) {
     ret += remove_doc_internal(doc_id);
@@ -66,38 +64,41 @@ int BaseDocumentIndex<DocTraits>::batch_remove(const std::vector<DocId> doc_ids)
 
 
 template <typename DocTraits>
-std::pair<int, int> BaseDocumentIndex<DocTraits>::apply(ExpireTime expire_time) {
+std::pair<int, int> RowIndexImpl<DocTraits>::apply(ExpireTime expire_time) {
   int ret_expire = 0;
   int ret = 0;
-  std::unique_lock<std::mutex> lock_change(changeset_mutex_);
-  ExpVec results = expire_.expire_with_limit(expire_time, max_size_);
-  ret_expire += results.size();
-  for (auto& expire_item: results) {
-    remove_doc_internal(expire_item.first);
+  {
+    std::unique_lock<std::mutex> lock_change(change_mutex_);
+    typename ExpTable::ExpireVec results = expire_.expire_with_limit(expire_time, max_size_);
+    ret_expire += results.size();
+    for (auto& expire_item: results) {
+      remove_doc_internal(expire_item.first);
+    }
+    ret += apply_internal();
   }
-  ret += apply_internal(changeset_);
   return std::make_pair(ret, ret_expire);
 }
 
 template <typename DocTraits>
 template <typename Dumper>
-size_t BaseDocumentIndex<DocTraits>::dump(Dumper&& dumper) {
-  std::unique_lock<std::mutex> lock_change(changeset_mutex_);
-
+size_t RowIndexImpl<DocTraits>::dump(Dumper&& dumper) {
   size_t ret = 0;
-  ret += dump_internal(dumper);
-  ret += expire_.dump(dumper);
-  ret += dump_docterm_map_internal(dumper);
+  {
+    std::unique_lock<std::mutex> lock_change(change_mutex_);
+    ret += dump_internal(dumper);
+    ret += expire_.dump(dumper);
+    ret += dump_docterm_map_internal(dumper);
+  }
   return ret;
 }
 
 template <typename DocTraits>
-void BaseDocumentIndex<DocTraits>::update_expire_internal(DocId doc_id, ExpireTime expire_time) {
+void RowIndexImpl<DocTraits>::update_expire_internal(DocId doc_id, ExpireTime expire_time) {
   expire_.update(doc_id, expire_time);
 }
 
 template <typename DocTraits>
-void BaseDocumentIndex<DocTraits>::update_docterm_map_internal(DocId doc_id, const DocTerms& terms) {
+void RowIndexImpl<DocTraits>::update_docterm_map_internal(DocId doc_id, const DocTerms& terms) {
   // doc_term_map_ is guarded by changeset_mutex
   auto iter = doc_term_map_.find(doc_id);
   if (iter == doc_term_map_.end()) {
@@ -110,7 +111,7 @@ void BaseDocumentIndex<DocTraits>::update_docterm_map_internal(DocId doc_id, con
   } else {
     auto& existing_terms = iter->second;
     // remove term-docid pair in postinglist
-    remove_internal(doc_id, existing_terms, changeset_);
+    remove_internal(doc_id, existing_terms);
     existing_terms.clear();
     if (existing_terms.capacity() < terms.size()) {
       existing_terms.reserve(terms.size());
@@ -122,10 +123,10 @@ void BaseDocumentIndex<DocTraits>::update_docterm_map_internal(DocId doc_id, con
 }
 
 template <typename DocTraits>
-int BaseDocumentIndex<DocTraits>::remove_doc_internal(DocId doc_id) {
+int RowIndexImpl<DocTraits>::remove_doc_internal(DocId doc_id) {
   auto iter = doc_term_map_.find(doc_id);
   if (iter != doc_term_map_.end()) {
-    remove_internal(doc_id, iter->second, changeset_);
+    remove_internal(doc_id, iter->second);
     // doc_term_map_ is guarded by changeset_mutex
     doc_term_map_.erase(iter);
     return 1;
@@ -136,7 +137,7 @@ int BaseDocumentIndex<DocTraits>::remove_doc_internal(DocId doc_id) {
 
 template <typename DocTraits>
 template <typename Loader>
-void BaseDocumentIndex<DocTraits>::load_docterm_internal(Loader&& loader) {
+void RowIndexImpl<DocTraits>::load_docterm_internal(Loader&& loader) {
   // load doc_term_map form loader
   size_t size = 0;
   loader.load(size);
@@ -162,7 +163,7 @@ void BaseDocumentIndex<DocTraits>::load_docterm_internal(Loader&& loader) {
 
 template <typename DocTraits>
 template <typename Dumper>
-size_t BaseDocumentIndex<DocTraits>::dump_docterm_map_internal(Dumper&& dumper) const {
+size_t RowIndexImpl<DocTraits>::dump_docterm_map_internal(Dumper&& dumper) const {
   size_t ret = 0;
   ret += dumper.dump(doc_term_map_.size());
   for (const auto& doc_term_pair: doc_term_map_) {
@@ -179,4 +180,4 @@ size_t BaseDocumentIndex<DocTraits>::dump_docterm_map_internal(Dumper&& dumper) 
 
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_CORE_IMPL_BASE_DOCUMENT_INDEX_INL_H_ */
+#endif /* SRC_MAIN_CORE_IMPL_ROW_INDEX_IMPL_INL_H_ */

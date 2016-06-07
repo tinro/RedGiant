@@ -1,5 +1,5 @@
-#ifndef SRC_MAIN_CORE_LOCK_SPIN_LOCK_H_
-#define SRC_MAIN_CORE_LOCK_SPIN_LOCK_H_
+#ifndef SRC_MAIN_UTILS_SPIN_LOCK_H_
+#define SRC_MAIN_UTILS_SPIN_LOCK_H_
 
 #include <atomic>
 
@@ -23,4 +23,4 @@ private:
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_CORE_LOCK_SPIN_LOCK_H_ */
+#endif /* SRC_MAIN_UTILS_SPIN_LOCK_H_ */

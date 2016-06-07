@@ -1,19 +1,27 @@
-#ifndef SRC_MAIN_CORE_IMPL_BASE_EVENT_INDEX_H_
-#define SRC_MAIN_CORE_IMPL_BASE_EVENT_INDEX_H_
+#ifndef SRC_MAIN_CORE_IMPL_POINT_INDEX_IMPL_H_
+#define SRC_MAIN_CORE_IMPL_POINT_INDEX_IMPL_H_
 
 #include <map>
 #include <memory>
 #include <tuple>
 #include <utility>
 #include <vector>
-#include "core/impl/base_index.h"
-#include "core/index/btree_expire_table.h"
+
+#include "core/impl/base_index_impl.h"
+#include "core/impl/base_index_impl-inl.h"
+#include "core/impl/btree_expire_table.h"
 
 namespace redgiant {
+/*
+ * - This class implements the index that are updated by scatter points. Each
+ *   update is a weight associated with a doc_id and a term_id. Each point has
+ *   an expire time. The points are removed separately on expiration.
+ */
 template <typename DocTraits>
-class BaseEventIndex: public BaseIndex<DocTraits> {
+class PointIndexImpl: public BaseIndexImpl<DocTraits> {
 public:
-  typedef BaseIndex<DocTraits> Base;
+  friend class PointIndexImplTest;
+  typedef BaseIndexImpl<DocTraits> Base;
   typedef typename Base::DocId DocId;
   typedef typename Base::TermId TermId;
   typedef typename Base::TermWeight TermWeight;
@@ -22,30 +30,30 @@ public:
   typedef typename Base::TermIdHash TermIdHash;
   typedef std::tuple<DocId, TermId, TermWeight, ExpireTime> EventTuple;
 
-  struct EventIdPair {
+  struct TermDocIdPair {
     TermId term_id;
     DocId doc_id;
 
-    bool operator< (const EventIdPair& rhs) const {
+    bool operator< (const TermDocIdPair& rhs) const {
       return term_id < rhs.term_id || (term_id == rhs.term_id && doc_id < rhs.doc_id);
     }
 
-    bool operator== (const EventIdPair& rhs) const {
+    bool operator== (const TermDocIdPair& rhs) const {
       return term_id == rhs.term_id && doc_id < rhs.doc_id;
     }
   };
 
-  BaseEventIndex(size_t initial_buckets, size_t max_size)
+  PointIndexImpl(size_t initial_buckets, size_t max_size)
   : Base(initial_buckets), max_size_(max_size) {
   }
 
   // create from snapshot
   // may throw exception: std::ios_base::failure
   template <typename Loader>
-  BaseEventIndex(size_t initial_buckets, size_t max_size, Loader&& loader);
+  PointIndexImpl(size_t initial_buckets, size_t max_size, Loader&& loader);
 
   // gcc has bug with =default
-  ~BaseEventIndex() { }
+  ~PointIndexImpl() { }
 
   size_t get_expire_table_size() const;
 
@@ -66,6 +74,8 @@ public:
   size_t dump(Dumper&& dumper);
 
 protected:
+  typedef BTreeExpireTable<TermDocIdPair, ExpireTime> ExpTable;
+
   using Base::create_update_internal;
   using Base::remove_internal;
   using Base::apply_internal;
@@ -74,14 +84,13 @@ protected:
   void update_expire_internal(DocId doc_id, TermId term_id, ExpireTime expire_time);
 
 protected:
-  typedef BTreeExpireTable<EventIdPair, ExpireTime> ExpTable;
-  typedef typename ExpTable::ExpireVec ExpVec;
+  using Base::query_mutex_;
+  using Base::change_mutex_;
 
   size_t max_size_;
+  // protected by change_mutex_
   ExpTable expire_;
-  std::unordered_set<TermId> changeset_;
-  mutable std::mutex changeset_mutex_;
 };
 } /* namespace redgiant */
 
-#endif /* SRC_MAIN_CORE_IMPL_BASE_EVENT_INDEX_H_ */
+#endif /* SRC_MAIN_CORE_IMPL_POINT_INDEX_IMPL_H_ */

@@ -19,14 +19,19 @@ public:
   typedef std::pair<DocId, Weight> PostingPair;
   typedef std::map<DocId, Weight> PostingMap;
 
-  explicit MapPostingList(WeightMerger merger = WeightMerger())
-  : upper_bound_(), merger_(std::move(merger)) {
+  MapPostingList()
+  : upper_bound_(), merger_() {
+    merger_(upper_bound_); // initialize
+  }
+
+  explicit MapPostingList(const WeightMerger& merger)
+  : upper_bound_(), merger_(merger) {
     merger_(upper_bound_); // initialize
   }
 
   template <typename InputWeight>
-  MapPostingList(PostingListReader<DocId, InputWeight>& reader, WeightMerger merger = WeightMerger())
-  : upper_bound_(), merger_(std::move(merger)) {
+  MapPostingList(PostingListReader<DocId, InputWeight>& reader, const WeightMerger& merger = WeightMerger())
+  : upper_bound_(), merger_(merger) {
     merger_(upper_bound_); // initialize
     for (DocId doc_id = reader.next(DocId()); !!doc_id; doc_id = reader.next(doc_id)) {
       Weight weight = reader.read();
@@ -57,9 +62,6 @@ public:
       return 1;
     }
     return 0;
-  }
-
-  virtual void apply() {
   }
 
   virtual std::unique_ptr<Reader> create_reader(std::shared_ptr<PList> shared_list) const;
@@ -133,21 +135,21 @@ public:
   : merger_() {
   }
 
-  MapPostingListFactory(WeightMerger merger)
+  explicit MapPostingListFactory(const WeightMerger& merger)
   : merger_(merger) {
   }
 
   virtual ~MapPostingListFactory() = default;
 
-  virtual std::shared_ptr<PList> create_posting_list() {
+  virtual std::shared_ptr<PList> create_posting_list() const {
     return std::shared_ptr<PList>(new MapPostingList<DocId, Weight, WeightMerger>(merger_));
   }
 
-  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByVal> reader) {
+  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByVal> reader) const {
     return std::shared_ptr<PList>(new MapPostingList<DocId, Weight, WeightMerger>(*reader, merger_));
   }
 
-  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByRef> reader) {
+  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByRef> reader) const {
     return std::shared_ptr<PList>(new MapPostingList<DocId, Weight, WeightMerger>(*reader, merger_));
   }
 
