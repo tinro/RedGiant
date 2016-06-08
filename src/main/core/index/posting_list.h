@@ -37,15 +37,10 @@ public:
   virtual int remove(DocId doc_id) = 0;
 
   /*
-   * -  Apply the pending changes if it delays update and remove calls.
-   * -  Do nothing if the update and remove calls are effected immediately
-   */
-  virtual void apply() = 0;
-
-  /*
    * -  Create a PostingListReader class iterates over the contents of this object.
    * -  The PostingListReader hold pointers to contents of this object with a shared life time with the input
    *    shared_ptr. So the input shared_ptr shall eventually owns this object.
+   * -  It may also return null if the internal status is not ready to create a reader.
    */
   virtual std::unique_ptr<Reader> create_reader(std::shared_ptr<PList> shared_list) const = 0;
 };
@@ -64,17 +59,17 @@ public:
   /*
    * -  Create a posting list and return by shared_ptr.
    */
-  virtual std::shared_ptr<PList> create_posting_list() = 0;
+  virtual std::shared_ptr<PList> create_posting_list() const = 0;
 
   /*
    * -  Create a posting list from the given by-value reader and return by shared_ptr.
    */
-  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByVal> reader) = 0;
+  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByVal> reader) const = 0;
 
   /*
    * -  Create a posting list from the given by-ref reader and return by shared_ptr.
    */
-  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByRef> reader) = 0;
+  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByRef> reader) const = 0;
 };
 } /* namespace redgiant */
 

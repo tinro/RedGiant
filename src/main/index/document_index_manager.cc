@@ -70,7 +70,7 @@ int DocumentIndexManager::update(std::shared_ptr<Document> doc, time_t expire_ti
 
 int DocumentIndexManager::batch_update(const std::vector<std::shared_ptr<Document>>& docs, time_t expire_time) {
   StopWatch watch;
-  std::vector<DocTuple> update_docs;
+  std::vector<RowTuple> update_docs;
   for (const auto& doc: docs) {
     DocTerms weights;
     // loop in all feature vectors
@@ -105,9 +105,7 @@ auto DocumentIndexManager::query(const QueryRequest& request, const DocumentQuer
     return nullptr;
   }
 
-  std::vector<ReaderPair> readers;
-  readers.reserve(query_size);
-  index_.batch_query(query.get_doc_queries(), &readers);
+  std::vector<ReaderPair> readers = index_.batch_query(query.get_doc_queries());
 
   if (request.is_debug()) {
     LOG_INFO(logger, "[query:%s] document query %zu terms, found %zu terms.",

@@ -19,14 +19,19 @@ public:
   typedef std::pair<DocId, Weight> PostingPair;
   typedef btree::btree_map<DocId, Weight> PostingMap;
 
-  explicit BTreePostingList(WeightMerger merger = WeightMerger())
-  : upper_bound_(), merger_(std::move(merger)) {
+  BTreePostingList()
+  : upper_bound_(), merger_() {
+    merger_(upper_bound_); // initialize
+  }
+
+  explicit BTreePostingList(const WeightMerger& merger)
+  : upper_bound_(), merger_(merger) {
     merger_(upper_bound_); // initialize
   }
 
   template <typename InputWeight>
-  BTreePostingList(PostingListReader<DocId, InputWeight>& reader, WeightMerger merger = WeightMerger())
-  : upper_bound_(), merger_(std::move(merger)) {
+  explicit BTreePostingList(PostingListReader<DocId, InputWeight>& reader, const WeightMerger& merger = WeightMerger())
+  : upper_bound_(), merger_(merger) {
     merger_(upper_bound_); // initialize
     for (DocId doc_id = reader.next(DocId()); !!doc_id; doc_id = reader.next(doc_id)) {
       Weight weight = reader.read();
@@ -57,9 +62,6 @@ public:
       return 1;
     }
     return 0;
-  }
-
-  virtual void apply() {
   }
 
   virtual std::unique_ptr<Reader> create_reader(std::shared_ptr<PList> shared_list) const;
@@ -133,21 +135,21 @@ public:
   : merger_() {
   }
 
-  BTreePostingListFactory(WeightMerger merger)
+  explicit BTreePostingListFactory(const WeightMerger& merger)
   : merger_(merger) {
   }
 
   virtual ~BTreePostingListFactory() = default;
 
-  virtual std::shared_ptr<PList> create_posting_list() {
+  virtual std::shared_ptr<PList> create_posting_list() const {
     return std::shared_ptr<PList>(new BTreePostingList<DocId, Weight, WeightMerger>(merger_));
   }
 
-  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByVal> reader) {
+  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByVal> reader) const {
     return std::shared_ptr<PList>(new BTreePostingList<DocId, Weight, WeightMerger>(*reader, merger_));
   }
 
-  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByRef> reader) {
+  virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByRef> reader) const {
     return std::shared_ptr<PList>(new BTreePostingList<DocId, Weight, WeightMerger>(*reader, merger_));
   }
 

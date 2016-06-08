@@ -12,7 +12,6 @@ template <typename DocId, typename Score>
 class WandReader : public PostingListReader<DocId, Score> {
 public:
   friend class WandReaderTest;
-
   typedef PostingListReader<DocId, Score> Reader;
 
   WandReader(std::vector<std::unique_ptr<Reader>>&& input_readers);

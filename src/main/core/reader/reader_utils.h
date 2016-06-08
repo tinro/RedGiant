@@ -10,22 +10,23 @@
 
 namespace redgiant {
 /*
- * Helper function for create_reader, receiving the shared_ptr by lvalue reference. A copy happens here to increase
- * shared owners of the posting list object.
+ * Helper function for create_reader, receiving the shared_ptr by lvalue reference.
+ * A copy happens here to increase shared owners of the posting list object.
  */
 template <typename PList>
 auto create_reader_shared(const std::shared_ptr<PList>& shared_list)
--> std::unique_ptr<typename PList::Reader> {
+-> std::unique_ptr<typename std::remove_cv<PList>::type::Reader> {
   return shared_list->create_reader(shared_list);
 }
 
 /*
- * Helper function for create_reader, receiving the shared_ptr by rvalue reference. A move happens here to avoid
- * increasing owners of the posting list object. Copying shared_ptr makes a few synchronization cost.
+ * Helper function for create_reader, receiving the shared_ptr by rvalue reference.
+ * A move happens here to avoid increasing owners of the posting list object.
+ * Copying shared_ptr makes a few synchronization cost.
  */
 template <typename PList>
 auto create_reader_shared(const std::shared_ptr<PList>&& shared_list)
--> std::unique_ptr<typename PList::Reader> {
+-> std::unique_ptr<typename std::remove_cv<PList>::type::Reader> {
   PList* ptr = shared_list.get();
   return ptr->create_reader(std::move(shared_list));
   // NOTE: shared_list->create_reader(std::move(shared_list)) has UB

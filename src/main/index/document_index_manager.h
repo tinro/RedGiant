@@ -21,7 +21,7 @@ public:
   typedef DocumentIndex::TermWeight TermWeight;
   typedef DocumentIndex::TermPair TermPair;
   typedef DocumentIndex::DocTerms DocTerms;
-  typedef DocumentIndex::DocTuple DocTuple;
+  typedef DocumentIndex::RowTuple RowTuple;
   typedef DocumentIndex::RawReader RawReader;
   typedef DocumentQuery::Score Score;
   // the reader type is identical for both doc index and gmp index
