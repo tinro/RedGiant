@@ -148,14 +148,14 @@ protected:
     // doc (3): (101, 3), (103, 5), (105, 7). expire at 20
     // doc (99): (103, 1), (110, 1), expire at 15/99
     ret = index->batch_update(std::vector<MockPointIndex::PointTuple> {
-      {1, 101, 1, 10},
-      {1, 102, 2, 10},
-      {1, 103, 3, 2},
-      {3, 101, 3, 20},
-      {3, 103, 5, 20},
-      {3, 105, 7, 20},
-      {99, 103, 1, 15},
-      {99, 110, 1, 99}
+      MockPointIndex::PointTuple {1, 101, 1, 10},
+      MockPointIndex::PointTuple {1, 102, 2, 10},
+      MockPointIndex::PointTuple {1, 103, 3, 2},
+      MockPointIndex::PointTuple {3, 101, 3, 20},
+      MockPointIndex::PointTuple {3, 103, 5, 20},
+      MockPointIndex::PointTuple {3, 105, 7, 20},
+      MockPointIndex::PointTuple {99, 103, 1, 15},
+      MockPointIndex::PointTuple {99, 110, 1, 99}
     });
     CPPUNIT_ASSERT_EQUAL(8, ret);
     // changes not applied
@@ -181,10 +181,10 @@ protected:
 
     // update doc 3, (101, 1), expire at 30
     ret = index->batch_update(std::vector<MockPointIndex::PointTuple> {
-      {3, 102, 1, 30},
-      {3, 105, 9, 30},
-      {99, 105, 1, 30},
-      {99, 110, 1, 99}
+      MockPointIndex::PointTuple {3, 102, 1, 30},
+      MockPointIndex::PointTuple {3, 105, 9, 30},
+      MockPointIndex::PointTuple {99, 105, 1, 30},
+      MockPointIndex::PointTuple {99, 110, 1, 99}
     });
     CPPUNIT_ASSERT_EQUAL(4, ret);
 
