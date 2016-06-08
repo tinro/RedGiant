@@ -145,7 +145,7 @@ auto BaseIndexImpl<DocTraits>::query_internal(TermId term_id)
 }
 
 template <typename DocTraits>
-auto BaseIndexImpl<DocTraits>::change_internal(TermId term_id)
+auto BaseIndexImpl<DocTraits>::change_internal(TermId term_id, bool create)
 -> std::shared_ptr<FreezablePList> {
   // check if this term is already changed
   auto iter_changed = changed_index_.find(term_id);
@@ -163,34 +163,45 @@ auto BaseIndexImpl<DocTraits>::change_internal(TermId term_id)
           std::make_shared<FreezablePList>(*factory_, create_reader_shared(std::move(plist)));
       changed_index_.insert(iter_changed, std::make_pair(term_id, fplist));
       return fplist;
-    } else {
+    } else if (create) {
       // create an empty posting list
       std::shared_ptr<FreezablePList> fplist =
           std::make_shared<FreezablePList>(*factory_);
       changed_index_.insert(iter_changed, std::make_pair(term_id, fplist));
       return fplist;
+    } else {
+      // do not allowed to create
+      return nullptr;
     }
   }
 }
 
 template <typename DocTraits>
 int BaseIndexImpl<DocTraits>::create_update_internal(DocId doc_id, TermId term_id, const TermWeight& weights) {
-  std::shared_ptr<FreezablePList> fplist = change_internal(term_id);
-  return fplist->update(doc_id, weights);
+  std::shared_ptr<FreezablePList> fplist = change_internal(term_id, true);
+  if (fplist) {
+    return fplist->update(doc_id, weights);
+  }
+  return 0;
 }
 
 template <typename DocTraits>
 int BaseIndexImpl<DocTraits>::remove_internal(DocId doc_id, TermId term_id) {
-  std::shared_ptr<FreezablePList> fplist = change_internal(term_id);
-  return fplist->remove(doc_id);
+  std::shared_ptr<FreezablePList> fplist = change_internal(term_id, false);
+  if (fplist) {
+    return fplist->remove(doc_id);
+  }
+  return 0;
 }
 
 template <typename DocTraits>
 int BaseIndexImpl<DocTraits>::remove_internal(DocId doc_id, std::vector<TermId> terms) {
   int ret = 0;
   for (const auto& term_id: terms) {
-    std::shared_ptr<FreezablePList> fplist = change_internal(term_id);
-    ret += fplist->remove(doc_id);
+    std::shared_ptr<FreezablePList> fplist = change_internal(term_id, false);
+    if (fplist) {
+      ret += fplist->remove(doc_id);
+    }
   }
   return ret;
 }

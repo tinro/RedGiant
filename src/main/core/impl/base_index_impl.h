@@ -81,7 +81,7 @@ protected:
 
   std::shared_ptr<PList> query_internal(TermId term_id);
 
-  std::shared_ptr<FreezablePList> change_internal(TermId term_id);
+  std::shared_ptr<FreezablePList> change_internal(TermId term_id, bool create);
 
   int create_update_internal(DocId doc_id, TermId term_id, const TermWeight& weights);
 

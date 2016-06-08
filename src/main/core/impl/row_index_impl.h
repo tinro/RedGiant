@@ -34,7 +34,7 @@ public:
   typedef typename Base::TermIdHash TermIdHash;
   typedef std::pair<TermId, TermWeight> TermPair;
   typedef std::vector<TermPair> DocTerms;
-  typedef std::tuple<DocId, DocTerms, ExpireTime> DocTuple;
+  typedef std::tuple<DocId, DocTerms, ExpireTime> RowTuple;
 
   RowIndexImpl(size_t initial_buckets, size_t max_size)
   : Base(initial_buckets), max_size_(max_size) {
@@ -52,7 +52,7 @@ public:
 
   int update(DocId doc_id, const DocTerms& terms, ExpireTime expire_time);
 
-  int batch_update(const std::vector<DocTuple>& batch);
+  int batch_update(const std::vector<RowTuple>& batch);
 
   int remove(const DocId doc_id);
 

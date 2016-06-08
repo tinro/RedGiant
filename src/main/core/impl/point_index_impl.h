@@ -28,7 +28,7 @@ public:
   typedef typename Base::ExpireTime ExpireTime;
   typedef typename Base::DocIdHash DocIdHash;
   typedef typename Base::TermIdHash TermIdHash;
-  typedef std::tuple<DocId, TermId, TermWeight, ExpireTime> EventTuple;
+  typedef std::tuple<DocId, TermId, TermWeight, ExpireTime> PointTuple;
 
   struct TermDocIdPair {
     TermId term_id;
@@ -57,9 +57,9 @@ public:
 
   size_t get_expire_table_size() const;
 
-  int update(DocId doc_id, TermId term_id, const TermWeight& weights, ExpireTime expire_time);
+  int update(DocId doc_id, TermId term_id, const TermWeight& weight, ExpireTime expire_time);
 
-  int batch_update(const std::vector<EventTuple>& batch);
+  int batch_update(const std::vector<PointTuple>& batch);
 
   /*
    * Remove expired items by the input expire_time.

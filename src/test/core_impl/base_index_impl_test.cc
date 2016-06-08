@@ -21,8 +21,8 @@ typedef BaseIndexImpl<MockTraits> MockBaseIndex;
 
 class BaseIndexImplTest: public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(BaseIndexImplTest);
-  CPPUNIT_TEST(test_update);
-  CPPUNIT_TEST(test_remove);
+  CPPUNIT_TEST(test_update_internal);
+  CPPUNIT_TEST(test_remove_internal);
   CPPUNIT_TEST(test_query);
   CPPUNIT_TEST(test_batch_query);
   CPPUNIT_TEST_SUITE_END();
@@ -32,7 +32,7 @@ public:
   virtual ~BaseIndexImplTest() = default;
 
 protected:
-  void test_update() {
+  void test_update_internal() {
     auto index = create_case_empty();
     CPPUNIT_ASSERT_EQUAL(0, (int)index->index_.size());
 
@@ -44,13 +44,11 @@ protected:
     CPPUNIT_ASSERT_EQUAL(1, ret);
     ret = index->create_update_internal(1, 103, 3);
     CPPUNIT_ASSERT_EQUAL(1, ret);
-
     // changes not applied
     CPPUNIT_ASSERT_EQUAL(0, (int)index->get_term_count());
 
     // apply changes
     index->apply_internal();
-
     // changes applied
     CPPUNIT_ASSERT_EQUAL(2, (int)index->get_term_count());
 
@@ -72,7 +70,7 @@ protected:
     CPPUNIT_ASSERT_EQUAL(1, results[0].second);
   }
 
-  void test_remove() {
+  void test_remove_internal() {
     auto index = create_case_1();
     CPPUNIT_ASSERT_EQUAL(5, (int)index->index_.size());
 
@@ -86,13 +84,11 @@ protected:
     // batch remove
     ret = index->remove_internal(3, {101, 103, 110});
     CPPUNIT_ASSERT_EQUAL(2, ret);
-
     // changes not applied
     CPPUNIT_ASSERT_EQUAL(5, (int)index->get_term_count());
 
     // apply changes. term 101 get removed
     index->apply_internal();
-
     // changes applied
     CPPUNIT_ASSERT_EQUAL(4, (int)index->get_term_count());
 

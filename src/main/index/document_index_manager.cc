@@ -70,7 +70,7 @@ int DocumentIndexManager::update(std::shared_ptr<Document> doc, time_t expire_ti
 
 int DocumentIndexManager::batch_update(const std::vector<std::shared_ptr<Document>>& docs, time_t expire_time) {
   StopWatch watch;
-  std::vector<DocTuple> update_docs;
+  std::vector<RowTuple> update_docs;
   for (const auto& doc: docs) {
     DocTerms weights;
     // loop in all feature vectors

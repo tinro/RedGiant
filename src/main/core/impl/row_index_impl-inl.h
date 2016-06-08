@@ -32,10 +32,10 @@ int RowIndexImpl<DocTraits>::update(DocId doc_id, const DocTerms& terms, ExpireT
 }
 
 template <typename DocTraits>
-int RowIndexImpl<DocTraits>::batch_update(const std::vector<DocTuple>& batch) {
+int RowIndexImpl<DocTraits>::batch_update(const std::vector<RowTuple>& batch) {
   int ret = 0;
   std::unique_lock<std::mutex> lock_change(change_mutex_);
-  for (const DocTuple& tuple: batch) {
+  for (const RowTuple& tuple: batch) {
     update_expire_internal(std::get<0>(tuple), std::get<2>(tuple));
     update_docterm_map_internal(std::get<0>(tuple), std::get<1>(tuple));
     for (const TermPair& term_pair: std::get<1>(tuple)) {
@@ -104,7 +104,7 @@ void RowIndexImpl<DocTraits>::update_docterm_map_internal(DocId doc_id, const Do
   if (iter == doc_term_map_.end()) {
     std::vector<TermId> new_terms;
     new_terms.reserve(terms.size());
-    for (TermPair term_pair : terms) {
+    for (const TermPair& term_pair : terms) {
       new_terms.push_back(term_pair.first);
     }
     doc_term_map_[doc_id] = std::move(new_terms);
@@ -113,10 +113,8 @@ void RowIndexImpl<DocTraits>::update_docterm_map_internal(DocId doc_id, const Do
     // remove term-docid pair in postinglist
     remove_internal(doc_id, existing_terms);
     existing_terms.clear();
-    if (existing_terms.capacity() < terms.size()) {
-      existing_terms.reserve(terms.size());
-    }
-    for (TermPair term_pair : terms) {
+    existing_terms.reserve(terms.size());
+    for (const TermPair& term_pair : terms) {
       existing_terms.push_back(term_pair.first);
     }
   }
@@ -126,14 +124,13 @@ template <typename DocTraits>
 int RowIndexImpl<DocTraits>::remove_doc_internal(DocId doc_id) {
   auto iter = doc_term_map_.find(doc_id);
   if (iter != doc_term_map_.end()) {
-    remove_internal(doc_id, iter->second);
+    int ret = remove_internal(doc_id, iter->second);
     // doc_term_map_ is guarded by changeset_mutex
     doc_term_map_.erase(iter);
-    return 1;
+    return ret;
   }
   return 0;
 }
-
 
 template <typename DocTraits>
 template <typename Loader>

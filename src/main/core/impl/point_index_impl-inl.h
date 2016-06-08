@@ -18,17 +18,17 @@ size_t PointIndexImpl<DocTraits>::get_expire_table_size() const {
 }
 
 template <typename DocTraits>
-int PointIndexImpl<DocTraits>::update(DocId doc_id, TermId term_id, const TermWeight& weights, ExpireTime expire_time) {
+int PointIndexImpl<DocTraits>::update(DocId doc_id, TermId term_id, const TermWeight& weight, ExpireTime expire_time) {
   std::unique_lock<std::mutex> lock_change(change_mutex_);
   update_expire_internal(doc_id, term_id, expire_time);
-  return create_update_internal(doc_id, term_id, weights);
+  return create_update_internal(doc_id, term_id, weight);
 }
 
 template <typename DocTraits>
-int PointIndexImpl<DocTraits>::batch_update(const std::vector<EventTuple>& batch) {
+int PointIndexImpl<DocTraits>::batch_update(const std::vector<PointTuple>& batch) {
   int ret = 0;
   std::unique_lock<std::mutex> lock_change(change_mutex_);
-  for (const EventTuple& tuple: batch) {
+  for (const PointTuple& tuple: batch) {
     update_expire_internal(std::get<0>(tuple), std::get<1>(tuple), std::get<3>(tuple));
     ret += create_update_internal(std::get<0>(tuple), std::get<1>(tuple), std::get<2>(tuple));
   }
@@ -40,7 +40,7 @@ std::pair<int, int> PointIndexImpl<DocTraits>::apply(ExpireTime expire_time) {
   int ret_expire = 0;
   int ret = 0;
   std::unique_lock<std::mutex> lock_change(change_mutex_);
-  ExpVec results = expire_.expire_with_limit(expire_time, max_size_);
+  typename ExpTable::ExpireVec results = expire_.expire_with_limit(expire_time, max_size_);
   ret_expire += results.size();
   for (auto& expire_item: results) {
     remove_internal(expire_item.first.doc_id, expire_item.first.term_id);
