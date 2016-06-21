@@ -1,25 +1,74 @@
-sudo: required
-dist: trusty
-
 language: cpp
 
-compiler:
- - clang
- - gcc
-
-env:
-  matrix:
-    - CONF=release ARCH=x86_64
+matrix:
+  include:
+    - compiler: gcc-4.9
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+            - libevent-dev
+            - liblog4cxx10-dev
+            - libcppunit-dev
+      env:
+        - _CXX=g++-4.9
+        - _CC=gcc-4.9
+    - compiler: gcc-5
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+            - libevent-dev
+            - liblog4cxx10-dev
+            - libcppunit-dev
+      env:
+        - _CXX=g++-5
+        - _CC=gcc-5
+#    - compiler: clang-3.6
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#            - llvm-toolchain-precise-3.6
+#          packages:
+#            - clang-3.6
+#            - libevent-dev
+#            - liblog4cxx10-dev
+#            - libcppunit-dev
+#      env:
+#        - _CXX=clang++-3.6
+#        - _CC=clang-3.6
+#    - compiler: clang-3.7
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#            - llvm-toolchain-precise-3.7
+#          packages:
+#            - clang-3.7
+#            - libevent-dev
+#            - liblog4cxx10-dev
+#            - libcppunit-dev
+#      env:
+#        - _CXX=clang++-3.7
+#        - _CC=clang-3.7
 
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y libevent-dev liblog4cxx10-dev libcppunit-dev
 
 install:
 
 before_script:
 
 script:
+  - export CXX=$_CXX
+  - export CC=$_CC
   - ./make.sh
 
 after_success:
+
+notifications:
+  email: false

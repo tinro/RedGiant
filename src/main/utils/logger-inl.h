@@ -10,8 +10,6 @@
 #include <log4cxx/propertyconfigurator.h>
 #include <log4cxx/xml/domconfigurator.h>
 
-using namespace log4cxx;
-
 namespace redgiant {
 
 inline int init_logger(const char* conf_path) {

@@ -14,7 +14,7 @@ AC_PROG_CC
 AC_PROG_RANLIB
 
 CFLAGS+=" -std=c11 -Werror"
-CXXFLAGS+=" -std=c++11 -Werror"
+CXXFLAGS+=" -std=c++14 -Werror"
 
 # Checks for libraries.
 AC_CHECK_LIB(['event'], ['event_init'])
