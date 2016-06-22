@@ -2,13 +2,12 @@
 #define SRC_MAIN_DATA_FEATURE_SPACE_MANAGER_H_
 
 #include <memory>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 #include <utility>
 
 #include "data/feature_space.h"
-#include "third_party/lock/shared_lock.h"
-#include "third_party/lock/shared_mutex.h"
 #include "third_party/rapidjson/document.h"
 
 namespace redgiant {
@@ -23,14 +22,14 @@ public:
 
   std::shared_ptr<FeatureSpace> get_space(const std::string& space_name) const {
     // read spaces
-    shared_lock<shared_mutex> lock(mutex_spaces_);
+    std::shared_lock<std::shared_timed_mutex> lock(mutex_spaces_);
     return get_space_internal(space_name);
   }
 
   void set_space(std::shared_ptr<FeatureSpace> space) {
     if (space) {
       // write spaces
-      std::unique_lock<shared_mutex> lock(mutex_spaces_);
+      std::unique_lock<std::shared_timed_mutex> lock(mutex_spaces_);
       set_space_internal(std::move(space));
     }
   }
@@ -40,7 +39,7 @@ public:
     std::shared_ptr<FeatureSpace> space =
         std::make_shared<FeatureSpace>(space_name, space_id, type);
     // write spaces
-    std::unique_lock<shared_mutex> lock(mutex_spaces_);
+    std::unique_lock<std::shared_timed_mutex> lock(mutex_spaces_);
     set_space_internal(space);
     return space;
   }
@@ -64,7 +63,7 @@ private:
 
 private:
   std::unordered_map<std::string, std::shared_ptr<FeatureSpace>> spaces_;
-  mutable shared_mutex mutex_spaces_;
+  mutable std::shared_timed_mutex mutex_spaces_;
 };
 
 } /* namespace redgiant */

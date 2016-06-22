@@ -18,7 +18,7 @@ int FeatureSpaceManager::initialize(const rapidjson::Value& root) {
   }
 
   // lock write during the whole parsing stage. it will only happen once on startup.
-  std::unique_lock<shared_mutex> lock(mutex_spaces_);
+  std::unique_lock<std::shared_timed_mutex> lock(mutex_spaces_);
   for (auto it = root.Begin(); it != root.End(); ++it) {
     int id;
     std::string name;

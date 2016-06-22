@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <utility>
 #include <unordered_map>
 #include <vector>
@@ -11,7 +12,6 @@
 #include "core/index/posting_list.h"
 #include "core/query/posting_list_query.h"
 #include "core/reader/posting_list_reader.h"
-#include "third_party/lock/shared_mutex.h"
 
 namespace redgiant {
 /*
@@ -98,7 +98,7 @@ protected:
   size_t dump_internal(Dumper&& dumper);
 
 protected:
-  mutable shared_mutex query_mutex_;
+  mutable std::shared_timed_mutex query_mutex_;
   mutable std::mutex change_mutex_;
   // protected by query_mutex_
   std::unordered_map<TermId, std::shared_ptr<PList>> index_;

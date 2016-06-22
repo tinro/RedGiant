@@ -6,7 +6,6 @@
 #include "core/index/btree_posting_list.h"
 #include "core/reader/reader_utils.h"
 #include "core/snapshot/snapshot_reader.h"
-#include "third_party/lock/shared_lock.h"
 
 namespace redgiant {
 
@@ -50,26 +49,26 @@ BaseIndexImpl<DocTraits>::BaseIndexImpl(size_t initial_buckets, Loader&& loader)
 
 template <typename DocTraits>
 size_t BaseIndexImpl<DocTraits>::get_term_count() const {
-  shared_lock<shared_mutex> lock_query(query_mutex_);
+  std::shared_lock<std::shared_timed_mutex> lock_query(query_mutex_);
   return index_.size();
 }
 
 template <typename DocTraits>
 size_t BaseIndexImpl<DocTraits>::get_bucket_count() const {
-  shared_lock<shared_mutex> lock_query(query_mutex_);
+  std::shared_lock<std::shared_timed_mutex> lock_query(query_mutex_);
   return index_.bucket_count();
 }
 
 template <typename DocTraits>
 float BaseIndexImpl<DocTraits>::get_load_factor() const {
-  shared_lock<shared_mutex> lock_query(query_mutex_);
+  std::shared_lock<std::shared_timed_mutex> lock_query(query_mutex_);
   return index_.load_factor();
 }
 
 template <typename DocTraits>
 auto BaseIndexImpl<DocTraits>::peek(TermId term_id) const
 -> std::unique_ptr<RawReader> {
-  shared_lock<shared_mutex> lock_query(query_mutex_);
+  std::shared_lock<std::shared_timed_mutex> lock_query(query_mutex_);
   auto iter = index_.find(term_id);
   // allow stored posting list to be empty, means no data stored
   if (iter != index_.end()) {
@@ -85,7 +84,7 @@ template <typename DocTraits>
 template <typename Score>
 auto BaseIndexImpl<DocTraits>::query(TermId term_id, const Query<Score>& query) const
 -> std::unique_ptr<Reader<Score>> {
-  shared_lock<shared_mutex> lock_query(query_mutex_);
+  std::shared_lock<std::shared_timed_mutex> lock_query(query_mutex_);
   auto iter = index_.find(term_id);
   // allow stored posting list to be empty, means no data stored
   if (iter != index_.end()) {
@@ -111,7 +110,7 @@ auto BaseIndexImpl<DocTraits>::batch_query(const std::vector<QueryPair<Score>>& 
 
   // first, find all terms and copy the pointers to them out
   {
-    shared_lock<shared_mutex> lock_query(query_mutex_);
+    std::shared_lock<std::shared_timed_mutex> lock_query(query_mutex_);
     for (const auto& query: queries) {
       auto iter = index_.find(query.first);
       if (iter != index_.end()) {
@@ -154,7 +153,7 @@ auto BaseIndexImpl<DocTraits>::change_internal(TermId term_id, bool create)
     return iter_changed->second;
   } else {
     // not changed yet. find in main index
-    shared_lock<shared_mutex> lock_query(query_mutex_);
+    std::shared_lock<std::shared_timed_mutex> lock_query(query_mutex_);
     std::shared_ptr<PList> plist = query_internal(term_id);
     lock_query.unlock();
     if (plist) {
@@ -211,7 +210,7 @@ template <typename DocTraits>
 int BaseIndexImpl<DocTraits>::apply_internal() {
   int ret = 0;
   if (!changed_index_.empty()) {
-    std::unique_lock<shared_mutex> wlock_query(query_mutex_);
+    std::unique_lock<std::shared_timed_mutex> wlock_query(query_mutex_);
     for (const auto& changed_pair: changed_index_) {
       auto iter = index_.find(changed_pair.first);
       if (iter != index_.end()) {
@@ -240,7 +239,7 @@ int BaseIndexImpl<DocTraits>::apply_internal() {
 template <typename DocTraits>
 template <typename Dumper>
 size_t BaseIndexImpl<DocTraits>::dump_internal(Dumper&& dumper) {
-  shared_lock<shared_mutex> lock_query(query_mutex_);
+  std::shared_lock<std::shared_timed_mutex> lock_query(query_mutex_);
   size_t ret = 0;
   ret += dumper.dump(index_.size());
   for (const auto& term_pair: index_) {
