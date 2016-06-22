@@ -33,7 +33,7 @@ public:
   ~QueryRequest() = default;
 
   std::unique_ptr<QueryResult> create_result() const {
-    return std::unique_ptr<QueryResult>(new QueryResult(request_id_, watch_));
+    return std::make_unique<QueryResult>(request_id_, watch_);
   }
 
   const std::string& get_request_id() const {

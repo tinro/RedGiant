@@ -110,7 +110,7 @@ auto read_single(PostingListReader<DocId, Weight>& reader, DocId key)
     --read_key;
     read_key = reader.next(read_key);
     if (read_key == key) {
-      return std::unique_ptr<WeightByVal>(new WeightByVal(reader.read()));
+      return std::make_unique<WeightByVal>(reader.read());
     }
   }
   return nullptr;

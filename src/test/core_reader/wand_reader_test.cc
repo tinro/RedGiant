@@ -235,7 +235,7 @@ private:
     readers.emplace_back(new MockReader<int, int>({ // upper bound 10
       {5, 10}, {9, 10}
     }));
-    return std::unique_ptr<WandReader<int, int>>(new WandReader<int, int>(std::move(readers)));
+    return std::make_unique<WandReader<int, int>>(std::move(readers));
   }
 };
 

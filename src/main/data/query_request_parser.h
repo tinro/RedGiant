@@ -55,7 +55,7 @@ public:
   virtual ~QueryRequestParserFactory() = default;
 
   std::unique_ptr<Parser<QueryRequest>> create_parser() {
-    return std::unique_ptr<Parser<QueryRequest>>(new QueryRequestParser(feature_spaces_));
+    return std::make_unique<QueryRequestParser>(feature_spaces_);
   }
 
 private:

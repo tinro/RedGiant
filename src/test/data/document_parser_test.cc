@@ -146,7 +146,7 @@ private:
   };
 
   std::unique_ptr<DocumentParser> create_parser(std::shared_ptr<FeatureSpaceManager> feature_spaces) {
-    return std::unique_ptr<DocumentParser>(new DocumentParser(std::move(feature_spaces)));
+    return std::make_unique<DocumentParser>(std::move(feature_spaces));
   };
 };
 

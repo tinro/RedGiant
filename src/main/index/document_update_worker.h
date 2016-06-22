@@ -34,7 +34,7 @@ public:
   virtual ~FeedDocumentWorkerFactory() = default;
 
   virtual std::unique_ptr<DocumentUpdateWorker> create() {
-    return std::unique_ptr<DocumentUpdateWorker>(new DocumentUpdateWorker(index_));
+    return std::make_unique<DocumentUpdateWorker>(index_);
   }
 
 private:

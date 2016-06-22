@@ -35,7 +35,7 @@ public:
   virtual ~SnapshotHandlerFactory() = default;
 
   virtual std::unique_ptr<RequestHandler> create_handler() {
-    return std::unique_ptr<RequestHandler>(new SnapshotHandler(index_view_, snapshot_prefix_));
+    return std::make_unique<SnapshotHandler>(index_view_, snapshot_prefix_);
   }
 
 private:

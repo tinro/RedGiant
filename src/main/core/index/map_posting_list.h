@@ -119,8 +119,8 @@ auto MapPostingList<DocId, Weight, WeightMerger>::create_reader(std::shared_ptr<
 -> std::unique_ptr<Reader> {
   // the parameters of reader constructor are pointers to the internal vector and upper bound weight,
   // these pointers shares the life time with posting_list so that they are always valid as long as the reader valid.
-  return std::unique_ptr<Reader>(new MapPostingListReader<DocId, Weight>(posting_, upper_bound_,
-      std::move(shared_list)));
+  return std::make_unique<MapPostingListReader<DocId, Weight>>(posting_, upper_bound_,
+      std::move(shared_list));
 }
 
 template <typename DocId, typename Weight, typename WeightMerger = MaxWeight<Weight>>
@@ -142,15 +142,15 @@ public:
   virtual ~MapPostingListFactory() = default;
 
   virtual std::shared_ptr<PList> create_posting_list() const {
-    return std::shared_ptr<PList>(new MapPostingList<DocId, Weight, WeightMerger>(merger_));
+    return std::make_shared<MapPostingList<DocId, Weight, WeightMerger>>(merger_);
   }
 
   virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByVal> reader) const {
-    return std::shared_ptr<PList>(new MapPostingList<DocId, Weight, WeightMerger>(*reader, merger_));
+    return std::make_shared<MapPostingList<DocId, Weight, WeightMerger>>(*reader, merger_);
   }
 
   virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByRef> reader) const {
-    return std::shared_ptr<PList>(new MapPostingList<DocId, Weight, WeightMerger>(*reader, merger_));
+    return std::make_shared<MapPostingList<DocId, Weight, WeightMerger>>(*reader, merger_);
   }
 
 private:

@@ -37,7 +37,7 @@ public:
   virtual ~MockHandlerFactory() = default;
 
   virtual std::unique_ptr<RequestHandler> create_handler() {
-    return std::unique_ptr<RequestHandler>(new MockHandler(message_));
+    return std::make_unique<MockHandler>(message_);
   }
 };
 } /* namespace redgiant */

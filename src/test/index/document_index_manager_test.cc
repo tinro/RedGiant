@@ -117,7 +117,7 @@ private:
   }
 
   std::unique_ptr<DocumentIndexManager> create_index() {
-    auto index = std::unique_ptr<DocumentIndexManager>(new DocumentIndexManager(1000, 1000));
+    auto index = std::make_unique<DocumentIndexManager>(1000, 1000);
     // create document vectors
     index->update(create_document(
         "00000000-0001-0000-0000-000000000000",

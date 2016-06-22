@@ -73,7 +73,7 @@ protected:
 
 private:
   std::unique_ptr<ModelManagerFactory> create_model_manager_factory() {
-    return std::unique_ptr<ModelManagerFactory>(new ModelManagerFactory());
+    return std::make_unique<ModelManagerFactory>();
   }
 
   std::unique_ptr<RankingModel> create_model_manager() {
@@ -98,13 +98,11 @@ private:
   }
 
   std::unique_ptr<QueryRequest> mock_request_1() {
-    std::unique_ptr<QueryRequest> req(new QueryRequest("0001", 10, "default_a", StopWatch(), true));
-    return req;
+    return std::make_unique<QueryRequest>("0001", 10, "default_a", StopWatch(), true);
   }
 
   std::unique_ptr<QueryRequest> mock_request_2() {
-    std::unique_ptr<QueryRequest> req(new QueryRequest("0002", 10, "", StopWatch(), true));
-    return req;
+    return std::make_unique<QueryRequest>("0002", 10, "", StopWatch(), true);
   }
 };
 

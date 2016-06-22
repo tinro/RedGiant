@@ -145,7 +145,7 @@ private:
   }
 
   std::unique_ptr<DocumentIndexManager> create_index(FeatureSpaceManager& feature_spaces) {
-    auto index = std::unique_ptr<DocumentIndexManager>(new DocumentIndexManager(1000, 1000));
+    auto index = std::make_unique<DocumentIndexManager>(1000, 1000);
     auto space_cat = feature_spaces.get_space("category");
     auto space_ent = feature_spaces.get_space("entity");
     // create document vectors

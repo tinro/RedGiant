@@ -31,7 +31,7 @@ public:
   virtual ~SimpleQueryExecutorFactory() = default;
 
   virtual std::unique_ptr<QueryExecutor> create_executor() {
-    return std::unique_ptr<QueryExecutor>(new SimpleQueryExecutor(index_, model_));
+    return std::make_unique<SimpleQueryExecutor>(index_, model_);
   }
 
 private:

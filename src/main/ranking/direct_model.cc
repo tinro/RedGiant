@@ -28,7 +28,7 @@ std::unique_ptr<IntermQuery> DirectModel::process(const QueryRequest& request) c
       }
     }
   }
-  return std::unique_ptr<IntermQuery>(new IntermQuery(std::move(terms)));
+  return std::make_unique<IntermQuery>(std::move(terms));
 }
 
 std::unique_ptr<RankingModel> DirectModelFactory::create_model(const rapidjson::Value& config) const {
@@ -38,7 +38,7 @@ std::unique_ptr<RankingModel> DirectModelFactory::create_model(const rapidjson::
     LOG_DEBUG(logger, "creating model %s in type %s", name.c_str(), type.c_str());
   }
 
-  return std::unique_ptr<RankingModel>(new DirectModel());
+  return std::make_unique<DirectModel>();
 }
 
 

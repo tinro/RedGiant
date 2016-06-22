@@ -191,11 +191,11 @@ public:
 
 protected:
   virtual std::unique_ptr<PostingListFactory<int, int>> create_factory() {
-    return std::unique_ptr<PostingListFactory<int, int>>(new BTreePostingListFactory<int, int>());
+    return std::make_unique<BTreePostingListFactory<int, int>>();
   }
 
   virtual std::unique_ptr<PostingListFactory<int, MockWeight>> create_factory_weight() {
-    return std::unique_ptr<PostingListFactory<int, MockWeight>>(new BTreePostingListFactory<int, MockWeight>());
+    return std::make_unique<BTreePostingListFactory<int, MockWeight>>();
   }
 };
 
@@ -218,11 +218,11 @@ public:
 
 protected:
   virtual std::unique_ptr<PostingListFactory<int, int>> create_factory() {
-    return std::unique_ptr<PostingListFactory<int, int>>(new MapPostingListFactory<int, int>());
+    return std::make_unique<MapPostingListFactory<int, int>>();
   }
 
   virtual std::unique_ptr<PostingListFactory<int, MockWeight>> create_factory_weight() {
-    return std::unique_ptr<PostingListFactory<int, MockWeight>>(new MapPostingListFactory<int, MockWeight>());
+    return std::make_unique<MapPostingListFactory<int, MockWeight>>();
   }
 };
 

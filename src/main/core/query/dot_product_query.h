@@ -30,7 +30,7 @@ public:
   virtual ~DotProductQuery() = default;
 
   virtual std::unique_ptr<Reader> query(std::unique_ptr<InputReader> reader) const {
-    return std::unique_ptr<Reader>(new ScoreReader(std::move(reader), query_, combiner_));
+    return std::make_unique<ScoreReader>(std::move(reader), query_, combiner_);
   }
 
   const QueryWeight & get_query_weight() const {

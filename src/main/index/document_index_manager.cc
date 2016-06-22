@@ -127,7 +127,7 @@ auto DocumentIndexManager::query(const QueryRequest& request, const DocumentQuer
   for (auto& reader: readers) {
     simple_readers.push_back(std::move(reader.second));
   }
-  return std::unique_ptr<Reader>(new WandReader<DocId, Score>(std::move(simple_readers)));
+  return std::make_unique<WandReader<DocId, Score>>(std::move(simple_readers));
 }
 
 int DocumentIndexManager::dump(const std::string& snapshot_prefix) {

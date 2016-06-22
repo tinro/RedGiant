@@ -130,7 +130,7 @@ private:
   }
 
   virtual std::unique_ptr<PostingListFactory<int, int>> create_factory() {
-    return std::unique_ptr<PostingListFactory<int, int>>(new BTreePostingListFactory<int, int>());
+    return std::make_unique<BTreePostingListFactory<int, int>>();
   }
 };
 

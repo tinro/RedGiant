@@ -55,7 +55,7 @@ public:
   virtual ~DocumentParserFactory() = default;
 
   std::unique_ptr<Parser<Document>> create_parser() {
-    return std::unique_ptr<Parser<Document>>(new DocumentParser(feature_spaces_));
+    return std::make_unique<DocumentParser>(feature_spaces_);
   }
 
 private:

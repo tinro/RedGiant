@@ -14,7 +14,7 @@ public:
   virtual ~MockModel() = default;
 
   virtual std::unique_ptr<IntermQuery> process(const QueryRequest& request) const {
-    return std::unique_ptr<IntermQuery>(new IntermQuery({}));
+    return std::make_unique<IntermQuery>({});
   }
 };
 
@@ -29,7 +29,7 @@ public:
 
   virtual std::unique_ptr<RankingModel> create_model(const rapidjson::Value& config) const {
     (void)config;
-    return std::unique_ptr<RankingModel>(new MockModel());
+    return std::make_unique<MockModel>();
   }
 
 private:

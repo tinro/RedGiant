@@ -71,7 +71,7 @@ std::unique_ptr<IntermQuery> FeatureMappingModel::process(const QueryRequest& re
       } // for feature_pair
     } // for iter in range
   } // for fv
-  return std::unique_ptr<IntermQuery>(new IntermQuery({terms.begin(), terms.end()}));
+  return std::make_unique<IntermQuery>({terms.begin(), terms.end()});
 }
 
 std::unique_ptr<RankingModel> FeatureMappingModelFactory::create_model(const rapidjson::Value& config) const {

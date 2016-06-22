@@ -22,7 +22,7 @@ public:
 
 protected:
   void test_create_feature_space() {
-    auto feature_spaces = std::unique_ptr<FeatureSpaceManager>(new FeatureSpaceManager());
+    auto feature_spaces = std::make_unique<FeatureSpaceManager>();
     auto space_a = feature_spaces->create_space("A", 1, FeatureSpace::SpaceType::kInteger);
     auto space_b = feature_spaces->create_space("BB", 2, FeatureSpace::SpaceType::kString);
     auto space_c = feature_spaces->create_space("CCC", 3, FeatureSpace::SpaceType::kInteger);

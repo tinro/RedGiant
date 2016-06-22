@@ -19,7 +19,7 @@ public:
   virtual ~TestHandlerFactory() = default;
 
   virtual std::unique_ptr<RequestHandler> create_handler() {
-    return std::unique_ptr<RequestHandler>(new TestHandler());
+    return std::make_unique<TestHandler>();
   }
 };
 } /* namespace redgiant */

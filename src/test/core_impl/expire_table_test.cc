@@ -168,7 +168,7 @@ protected:
   }
 
   virtual std::unique_ptr<BTreeExpireTable<int, int>> create_case_empty() {
-    return std::unique_ptr<BTreeExpireTable<int, int>>(new BTreeExpireTable<int, int>());
+    return std::make_unique<BTreeExpireTable<int, int>>();
   }
 
   template <typename K, typename V>

@@ -99,8 +99,8 @@ auto SequentialPostingList<DocId, Weight>::create_reader(std::shared_ptr<PList> 
 -> std::unique_ptr<Reader> {
   // the parameters of reader constructor are pointers to the internal vector and upper bound weight,
   // these pointers shares the life time with posting_list so that they are always valid as long as the reader valid.
-  return std::unique_ptr<Reader>(new SequentialPostingListReader<DocId, Weight>(posting_, upper_bound_,
-      std::move(shared_list)));
+  return std::make_unique<SequentialPostingListReader<DocId, Weight>>(posting_, upper_bound_,
+      std::move(shared_list));
 }
 
 template <typename DocId, typename Weight>
@@ -116,15 +116,15 @@ public:
   virtual ~SequentialPostingListFactory() = default;
 
   virtual std::shared_ptr<PList> create_posting_list() const {
-    return std::shared_ptr<PList>(new SequentialPostingList<DocId, Weight>());
+    return std::make_shared<SequentialPostingList<DocId, Weight>>();
   }
 
   virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByVal> reader) const {
-    return std::shared_ptr<PList>(new SequentialPostingList<DocId, Weight>(*reader));
+    return std::make_shared<SequentialPostingList<DocId, Weight>>(*reader);
   }
 
   virtual std::shared_ptr<PList> create_posting_list(std::unique_ptr<ReaderByRef> reader) const {
-    return std::shared_ptr<PList>(new SequentialPostingList<DocId, Weight>(*reader));
+    return std::make_shared<SequentialPostingList<DocId, Weight>>(*reader);
   }
 };
 } /* namespace redgiant */

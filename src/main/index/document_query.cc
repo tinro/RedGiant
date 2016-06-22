@@ -15,7 +15,7 @@ DocumentQuery::DocumentQuery(const QueryRequest& request, const IntermQuery& int
 
   for (const auto& term_pair : interm_query.get_features()) {
     doc_queries_.push_back(std::make_pair(term_pair.first,
-        std::unique_ptr<ConcreteDocQuery>(new ConcreteDocQuery(term_pair.second))));
+        std::make_unique<ConcreteDocQuery>(term_pair.second)));
   }
 }
 
