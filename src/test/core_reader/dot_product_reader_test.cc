@@ -55,13 +55,11 @@ protected:
 
 private:
   std::unique_ptr<DotProductReader<int, int, int>> create_case_1(int query) {
-    std::unique_ptr<PostingListReader<int, int>> raw_reader (
-        new MockReader<int, int>({ // upper bound: 8
+    auto raw_reader = std::make_unique<MockReader<int, int>>({ // upper bound: 8
           {1, 8}, {2, 2}, {5, 4}, {8, 4}, {10, 2}
-        }));
+        });
 
-    return std::unique_ptr<DotProductReader<int, int, int>> (
-        new DotProductReader<int, int, int>(std::move(raw_reader), query));
+    return std::make_unique<DotProductReader<int, int, int>>(std::move(raw_reader), query);
   }
 };
 

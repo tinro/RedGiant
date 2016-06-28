@@ -156,18 +156,16 @@ private:
   }
 
   std::shared_ptr<PostingList<int, int>> create_case_1() {
-    std::unique_ptr<PostingListReader<int, int>> raw_reader (
-        new MockReader<int, int>({ // upper bound: 8
+    auto raw_reader = std::make_unique<MockReader<int, int>>({ // upper bound: 8
           {1, 8}, {2, 2}, {5, 4}, {8, 4}, {10, 2}
-        }));
+        });
     return create_factory()->create_posting_list(std::move(raw_reader));
   }
 
   std::shared_ptr<PostingList<int, MockWeight>> create_case_2() {
-    std::unique_ptr<PostingListReader<int, MockWeight>> raw_reader (
-        new MockReader<int, MockWeight>({ // upper bound: {9, 8}
+    auto raw_reader = std::make_unique<MockReader<int, MockWeight>>({ // upper bound: {9, 8}
           {1, {2, 5}}, {2, {3, 7}}, {5, {1, 8}}, {8, {9, 2}}, {10, {3, 1}}
-        }));
+        });
     return create_factory_weight()->create_posting_list(std::move(raw_reader));
   }
 };

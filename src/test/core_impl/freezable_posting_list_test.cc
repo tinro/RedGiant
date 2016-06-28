@@ -121,10 +121,10 @@ private:
   }
 
   std::shared_ptr<FreezablePostingList<int, int>> create_case_1() {
-    std::unique_ptr<PostingListReader<int, int>> raw_reader (
-        new MockReader<int, int>({ // upper bound: 8
+    auto raw_reader = std::make_unique<MockReader<int, int>>(
+        MockReader<int, int>::PostingVec { // upper bound: 8
           {1, 8}, {2, 2}, {5, 4}, {8, 4}, {10, 2}
-        }));
+        });
     // create with a factory and an existing instance
     return std::make_shared<FreezablePostingList<int, int>>(*create_factory(), std::move(raw_reader));
   }

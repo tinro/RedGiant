@@ -68,8 +68,8 @@ int Server::initialize() {
     for (auto& factory: routes_) {
       route_map.emplace(factory.first, factory.second->create_handler());
     }
-    std::shared_ptr<ServerInstance> instance(new ServerInstance(
-        fd_, notify_fd_[0], max_req_per_thread_, std::move(route_map)));
+    auto instance = std::make_shared<ServerInstance>(
+        fd_, notify_fd_[0], max_req_per_thread_, std::move(route_map));
     ret = instance->initialize(i);
     if (ret < 0) {
       break;

@@ -138,7 +138,7 @@ private:
   }
 
   std::unique_ptr<QueryRequest> mock_request_1(FeatureSpaceManager& feature_spaces) {
-    std::unique_ptr<QueryRequest> req(new QueryRequest("0001", 10, "default_a", StopWatch(), true));
+    auto req = std::make_unique<QueryRequest>("0001", 10, "default_a", StopWatch(), true);
     req->add_feature_vector(FeatureVector(feature_spaces.get_space("category_inferred"), {
         {"123", 1.0},
         {"456", 2.0},

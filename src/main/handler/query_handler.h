@@ -38,9 +38,8 @@ public:
   virtual ~QueryHandlerFactory() = default;
 
   virtual std::unique_ptr<RequestHandler> create_handler() {
-    return std::unique_ptr<RequestHandler>(
-        new QueryHandler(parser_factory_->create_parser(),
-            executor_factory_->create_executor()));
+    return std::make_unique<QueryHandler>(parser_factory_->create_parser(),
+            executor_factory_->create_executor());
   }
 
 private:

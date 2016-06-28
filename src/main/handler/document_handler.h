@@ -43,8 +43,7 @@ public:
   virtual ~FeedDocumentHandlerFactory() = default;
 
   virtual std::unique_ptr<RequestHandler> create_handler() {
-    return std::unique_ptr<RequestHandler>(
-        new DocumentHandler(parser_factory_->create_parser(), index_view_, default_ttl_));
+    return std::make_unique<DocumentHandler>(parser_factory_->create_parser(), index_view_, default_ttl_);
   }
 
 private:

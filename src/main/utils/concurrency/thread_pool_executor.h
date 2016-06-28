@@ -112,7 +112,7 @@ public:
     if (executors_.empty()) {
       for (size_t i = 0; i < thread_num_; ++i) {
         // create an executor with the id and reference to the message queue;
-        std::unique_ptr<ThreadExecutor<RunnableJob>> executor(new ThreadExecutor<RunnableJob>(i, queue_));
+        auto executor = std::make_unique<ThreadExecutor<RunnableJob>>(i, queue_);
         executor->start();
         executors_.push_back(std::move(executor));
       }

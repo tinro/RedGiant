@@ -42,8 +42,7 @@ BaseIndexImpl<DocTraits>::BaseIndexImpl(size_t initial_buckets, Loader&& loader)
     loader.load(term_id);
     // create a reader from the snapshot, and then create the posting list from the reader
     index_[term_id] = factory_->create_posting_list(
-        std::unique_ptr<PostingListReader<DocId, TermWeight>>(
-            new SnapshotReader<DocId, TermWeight>(loader)));
+        std::make_unique<SnapshotReader<DocId, TermWeight>>(loader));
   }
 }
 

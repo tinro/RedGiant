@@ -183,8 +183,7 @@ private:
 
   // output score is long
   std::unique_ptr<PostingListQuery<int, long, const int&>> create_query(long x) {
-    return std::unique_ptr<PostingListQuery<int, long, const int&>>(
-        new DotProductQuery<int, long, const int&>(x));
+    return std::make_unique<DotProductQuery<int, long, const int&>>(x);
   }
 };
 

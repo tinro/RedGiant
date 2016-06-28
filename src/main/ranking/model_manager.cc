@@ -59,7 +59,7 @@ std::unique_ptr<RankingModel> ModelManagerFactory::create_model(const rapidjson:
     return nullptr;
   }
 
-  std::unique_ptr<ModelManager> mm(new ModelManager());
+  auto mm = std::make_unique<ModelManager>();
   const char* default_model = json_get_str(config, "default_model");
   if (default_model && default_model[0]) {
     mm->set_default_model_name(default_model);
